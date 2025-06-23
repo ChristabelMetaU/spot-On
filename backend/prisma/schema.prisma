@@ -1,0 +1,41 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id Int  @id @default(autoincrement())
+  email String @unique
+  password_hash String
+  role String
+  created_at DateTime @default(now())
+  report reports[]
+}
+
+model spots{
+  id Int @id @default(autoincrement())
+  lot_name String @unique
+  coord_lat Float
+  coord_lng Float
+  type String
+  report reports[]
+
+}
+
+
+model reports{
+  id Int @id @default(autoincrement())
+  status Boolean
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  user Users @relation(fields: [user_id], references: [id])
+  spot spots @relation(fields: [spot_id], references: [id])
+  user_id Int
+  spot_id Int
+
+}
