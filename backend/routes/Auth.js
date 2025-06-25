@@ -13,20 +13,17 @@ router.post('/signup', async (req, res) => {
         if (!username || !password || !email) {
             return res.status(400).json({ error: "Username and password are required." });
         }
-        const result = await validateEmail(email);
-        if (!result.valid) {
+        const isValid = await validateEmail(email);
+        if (!isValid) {
             return res.status(400).json({ error: "Invalid email address." });
-        }else if(!result.isSchoolEmail){
-            return res.status(400).json({ error: "Email must be a valid school email" })
         }
         if (password.length < 8) {
-            return res.status(400).json({ error: "Password must be at least 8 characters long." });
+            return res.status(401).json({ error: "Password must be at least 8 characters long." });
         }
         const newUser = await prisma.users.create({
-            data: { username, password: hashedPassword, email, role}
+            data: { username, password_hash: hashedPassword, email, role}
         });
-       req.session.id = newUser.id;
-       res.status(201).json({ token, message: "User created successfully!", user:{id:newUser.id, username:newUser.username, email: newUser.email} });
+       res.status(201).json({ message: "User created successfully!", user:{id:newUser.id, username:newUser.username, email: newUser.email} });
     } catch (error) {
         return res.status(500).json({ error: "Something went wrong." });
     }
@@ -46,15 +43,12 @@ router.post('/Login',  async (req, res) =>{
         if (!user) {
             return res.status(400).json({ error: "Email not found, try again." });
         }
-        const isValidPassword = await bcrypt.compare(password, user.password);
+        const isValidPassword = await bcrypt.compare(password, user.password_hash);
         if (!isValidPassword) {
             return res.status(400).json({ error: "Invalid password" });
 
         }
-
-       req.session.id = user.id;
-       req.session.user = { id: user.id, username: user.username, email: user.email };
-        res.status(200).json({ token, message: "Login successful!", user:{id:user.id, username:user.username, email: user.email} });
+        res.status(200).json({ message: "Login successful!", user:{id:user.id, username:user.username, email: user.email} });
    } catch (error) {
        return res.status(500).json({ error: "Something went wrong, try again Later." });
    }
@@ -74,7 +68,7 @@ router.get('/me', async (req, res) => {
             where: { id: req.session.id },
             select: { username: true }
         });
-
+        if (!user) return res.status(401).json({ error: "user not lodded in" });
         if (!req.session.user) {
             return res.status(401).json({ error: "Unauthorized" });
         }
