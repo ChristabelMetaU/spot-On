@@ -8,13 +8,19 @@ const connectRedis =  require('connect-redis');
 const redis = require('redis');
 dotenv.config();
 
+app.use(cors(
+    {
+    origin: process.env.FRONTEND_URL,
+    optionsSuccessStatus: 200,
+    credentials: true}
+))
+
 app.use(express.json());
 app.use('/auth', auth);
 
-
 const RedisStore = connectRedis.RedisStore;
 const redisClient = redis.createClient({ url: process.env.REDIS_URL });
-redisClient.connect().catch(console.error);
+redisClient.connect();
 const store = new RedisStore({
     client: redisClient,
     prefix: "spotonspoton"
@@ -32,17 +38,8 @@ app.use(session({
     }
 }))
 
-app.use(cors({
-    origin: process.env.FRONTEND_URL,
-    credentials: true,
-}))
 
-app.get('/spots', (req, res) => {
-    //Todo
-    //check if session is valid before returning data
-    //if (!req.session.user) {
-})
 const PORT = process.env.PORT || 9000;
 app.listen(PORT, ()=>{
-    console.log(`Port running on ${PORT}`);
+    console.log();
 })

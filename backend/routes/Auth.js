@@ -1,6 +1,8 @@
 let router = require('express').Router();
 let validateEmail = require('../utils/validateEmail')
 const bcrypt = require("bcryptjs");
+const cors = require('cors');
+
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
@@ -51,6 +53,7 @@ router.post('/Login',  async (req, res) =>{
         }
 
        req.session.id = user.id;
+       req.session.user = { id: user.id, username: user.username, email: user.email };
         res.status(200).json({ token, message: "Login successful!", user:{id:user.id, username:user.username, email: user.email} });
    } catch (error) {
        return res.status(500).json({ error: "Something went wrong, try again Later." });
@@ -63,5 +66,21 @@ router.get('/logout', (req, res) => {
         res.clearCookie('connect.sid');
         res.status(200).json({ message: "Logout successful!" });
     });
+})
+
+router.get('/me', async (req, res) => {
+    if (req.session) {
+        const user = await prisma.users.findUnique({
+            where: { id: req.session.id },
+            select: { username: true }
+        });
+
+        if (!req.session.user) {
+            return res.status(401).json({ error: "Unauthorized" });
+        }
+        res.status(200).json({ message: "User logged in", user });
+    }else{
+        res.status(401).json({ error: "User not logged in  " });
+    }
 })
 module.exports = router;
