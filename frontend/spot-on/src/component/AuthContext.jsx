@@ -19,12 +19,12 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    const res = await fetch("http://localhost:3000/auth/login", {
+    const res = await fetch('http://localhost:3000/auth/Login', {
       method: "POST",
-      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({ email, password }),
     });
 
@@ -33,15 +33,14 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  const signUp = async (username, email, password) => {
-    const res = await fetch("http://localhost:3000/auth/signup", {
+  const signUp = async (username, email, password, role) => {
+    const res = await fetch('http://localhost:3000/auth/signup', {
       method: "POST",
-      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ username, email, password }),
-
+      credentials: "include",
+      body: JSON.stringify({ username, email, password, role }),
     });
     const data = await res.json();
     if (data.user) setUser(data.user);
