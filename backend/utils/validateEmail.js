@@ -23,7 +23,6 @@ const validateEmail = async (email) => {
         }
         return {isSchoolEmail: false, valid: true};
     } catch (error) {
-        console.log(error);
         return {isSchoolEmail: false, valid: false};
     }
 }
