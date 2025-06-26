@@ -1,16 +1,3 @@
-body.welcome-page{
-  min-height: 100vh;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background: linear-gradient(135deg, #f5ecc4 0%, #f0def0 100%);
-  text-align: center;
-  padding: 2rem;
-
-}
 
 .welcome-page h1{
   font-size: 3rem;

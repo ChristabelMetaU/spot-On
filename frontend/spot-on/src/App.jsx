@@ -4,6 +4,7 @@ import Login from './pages/Login'
 import Home from './pages/Home'
 import SignUp from './pages/SignUp'
 import Loading from './component/Loading'
+import Profile from './pages/Profile'
 import Welcome from './pages/Welcome'
 import { AuthProvider } from './component/AuthContext'
 import { useAuth } from './component/AuthContext'
@@ -16,15 +17,18 @@ function ProtectedRoute({children}) {
 function AppRoutes() {
   const { user } = useAuth();
   return (
-   <div>
-      <Loading />
+   <>
+        <Loading />
       <Routes>
         <Route path="/Welcome" element={!user?<Welcome/>: <Navigate to='/' />} />
         <Route path="/SignUp" element={!user?<SignUp />:<Navigate to='/'/>} />
         <Route path="/Login" element={!user ? <Login />: <Navigate to='/'/>} />
         <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+        <Route path="/Profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+
     </Routes>
-   </div>
+   </>
+
   )
 }
 
