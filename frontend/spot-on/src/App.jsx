@@ -25,7 +25,6 @@ function AppRoutes() {
         <Route path="/Login" element={!user ? <Login />: <Navigate to='/'/>} />
         <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
         <Route path="/Profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-
     </Routes>
    </>
 
