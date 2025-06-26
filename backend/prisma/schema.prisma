@@ -23,7 +23,7 @@ model spots{
   lot_name String @unique
   coord_lat Float
   coord_lng Float
-  type String
+  isOccupied Boolean @default(false)
   report reports[]
 
 }

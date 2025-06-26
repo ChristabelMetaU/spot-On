@@ -1,0 +1,25 @@
+
+.btn-nav {
+    padding: 0.75rem;
+    margin: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(45deg, #ff6a00 0%, #ee0979 100%);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.
+}
+
+.default, .report-btn {
+    background-color:#ee0979;
+    padding: 0.75rem;
+    margin: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
