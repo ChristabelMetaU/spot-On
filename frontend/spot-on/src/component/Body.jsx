@@ -5,17 +5,25 @@ import redDot from "../assets/redDot.jpg";
 import greenDot from "../assets/greenDot.jpg";
 const containerStyle = {
   width: "100%",
-  height: "300px",
+  height: "100%",
+  position: "relative",
+  flex: "1 1 50%",
 };
 
 const center = { lat: 35.8486, lng: -86.3669 };
 const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_KEY;
-const Body = ({ spots, setSpots, setSelectedSpot, setShowModal }) => {
+const Body = ({
+  spots,
+  setSpots,
+  setSelectedSpot,
+  setShowModal,
+  setActive,
+}) => {
   const handleMapClick = async (e) => {
     const newSpot = {
-      lot_name: `Lot ${spots.length + 1}`,
-      coord_lat: e.latLng.lat(),
-      coord_lng: e.latLng.lng(),
+      lotName: `SPOT ${spots.length + 1}`,
+      coordLat: e.latLng.lat(),
+      coordLng: e.latLng.lng(),
       isOccupied: false,
     };
 
@@ -28,7 +36,7 @@ const Body = ({ spots, setSpots, setSelectedSpot, setShowModal }) => {
         body: JSON.stringify(newSpot),
       });
       if (!response.ok) {
-        throw new Error("Error adding new spot");
+        throw new Error("Error now adding new spot");
       }
       const savedSpot = await response.json();
       setSpots([...spots, savedSpot]);
@@ -36,12 +44,13 @@ const Body = ({ spots, setSpots, setSelectedSpot, setShowModal }) => {
       throw new Error("Error adding new spot");
     }
   };
-  const displaySpotInfo = (spot) => {
+  const displaySpotInfo = (spot, i) => {
     setShowModal(true);
     setSelectedSpot(spot);
+    setActive({ spot, idx: i });
   };
   return (
-    <main>
+    <section className="map-container">
       <LoadScript googleMapsApiKey={googleMapsApiKey}>
         <GoogleMap
           mapContainerStyle={containerStyle}
@@ -49,21 +58,21 @@ const Body = ({ spots, setSpots, setSelectedSpot, setShowModal }) => {
           zoom={17}
           onDblClick={handleMapClick}
         >
-          {spots.map((spot) => (
+          {spots.map((spot, i) => (
             <Marker
               key={spot.id}
-              position={{ lat: spot.coord_lat, lng: spot.coord_lng }}
+              position={{ lat: spot.coordLat, lng: spot.coordLng }}
               icon={{
                 url: spot.isOccupied ? { greenDot } : { redDot },
               }}
               onClick={() => {
-                displaySpotInfo(spot);
+                displaySpotInfo(spot, i);
               }}
             />
           ))}
         </GoogleMap>
       </LoadScript>
-    </main>
+    </section>
   );
 };
 

@@ -20,9 +20,9 @@ model Users {
 
 model spots{
   id Int @id @default(autoincrement())
-  lot_name String @unique
-  coord_lat Float
-  coord_lng Float
+  lotName String @unique
+    coordLat Float
+    coordLng Float
   isOccupied Boolean @default(false)
   report reports[]
 

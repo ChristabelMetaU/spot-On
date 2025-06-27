@@ -1,25 +1,109 @@
+/** @format */
 
-.btn-nav {
-    padding: 0.75rem;
-    margin: 1rem;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #fff;
-  background: linear-gradient(45deg, #ff6a00 0%, #ee0979 100%);
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.
+:root {
+  --primary-gradient: linear-gradient(135deg, #f5f4f2 0%, #e3e7ef 100%);
+  --header-bg: #1c2e46;
+  --nav-bg: #dcdee5;
+  --nav-color: #1c2e46;
+  --btn-color: #1c2e46;
+  --footer-color: #1c2e46;
+  --btn-radius: 0.5rem;
+  --spacing: 1rem;
 }
 
-.default, .report-btn {
-    background-color:#ee0979;
-    padding: 0.75rem;
-    margin: 1rem;
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: var(--header-bg);
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: space-between;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.site-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--nav-bg);
+}
+
+.site-nav {
+  margin-top: calc((var(--spacing) * 2) + 2rem);
+  text-align: center;
+  width: 100%;
+  background: var(--nav-bg);
+  color: var(--nav-bg);
+  padding: var(--spacing) 0;
+}
+
+.site-nav button {
+  background: transparent;
+  border: 2px solid #fff;
+  background-color: var(--btn-color);
   font-size: 1rem;
-  font-weight: 600;
+  padding: 0.5rem 1.25rem;
+  margin: 0 0.5rem;
+  border-radius: var(--btn-radius);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+}
+
+.site-nav button:hover {
+  background: #fff;
+  color: var(--nav-color);
+}
+.site-nav .default {
+  background: #fff;
+  color: var(--nav-color);
+}
+.site-main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing);
+  padding: var(--spacing) 2rem;
+  margin-top: 1rem;
+  min-height: calc(100vh - 200px);
+}
+.map-container {
+  flex: 1 1 600px;
+  min-height: 400px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  background: #fff;
+}
+.reserve-container {
+  flex: 1 1 45%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.report-btn {
+  background: var(--nav-color);
   color: #fff;
   border: none;
-  border-radius: 8px;
+  padding: 1rem 2rem;
+  border-radius: var(--btn-radius);
+  font-size: 1.1rem;
   cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s;
+}
+
+.report-btn:hover {
+  transform: translateY(-3px);
+}
+
+.site-footer {
+  background: var(--footer-color);
+  color: white;
+  text-align: center;
+  padding: var(--spacing);
+  margin-top: auto;
 }
