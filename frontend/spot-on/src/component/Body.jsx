@@ -1,8 +1,5 @@
 /** @format */
-
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import redDot from "../assets/redDot.jpg";
-import greenDot from "../assets/greenDot.jpg";
 const containerStyle = {
   width: "100%",
   height: "100%",
@@ -63,7 +60,9 @@ const Body = ({
               key={spot.id}
               position={{ lat: spot.coordLat, lng: spot.coordLng }}
               icon={{
-                url: spot.isOccupied ? { greenDot } : { redDot },
+                url: spot.isOccupied
+                  ? "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+                  : "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
               }}
               onClick={() => {
                 displaySpotInfo(spot, i);

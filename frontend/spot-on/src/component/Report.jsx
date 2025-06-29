@@ -1,9 +1,37 @@
 /** @format */
 import { useState } from "react";
-const Report = () => {
+const Report = ({ spots }) => {
+  const [searchKeyword, setSearchKeyword] = useState("");
   const [showReportForm, setShowReportForm] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
+  const [showResults, setShowResults] = useState(false);
   const handleShowReportForm = () => {
     setShowReportForm(!showReportForm);
+  };
+  const fetchLots = async (value) => {
+    const searchedSpots = spots.filter((spot) => {
+      return spot.lotName.toLowerCase().includes(value.toLowerCase());
+    });
+    setSearchResults(searchedSpots);
+    setShowResults(value.length > 0);
+  };
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchKeyword(value);
+    fetchLots(value);
+  };
+  const handleInputFocus = (e) => {
+    setShowResults(searchKeyword.length > 0);
+  };
+  const handleBlur = () => {
+    setTimeout(() => {
+      setShowResults(false);
+    }, 100);
+  };
+  const handleResultClick = (result) => {
+    setSearchKeyword(result.lotName);
+    setShowResults(false);
+    setSearchResults([]);
   };
   return (
     <div className="reserve-container">
@@ -15,12 +43,32 @@ const Report = () => {
           <form className="modal-content">
             <h2>Report Parking spot </h2>
             <p>Help others find parking</p>
-            <input
-              type="text"
-              name="spot"
-              placeholder="Search for Parking spot"
-              className="spot-search"
-            />
+            <div className="search-container">
+              <input
+                type="text"
+                name="spot"
+                placeholder="Search for Parking spot"
+                value={searchKeyword}
+                onChange={handleSearch}
+                onBlur={handleBlur}
+                onFocus={handleInputFocus}
+                className="spot-search"
+              />
+              {showResults && (
+                <ul>
+                  {searchResults.map((result) => {
+                    return (
+                      <li
+                        key={result.id}
+                        onClick={() => handleResultClick(result)}
+                      >
+                        {result.lotName}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
             <div className="spotOccupied-btns">
               <button className="spot-free">Available</button>
               <button className="spot-taken">Occupied</button>
