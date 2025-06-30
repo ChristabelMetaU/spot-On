@@ -1,0 +1,131 @@
+/** @format */
+
+.profile {
+  max-width: 600px;
+  margin: 2rem auto;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+.profile-stats {
+  padding: 1.5rem;
+}
+.profile i.fa-arrow-left {
+  color: #ffffff;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.profie-picture img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 2px solid #2e3b55;
+  box-shadow: 0 2px8px rgba(0, 0, 0, 0.1);
+}
+.profile-user {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.profile i.fa-arrow-left:hover {
+  transform: translateX(-7px);
+}
+.profile-head {
+  background-color: #1f2a3d;
+  border-bottom: 2px solid #e0e0e0;
+  padding: 1rem;
+}
+.user-info {
+  margin-bottom: 2rem;
+  width: 100%;
+  padding-bottom: 1rem;
+}
+
+.user-info h1,
+.user-info p {
+  margin-top: 1em;
+  margin-bottom: 0;
+  color: #ffffff;
+}
+.role {
+  border: 1px solid #e0e0e0;
+  /* opacity: 0.5; */
+  display: inline-block;
+  border-radius: 15px;
+  padding-top: 0.5px;
+  padding-bottom: 1px;
+  padding-right: 10px;
+  padding-left: 10px;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.profile-stats p {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+.profile-report {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  background: #f5f7fa;
+  border-radius: 8px;
+
+  overflow-x: scroll;
+  overflow-y: scroll;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+}
+.profile-report h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: #2e3b55;
+}
+.profile-report p {
+  font-size: 0.95rem;
+  color: #444;
+  line-height: 1.4;
+}
+.profile-report,
+.show-more {
+  display: inline-block;
+  margin-top: 0.5rem;
+  margin-right: 1rem;
+  text-align: center;
+  cursor: pointer;
+  color: #4a90e9;
+  font-weight: 500;
+}
+
+.show-more:hover {
+  text-decoration: underline;
+}
+.legend {
+  border-top: 2px solid #e0e0e0;
+}
+.log-out {
+  padding: 1.5rem;
+}
+button {
+  display: inline-block;
+  background: #2e3b55;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: #1f2a3d;
+}
+h2 {
+  color: #888;
+  margin-top: 1.5rem;
+  text-align: center;
+  font-weight: 400;
+}

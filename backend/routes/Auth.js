@@ -30,16 +30,14 @@ router.post("/signup", async (req, res) => {
       data: { username, password_hash: hashedPassword, email, role },
     });
     req.session.userId = newUser.id;
-    res
-      .status(201)
-      .json({
-        message: "User created successfully!",
-        user: {
-          id: newUser.id,
-          username: newUser.username,
-          email: newUser.email,
-        },
-      });
+    res.status(201).json({
+      message: "User created successfully!",
+      user: {
+        id: newUser.id,
+        username: newUser.username,
+        email: newUser.email,
+      },
+    });
   } catch (error) {
     return res.status(500).json({ error: "Something went wrong." });
   }
@@ -64,12 +62,10 @@ router.post("/Login", async (req, res) => {
     if (!isValidPassword) {
       return res.status(400).json({ error: "Invalid password" });
     }
-    res
-      .status(200)
-      .json({
-        message: "Login successful!",
-        user: { id: user.id, username: user.username, email: user.email },
-      });
+    res.status(200).json({
+      message: "Login successful!",
+      user: { id: user.id, username: user.username, email: user.email },
+    });
   } catch (error) {
     return res
       .status(500)
@@ -96,6 +92,8 @@ router.get("/me", async (req, res) => {
       select: {
         id: true,
         username: true,
+        email: true,
+        role: true,
       },
     });
     if (!user) return res.status(401).json({ error: "user not logged in" });
