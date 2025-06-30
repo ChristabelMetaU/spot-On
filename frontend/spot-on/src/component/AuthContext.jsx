@@ -1,25 +1,30 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+/** @format */
+
+import { createContext, useContext, useState, useEffect } from "react";
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     try {
-        fetch("http://localhost:3000/auth/me", {
-            credentials: "include",
-          })
-            .then(res => res.json())
-            .then(data => {
-              if (data.user) setUser(data.user);
-            }).catch(setUser(null)).finally(() => setLoading(false));
+      fetch("http://localhost:3000/auth/me", {
+        credentials: "include",
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.user) setUser(data.user);
+        })
+        .catch(setUser(null))
+        .finally(() => setLoading(false));
     } catch (error) {
-        throw new Error(error);
+      throw new Error(error);
     }
   }, []);
 
   const login = async (email, password) => {
-    const res = await fetch('http://localhost:3000/auth/Login', {
+    const res = await fetch("http://localhost:3000/auth/Login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -34,7 +39,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const signUp = async (username, email, password, role) => {
-    const res = await fetch('http://localhost:3000/auth/signup', {
+    const res = await fetch("http://localhost:3000/auth/signup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -45,7 +50,7 @@ export const AuthProvider = ({ children }) => {
     const data = await res.json();
     if (data.user) setUser(data.user);
     return data;
-  }
+  };
 
   const logout = async () => {
     await fetch("http://localhost:3000/auth/logout", {
@@ -56,7 +61,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, signUp,logout, loading}}>
+    <AuthContext.Provider value={{ user, login, signUp, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

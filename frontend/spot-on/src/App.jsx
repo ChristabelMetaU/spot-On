@@ -8,7 +8,7 @@ import {
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
-import Loading from "./component/Loading";
+import Loading from "./component/FilterLoading";
 import UserProfile from "./pages/UserProfile";
 import Welcome from "./pages/Welcome";
 import { AuthProvider } from "./component/AuthContext";
@@ -22,7 +22,6 @@ function AppRoutes() {
   const { user } = useAuth();
   return (
     <>
-      <Loading />
       <Routes>
         <Route
           path="/Welcome"

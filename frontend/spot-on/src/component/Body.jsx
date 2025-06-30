@@ -1,5 +1,7 @@
 /** @format */
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import MapLoading from "./MapLoading";
+import { useAuth } from "./AuthContext";
 const containerStyle = {
   width: "100%",
   height: "100%",
@@ -17,6 +19,7 @@ const Body = ({
   setActive,
   activeFilters,
 }) => {
+  const { loading } = useAuth();
   const handleMapClick = async (e) => {
     const newSpot = {
       lotName: `East of Green House ${spots.length + 1}`,
@@ -57,27 +60,31 @@ const Body = ({
   return (
     <section className="map-container">
       <LoadScript googleMapsApiKey={googleMapsApiKey}>
-        <GoogleMap
-          mapContainerStyle={containerStyle}
-          center={center}
-          zoom={17}
-          onDblClick={handleMapClick}
-        >
-          {filtered.map((spot, i) => (
-            <Marker
-              key={spot.id}
-              position={{ lat: spot.coordLat, lng: spot.coordLng }}
-              icon={{
-                url: spot.isOccupied
-                  ? "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
-                  : "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
-              }}
-              onClick={() => {
-                displaySpotInfo(spot, i);
-              }}
-            />
-          ))}
-        </GoogleMap>
+        {loading ? (
+          <MapLoading />
+        ) : (
+          <GoogleMap
+            mapContainerStyle={containerStyle}
+            center={center}
+            zoom={17}
+            onDblClick={handleMapClick}
+          >
+            {filtered.map((spot, i) => (
+              <Marker
+                key={spot.id}
+                position={{ lat: spot.coordLat, lng: spot.coordLng }}
+                icon={{
+                  url: spot.isOccupied
+                    ? "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+                    : "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
+                }}
+                onClick={() => {
+                  displaySpotInfo(spot, i);
+                }}
+              />
+            ))}
+          </GoogleMap>
+        )}
       </LoadScript>
     </section>
   );
