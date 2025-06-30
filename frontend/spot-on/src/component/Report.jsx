@@ -1,10 +1,14 @@
 /** @format */
 import { useState } from "react";
-const Report = ({ spots }) => {
+const Report = ({ spots, handleReportSubmit, user }) => {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [showReportForm, setShowReportForm] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
+  const [occupied, setOccupied] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [spotType, setSpotType] = useState("");
+  const [description, setDescription] = useState("");
+  const [error, setError] = useState("");
   const handleShowReportForm = () => {
     setShowReportForm(!showReportForm);
   };
@@ -33,6 +37,32 @@ const Report = ({ spots }) => {
     setShowResults(false);
     setSearchResults([]);
   };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = {
+      spot_name: searchKeyword,
+      description: description,
+      type: spotType,
+      user_id: user.id,
+    };
+    const requiredData = {
+      spot_name: formData.spot_name,
+      typeof: formData.type,
+    };
+    const isEmptyField = Object.values(requiredData).some(
+      (val) => typeof val === "string" && val.trim() === ""
+    );
+    if (isEmptyField) {
+      setError("Please fill in all the fields");
+      return;
+    }
+    setError("");
+    setShowReportForm(false);
+    handleReportSubmit(formData, occupied);
+    setSearchKeyword("");
+    setSpotType("");
+    setDescription("");
+  };
   return (
     <div className="reserve-container">
       <button className="report-btn" onClick={handleShowReportForm}>
@@ -40,7 +70,7 @@ const Report = ({ spots }) => {
       </button>
       {showReportForm && (
         <div className="modal-overlay">
-          <form className="modal-content">
+          <form className="modal-content" onSubmit={handleSubmit}>
             <h2>Report Parking spot </h2>
             <p>Help others find parking</p>
             <div className="search-container">
@@ -69,25 +99,49 @@ const Report = ({ spots }) => {
                 </ul>
               )}
             </div>
+
             <div className="spotOccupied-btns">
-              <button className="spot-free">Available</button>
-              <button className="spot-taken">Occupied</button>
+              <button
+                className="spot-free"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setOccupied(false);
+                }}
+              >
+                Available
+              </button>
+              <button
+                className="spot-taken"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setOccupied(true);
+                }}
+              >
+                Occupied
+              </button>
             </div>
             <input
               type="text"
               name="spot"
               placeholder="Enter lot type"
               className="spot-type"
+              value={spotType}
+              onChange={(e) => setSpotType(e.target.value)}
             />
             <textarea
               id="description"
               className="description"
-              value={"Additional Information "}
+              value={description}
+              placeholder="Additional Information
+Example: Spot is close To the Gym"
+              onChange={(e) => setDescription(e.target.value)}
               rows={5}
               cols={50}
-              readOnly={true}
             />
-            <button className="close">Submit Report</button>
+            <p>{error}</p>
+            <button className="close" onClick={handleSubmit}>
+              Submit Report
+            </button>
             <button
               className="close"
               onClick={() => {

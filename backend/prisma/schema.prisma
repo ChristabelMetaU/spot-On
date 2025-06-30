@@ -31,12 +31,13 @@ model spots{
 
 model reports{
   id Int @id @default(autoincrement())
-  status Boolean
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
-  user Users @relation(fields: [user_id], references: [id])
-  spot spots @relation(fields: [spot_id], references: [id])
+  description String
+  type String
   user_id Int
-  spot_id Int
+  spot_name String
+   user Users @relation(fields: [user_id], references: [id])
+  spot spots @relation(fields: [spot_name], references: [lotName])
+  updated_at DateTime @default(now())
+   created_at DateTime @default(now())
 
 }

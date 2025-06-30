@@ -30,6 +30,47 @@ const Home = () => {
     };
     fetchSpots();
   }, [user, selectedSpot]);
+  const updateIsOccupied = async (updatedIsOccupied) => {
+    const response = await fetch(
+      `http://localhost:3000/map/spots/${selectedSpot.id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ isOccupied: updatedIsOccupied }),
+      }
+    );
+    const data = await response.json();
+    if (data.error) {
+      alert(data.error);
+      return;
+    }
+    setShowModal(false);
+    setSelectedSpot(data);
+    if (!data.isOccupied) {
+      setMessage(`${selectedSpot.lotName} is now marked as free.`);
+    } else {
+      setMessage(`${selectedSpot.lotName} is now marked as occupied.`);
+    }
+    setIsVisible(true);
+  };
+  const handleReportSubmit = async (formData, occupied) => {
+    const response = await fetch("http://localhost:3000/report/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+    const data = await response.json();
+    setIsVisible(true);
+    if (!data) {
+      setMessage("Something went wrong");
+    }
+    setMessage(data.message);
+    updateIsOccupied(occupied);
+  };
   return (
     <div className="Home">
       <Header />
@@ -43,16 +84,18 @@ const Home = () => {
           setActive={setActive}
         />
 
-        <Report spots={spots} />
+        <Report
+          spots={spots}
+          handleReportSubmit={handleReportSubmit}
+          user={user}
+        />
       </main>
       {showmodal && (
         <SpotModal
           setShowModal={setShowModal}
           spot={selectedSpot}
           spotIndex={active.idx}
-          setSelectedSpot={setSelectedSpot}
-          setMessage={setMessage}
-          setIsVisible={setIsVisible}
+          updateIsOccupied={updateIsOccupied}
         />
       )}
       {isVisible && <Message message={message} setIsVisible={setIsVisible} />}

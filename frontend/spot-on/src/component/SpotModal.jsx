@@ -2,14 +2,7 @@
 import React from "react";
 import { useState } from "react";
 import "../styles/Modal.css";
-const SpotModal = ({
-  spot,
-  setShowModal,
-  spotIndex,
-  setSelectedSpot,
-  setMessage,
-  setIsVisible,
-}) => {
+const SpotModal = ({ spot, setShowModal, spotIndex, updateIsOccupied }) => {
   const handleGetDirections = () => {
     const { coordLat, coordLng, lotName } = spot;
     const label = `${lotName} spot ${spotIndex + 1}`;
@@ -19,28 +12,7 @@ const SpotModal = ({
     window.open(url, "_blank");
     setShowModal(false);
   };
-  const updateIsOccupied = async (updatedIsOccupied) => {
-    const response = await fetch(`http://localhost:3000/map/spots/${spot.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ isOccupied: updatedIsOccupied }),
-    });
-    const data = await response.json();
-    if (data.error) {
-      alert(data.error);
-      return;
-    }
-    setShowModal(false);
-    setSelectedSpot(data);
-    if (!data.isOccupied) {
-      setMessage(`${spot.lotName} is now marked as free.`);
-    } else {
-      setMessage(`${spot.lotName} is now marked as occupied.`);
-    }
-    setIsVisible(true);
-  };
+
   return (
     <div>
       <div className="modal-overlay">

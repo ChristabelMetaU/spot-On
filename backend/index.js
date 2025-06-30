@@ -10,6 +10,7 @@ const connectRedis = require("connect-redis");
 const redis = require("redis");
 const map = require("./routes/Map");
 const spots = require("./routes/Spots");
+const reportRouter = require("./routes/Report");
 dotenv.config();
 
 app.use(
@@ -46,6 +47,6 @@ app.use(express.json());
 app.use("/auth", auth);
 app.use("/map", map);
 app.use("/spots", spots);
-
+app.use("/report", reportRouter);
 const PORT = process.env.PORT || 9000;
 app.listen(PORT);
