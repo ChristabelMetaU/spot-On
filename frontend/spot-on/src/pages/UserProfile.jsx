@@ -2,12 +2,13 @@
 import { useState, useEffect } from "react";
 import "../styles/Profile.css";
 import ProfileImg from "../assets/profileImg.jpg";
+import ProfileLoading from "../component/profileLoading";
 import { useAuth } from "../component/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 const UserProfile = () => {
   const navigate = useNavigate();
-  const { logout, user } = useAuth();
+  const { logout, user, loading } = useAuth();
   const [userReport, setUserReport] = useState([]);
   const [showFullText, setShowFullText] = useState(false);
   const limit = 5;
@@ -53,10 +54,13 @@ const UserProfile = () => {
           }}
         ></i>
         <div className="profile-user">
-          <div className="profie-picture">
-            {" "}
-            <img src={ProfileImg} alt="profile-img" />
-          </div>
+          {loading ? (
+            <ProfileLoading />
+          ) : (
+            <div className="profie-picture">
+              <img src={ProfileImg} alt="profile-img" />
+            </div>
+          )}
 
           <div className="user-info">
             <h1>{user.username}</h1>

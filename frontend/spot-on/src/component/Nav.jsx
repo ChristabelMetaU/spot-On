@@ -1,6 +1,8 @@
 /** @format */
 
 import { Link } from "react-router-dom";
+import FilterLoading from "./FilterLoading";
+import { useAuth } from "./AuthContext";
 import FilterToggles from "./FilterToggles";
 const Nav = ({
   showFilters,
@@ -8,11 +10,18 @@ const Nav = ({
   activeFilters,
   setActiveFilters,
 }) => {
-  // const [showFilters, setShowFilters] = useState(false);
+  const { loading } = useAuth();
   return (
     <nav className="site-nav">
       <Link to="/">
-        <button className={!showFilters ? "default" : "btn-nav"}>Map</button>
+        <button
+          className={!showFilters ? "default" : "btn-nav"}
+          onClick={() => {
+            setShowFilters((f) => !f);
+          }}
+        >
+          Map
+        </button>
       </Link>
       <button
         className={showFilters ? "default" : "btn-nav"}
@@ -25,14 +34,18 @@ const Nav = ({
       <Link to="/Profile">
         <button className="btn-nav">Profile</button>
       </Link>
-      {showFilters && (
-        <div className="nav-filters-container">
-          <FilterToggles
-            activeFilters={activeFilters}
-            setActiveFilters={setActiveFilters}
-          />
-        </div>
-      )}
+
+      {showFilters &&
+        (loading ? (
+          <FilterLoading />
+        ) : (
+          <div className="nav-filters-container">
+            <FilterToggles
+              activeFilters={activeFilters}
+              setActiveFilters={setActiveFilters}
+            />
+          </div>
+        ))}
     </nav>
   );
 };

@@ -31,7 +31,7 @@
 }
 
 .site-nav {
-  margin-top: calc((var(--spacing) * 2) + 2rem);
+  margin-top: calc((var(--spacing) * 1) + 0.1rem);
   text-align: center;
   width: 100%;
   background: var(--nav-bg);
