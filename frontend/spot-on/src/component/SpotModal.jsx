@@ -1,8 +1,13 @@
 /** @format */
-import React from "react";
-import { useState } from "react";
+import React, { useEffect } from "react";
 import "../styles/Modal.css";
-const SpotModal = ({ spot, setShowModal, spotIndex, updateIsOccupied }) => {
+const SpotModal = ({
+  spot,
+  setShowModal,
+  spotIndex,
+  handleReportSubmit,
+  id,
+}) => {
   const handleGetDirections = () => {
     const { coordLat, coordLng, lotName } = spot;
     const label = `${lotName} spot ${spotIndex + 1}`;
@@ -11,6 +16,15 @@ const SpotModal = ({ spot, setShowModal, spotIndex, updateIsOccupied }) => {
     )}`;
     window.open(url, "_blank");
     setShowModal(false);
+  };
+  const handleSubmit = (spot, isOccupied) => {
+    const formData = {
+      spot_name: spot.lotName,
+      description: "No description",
+      type: spot.type,
+      user_id: id,
+    };
+    handleReportSubmit(formData, isOccupied);
   };
 
   return (
@@ -21,16 +35,18 @@ const SpotModal = ({ spot, setShowModal, spotIndex, updateIsOccupied }) => {
           <div className="spotOccupied-btns">
             <button
               className="spot-free"
-              onClick={() => {
-                updateIsOccupied(false);
+              onClick={(e) => {
+                e.preventDefault();
+                handleSubmit(spot, false);
               }}
             >
               Confirm available
             </button>
             <button
               className="spot-taken"
-              onClick={() => {
-                updateIsOccupied(true);
+              onClick={(e) => {
+                e.preventDefault();
+                handleSubmit(spot, true);
               }}
             >
               Report occupied

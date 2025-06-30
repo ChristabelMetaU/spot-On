@@ -1,9 +1,14 @@
 /** @format */
 
 import { Link } from "react-router-dom";
-import { useState } from "react";
-const Nav = () => {
-  const [showFilters, setShowFilters] = useState(false);
+import FilterToggles from "./FilterToggles";
+const Nav = ({
+  showFilters,
+  setShowFilters,
+  activeFilters,
+  setActiveFilters,
+}) => {
+  // const [showFilters, setShowFilters] = useState(false);
   return (
     <nav className="site-nav">
       <Link to="/">
@@ -12,7 +17,7 @@ const Nav = () => {
       <button
         className={showFilters ? "default" : "btn-nav"}
         onClick={() => {
-          setShowFilters(!showFilters);
+          setShowFilters((f) => !f);
         }}
       >
         Filters
@@ -21,13 +26,11 @@ const Nav = () => {
         <button className="btn-nav">Profile</button>
       </Link>
       {showFilters && (
-        <div>
-          <h2>
-            Filters
-            <p>Green lot</p>
-            <p>Wkite lot</p>
-            <p>Red lot</p>
-          </h2>
+        <div className="nav-filters-container">
+          <FilterToggles
+            activeFilters={activeFilters}
+            setActiveFilters={setActiveFilters}
+          />
         </div>
       )}
     </nav>

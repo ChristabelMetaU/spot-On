@@ -15,10 +15,12 @@ const Body = ({
   setSelectedSpot,
   setShowModal,
   setActive,
+  activeFilters,
 }) => {
   const handleMapClick = async (e) => {
     const newSpot = {
-      lotName: `SPOT ${spots.length + 1}`,
+      lotName: `East of Green House ${spots.length + 1}`,
+      type: "green",
       coordLat: e.latLng.lat(),
       coordLng: e.latLng.lng(),
       isOccupied: false,
@@ -46,6 +48,12 @@ const Body = ({
     setSelectedSpot(spot);
     setActive({ spot, idx: i });
   };
+  const filtered = spots.filter((spot) => {
+    const types = spot.type.split(/\s+/);
+    const typeOk = types.some((t) => activeFilters[t.toLowerCase()]);
+    const occOk = spot.isOccupied ? activeFilters.occupied : activeFilters.free;
+    return typeOk && occOk;
+  });
   return (
     <section className="map-container">
       <LoadScript googleMapsApiKey={googleMapsApiKey}>
@@ -55,7 +63,7 @@ const Body = ({
           zoom={17}
           onDblClick={handleMapClick}
         >
-          {spots.map((spot, i) => (
+          {filtered.map((spot, i) => (
             <Marker
               key={spot.id}
               position={{ lat: spot.coordLat, lng: spot.coordLng }}

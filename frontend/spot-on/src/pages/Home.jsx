@@ -18,6 +18,15 @@ const Home = () => {
   const { user } = useAuth();
   const [selectedSpot, setSelectedSpot] = useState([]);
   const [showmodal, setShowModal] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [activeFilters, setActiveFilters] = useState({
+    red: true,
+    green: true,
+    white: true,
+    handicap: true,
+    free: true,
+    occupied: true,
+  });
   useEffect(() => {
     const fetchSpots = async () => {
       const response = await fetch("http://localhost:3000/map/spots");
@@ -74,7 +83,12 @@ const Home = () => {
   return (
     <div className="Home">
       <Header />
-      <Nav />
+      <Nav
+        showFilters={showFilters}
+        setShowFilters={setShowFilters}
+        activeFilters={activeFilters}
+        setActiveFilters={setActiveFilters}
+      />
       <main className="site-main">
         <Body
           spots={spots}
@@ -82,6 +96,7 @@ const Home = () => {
           setSelectedSpot={setSelectedSpot}
           setShowModal={setShowModal}
           setActive={setActive}
+          activeFilters={activeFilters}
         />
 
         <Report
@@ -95,7 +110,8 @@ const Home = () => {
           setShowModal={setShowModal}
           spot={selectedSpot}
           spotIndex={active.idx}
-          updateIsOccupied={updateIsOccupied}
+          handleReportSubmit={handleReportSubmit}
+          id={user.id}
         />
       )}
       {isVisible && <Message message={message} setIsVisible={setIsVisible} />}

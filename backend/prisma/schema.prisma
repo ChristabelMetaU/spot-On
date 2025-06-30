@@ -21,6 +21,7 @@ model Users {
 model spots{
   id Int @id @default(autoincrement())
   lotName String @unique
+  type String
     coordLat Float
     coordLng Float
   isOccupied Boolean @default(false)
