@@ -34,7 +34,7 @@ const SpotModal = ({
     }
     setShowModal(false);
     setSelectedSpot(data);
-    if (data.isOccupied) {
+    if (!data.isOccupied) {
       setMessage(`${spot.lotName} is now marked as free.`);
     } else {
       setMessage(`${spot.lotName} is now marked as occupied.`);
@@ -50,7 +50,7 @@ const SpotModal = ({
             <button
               className="spot-free"
               onClick={() => {
-                updateIsOccupied(true);
+                updateIsOccupied(false);
               }}
             >
               Confirm available
@@ -58,7 +58,7 @@ const SpotModal = ({
             <button
               className="spot-taken"
               onClick={() => {
-                updateIsOccupied(false);
+                updateIsOccupied(true);
               }}
             >
               Report occupied

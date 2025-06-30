@@ -29,7 +29,7 @@ const Home = () => {
       }
     };
     fetchSpots();
-  }, [user]);
+  }, [user, selectedSpot]);
   return (
     <div className="Home">
       <Header />
@@ -43,7 +43,7 @@ const Home = () => {
           setActive={setActive}
         />
 
-        <Report />
+        <Report spots={spots} />
       </main>
       {showmodal && (
         <SpotModal
