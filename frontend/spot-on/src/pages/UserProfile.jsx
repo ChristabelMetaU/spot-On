@@ -76,6 +76,7 @@ const UserProfile = () => {
           <div>
             {displayedReports.map((report) => (
               <div className="profile-report" key={report.id}>
+                <i class="fas fa-edit edit-icon"></i>
                 <h2>{report.spot_name}</h2>
                 <p>{report.lottype}</p>
                 <p>

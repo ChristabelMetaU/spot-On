@@ -8,7 +8,6 @@ import {
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
-import Loading from "./component/FilterLoading";
 import UserProfile from "./pages/UserProfile";
 import Welcome from "./pages/Welcome";
 import { AuthProvider } from "./component/AuthContext";

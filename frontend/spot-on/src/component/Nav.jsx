@@ -17,7 +17,7 @@ const Nav = ({
         <button
           className={!showFilters ? "default" : "btn-nav"}
           onClick={() => {
-            setShowFilters((f) => !f);
+            setShowFilters(false);
           }}
         >
           Map

@@ -1,4 +1,5 @@
 /** @format */
+/** @format */
 
 .profile {
   max-width: 600px;
@@ -125,7 +126,16 @@ button:hover {
 }
 h2 {
   color: #888;
-  margin-top: 1.5rem;
   text-align: center;
   font-weight: 400;
+}
+.profile-stats i {
+  color: #2e3b55;
+  display: flex;
+  justify-content: flex-end;
+  transition: ease-in-out 0.2s;
+}
+
+.profile-stats i:hover {
+  color: #00338b;
 }

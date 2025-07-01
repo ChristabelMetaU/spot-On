@@ -1,6 +1,6 @@
 /** @format */
 import { useState } from "react";
-const Report = ({ spots, handleReportSubmit, user }) => {
+const Report = ({ spots, handleReportSubmit, user, setSelectedSpot }) => {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [showReportForm, setShowReportForm] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
@@ -33,6 +33,7 @@ const Report = ({ spots, handleReportSubmit, user }) => {
     }, 100);
   };
   const handleResultClick = (result) => {
+    setSelectedSpot(result);
     setSearchKeyword(result.lotName);
     setShowResults(false);
     setSearchResults([]);
