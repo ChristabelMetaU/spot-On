@@ -24,9 +24,16 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
+.site-header img {
+  width: 5rem;
+  height: 5rem;
+  margin-right: 0.5rem;
+  border-radius: 30%;
+}
 .site-header h1 {
   margin: 0;
   font-size: 1.5rem;
+  margin-top: 1.5rem;
   color: var(--nav-bg);
 }
 
@@ -103,6 +110,6 @@
   background: var(--footer-color);
   color: white;
   text-align: center;
-  padding: var(--spacing);
+  padding: 2rem;
   margin-top: auto;
 }

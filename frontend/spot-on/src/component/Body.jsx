@@ -2,6 +2,7 @@
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import MapLoading from "./MapLoading";
 import { useAuth } from "./AuthContext";
+import { useState } from "react";
 const containerStyle = {
   width: "100%",
   height: "100%",
@@ -20,10 +21,12 @@ const Body = ({
   activeFilters,
 }) => {
   const { loading } = useAuth();
+  const [len, setLen] = useState(0);
   const handleMapClick = async (e) => {
+    setLen(len + 1);
     const newSpot = {
-      lotName: `East of Green House ${spots.length + 1}`,
-      type: "green",
+      lotName: `East of Gree spot ${len}`,
+      type: "white handicap",
       coordLat: e.latLng.lat(),
       coordLng: e.latLng.lng(),
       isOccupied: false,

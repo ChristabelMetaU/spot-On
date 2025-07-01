@@ -9,6 +9,7 @@ import Report from "../component/Report";
 import { useState, useEffect } from "react";
 import Message from "../component/Message";
 import SpotModal from "../component/SpotModal";
+
 import "../styles/Home.css";
 const Home = () => {
   const [spots, setSpots] = useState([]);
@@ -27,9 +28,39 @@ const Home = () => {
     free: true,
     occupied: true,
   });
+  const [userLocation, setUserLocation] = useState(null);
+  const [userLocationError, setUserLocationError] = useState(null);
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      setUserLocationError("Geolocation is not supported by your browser");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+      },
+      (error) => {
+        setUserLocationError(error.message);
+      },
+      { enableHighAccuracy: true }
+    );
+  }, []);
   useEffect(() => {
     const fetchSpots = async () => {
-      const response = await fetch("http://localhost:3000/map/spots");
+      if (!userLocation) {
+        return;
+      }
+      const { lat, lng } = userLocation;
+      if (!lat || !lng) {
+        return;
+      }
+      const response = await fetch(
+        `http://localhost:3000/map/spots?lat=${35.8465869577069}&lng=${-86.3668367808604}&radius=100`
+      );
       const data = await response.json();
       if (!data) {
         setSpots([]);
@@ -38,18 +69,16 @@ const Home = () => {
       }
     };
     fetchSpots();
-  }, [user, selectedSpot]);
-  const updateIsOccupied = async (updatedIsOccupied) => {
-    const response = await fetch(
-      `http://localhost:3000/map/spots/${selectedSpot.id}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ isOccupied: updatedIsOccupied }),
-      }
-    );
+  }, [user, userLocation, selectedSpot]);
+  const updateIsOccupied = async (Occupied) => {
+    const id = Number(selectedSpot.id);
+    const response = await fetch(`http://localhost:3000/map/spots/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ isOccupied: Occupied }),
+    });
     const data = await response.json();
     if (data.error) {
       alert(data.error);
@@ -103,6 +132,7 @@ const Home = () => {
           spots={spots}
           handleReportSubmit={handleReportSubmit}
           user={user}
+          setSelectedSpot={setSelectedSpot}
         />
       </main>
       {showmodal && (

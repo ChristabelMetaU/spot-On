@@ -1,14 +1,35 @@
 /** @format */
-
 const spotsRouter = require("express").Router();
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient, Prisma } = require("@prisma/client");
+const { haversineSQL } = require("../utils/Haversine.sql");
 const prisma = new PrismaClient();
-
 spotsRouter.get("/spots", async (req, res) => {
-  const spots = await prisma.spots.findMany();
-  if (!spots) {
-    return res.status(404).json({ message: "No spots found" });
+  const { lat, lng, radius } = req.query;
+  if (!lat || !lng || !radius) {
+    return res.status(400).json({ message: "Missing required parameters" });
   }
+  const latitude = parseFloat(lat);
+  const longitude = parseFloat(lng);
+  const rad = parseFloat(radius);
+
+  const degLat = rad / 111320;
+  const degLng = rad / (111320 * Math.cos(latitude * (Math.PI / 180)));
+
+  const minLat = latitude - degLat;
+  const maxLat = latitude + degLat;
+  const minLng = longitude - degLng;
+  const maxLng = longitude + degLng;
+  const spots = await prisma.$queryRaw`
+    SELECT * FROM  (
+    SELECT *, ${Prisma.raw(haversineSQL(latitude, longitude))} AS distance
+    FROM  "spots"
+    WHERE "coordLat" BETWEEN ${minLat} AND ${maxLat}
+    AND "coordLng" BETWEEN ${minLng} AND ${maxLng})
+    AS sub
+    WHERE distance <= ${rad}
+    ORDER BY distance
+    LIMIT 20;
+    `;
   res.json(spots);
 });
 
