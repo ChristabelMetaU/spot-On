@@ -137,3 +137,9 @@
   margin-top: 0;
   cursor: pointer;
 }
+.modal-content label {
+  font-size: 1.3rem;
+  font-weight: 300;
+  color: #1c2e46;
+  text-align: center;
+}

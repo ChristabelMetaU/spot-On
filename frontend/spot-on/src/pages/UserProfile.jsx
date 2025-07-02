@@ -5,7 +5,7 @@ import ProfileImg from "../assets/profileImg.jpg";
 import ProfileLoading from "../component/profileLoading";
 import { useAuth } from "../component/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { formatDistanceToNow } from "date-fns";
+import { getFormattedDate } from "../utils/getFormattedDate";
 const UserProfile = () => {
   const navigate = useNavigate();
   const { logout, user, loading } = useAuth();
@@ -15,17 +15,6 @@ const UserProfile = () => {
   const displayedReports = showFullText
     ? userReport
     : userReport.slice(0, limit);
-  const getFormattedDate = (timeStamp) => {
-    const date = new Date(timeStamp);
-    const now = new Date();
-    const diffrenceInms = now.getTime() - date.getTime();
-    const oneWeekInMs = 7 * 24 * 60 * 60 * 1000;
-    if (diffrenceInms < oneWeekInMs) {
-      return `${formatDistanceToNow(date, { addSuffix: true })}`;
-    } else {
-      return `on ${`format(date, 'do MMMM, yyyy')`}`;
-    }
-  };
   const displayReport = async () => {
     const response = await fetch(
       `http://localhost:3000/user/profile/${user.id}`
@@ -76,7 +65,7 @@ const UserProfile = () => {
           <div>
             {displayedReports.map((report) => (
               <div className="profile-report" key={report.id}>
-                <i class="fas fa-edit edit-icon"></i>
+                <i className="fas fa-edit edit-icon"></i>
                 <h2>{report.spot_name}</h2>
                 <p>{report.lottype}</p>
                 <p>

@@ -1,6 +1,7 @@
 /** @format */
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/Modal.css";
+import { getFormattedDate } from "../utils/getFormattedDate";
 const SpotModal = ({
   spot,
   setShowModal,
@@ -8,6 +9,7 @@ const SpotModal = ({
   handleReportSubmit,
   id,
 }) => {
+  const [spotReport, setSpotReport] = useState([]);
   const handleGetDirections = () => {
     const { coordLat, coordLng, lotName } = spot;
     const label = `${lotName} spot ${spotIndex + 1}`;
@@ -17,10 +19,21 @@ const SpotModal = ({
     window.open(url, "_blank");
     setShowModal(false);
   };
+
+  useEffect(() => {
+    const fetchSpotReports = async () => {
+      const response = await fetch(
+        `http://localhost:3000/report/spot/${spot.lotName}`
+      );
+      const data = await response.json();
+      setSpotReport(data);
+    };
+    fetchSpotReports();
+  }, [spot, setSpotReport]);
   const handleSubmit = (spot, isOccupied) => {
     const formData = {
       spot_name: spot.lotName,
-      description: "No description",
+      description: "Auto non description",
       type: spot.type,
       user_id: id,
     };
@@ -35,8 +48,7 @@ const SpotModal = ({
           <div className="spotOccupied-btns">
             <button
               className="spot-free"
-              onClick={(e) => {
-                e.preventDefault();
+              onClick={() => {
                 handleSubmit(spot, false);
               }}
             >
@@ -44,18 +56,29 @@ const SpotModal = ({
             </button>
             <button
               className="spot-taken"
-              onClick={(e) => {
-                e.preventDefault();
+              onClick={() => {
                 handleSubmit(spot, true);
               }}
             >
               Report occupied
             </button>
           </div>
+          <label>Spot's recent Activity </label>
           <textarea
             id="description"
             className="description"
-            value={"Recent Spot Activity\nTBA"}
+            value={
+              spotReport.length === 0
+                ? "No recent reports"
+                : spotReport
+                    .map(
+                      (report) =>
+                        `Report made ${getFormattedDate(
+                          report.created_at
+                        )} \n Description: ${report.description}`
+                    )
+                    .join("\n")
+            }
             onChange={(e) => setDescription(e.target.value)}
             rows={5}
             cols={50}

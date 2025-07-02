@@ -29,4 +29,22 @@ reportRouter.post("/create", async (req, res) => {
   }
 });
 
+//fetch report for a spot
+reportRouter.get("/spot/:name", async (req, res) => {
+  try {
+    const { name } = req.params;
+    const reports = await prisma.reports.findMany({
+      where: {
+        spot_name: name,
+      },
+    });
+    if (!reports) {
+      return res.status(404).json({ message: "Reports not found" });
+    }
+    res.json(reports);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 module.exports = reportRouter;
