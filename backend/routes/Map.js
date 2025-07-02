@@ -27,8 +27,7 @@ spotsRouter.get("/spots", async (req, res) => {
     AND "coordLng" BETWEEN ${minLng} AND ${maxLng})
     AS sub
     WHERE distance <= ${rad}
-    ORDER BY distance
-    LIMIT 20;
+    ORDER BY distance;
     `;
   res.json(spots);
 });
