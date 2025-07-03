@@ -75,6 +75,13 @@
   margin-top: 1rem;
   min-height: calc(100vh - 200px);
 }
+.map-title {
+  background-color: #1c2e46;
+  padding: 1rem;
+  color: #fff;
+  text-align: center;
+  font-size: 1.4rem;
+}
 .map-container {
   flex: 1 1 600px;
   min-height: 400px;
