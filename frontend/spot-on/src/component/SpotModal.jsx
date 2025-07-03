@@ -45,6 +45,23 @@ const SpotModal = ({
       <div className="modal-overlay">
         <div className="modal-content">
           <h2>{spot.lotName}</h2>
+
+          <div className="occupied">
+            <div className="occupied-status">
+              <div className={spot.isOccupied ? "red-dot" : "green-dot"}></div>
+              <p>{spot.isOccupied ? "Occupied" : "Available "}</p>
+            </div>
+            <div className="spot-update">
+              {spotReport.length > 0 ? <h3>Laat updated:</h3> : ""}
+              <p>
+                {spotReport.length > 0
+                  ? getFormattedDate(
+                      spotReport[spotReport.length - 1].updated_at
+                    )
+                  : ""}
+              </p>
+            </div>
+          </div>
           <div className="spotOccupied-btns">
             <button
               className="spot-free"
@@ -68,7 +85,8 @@ const SpotModal = ({
             id="description"
             className="description"
             value={
-              spotReport.length === 0
+              `Spot type: ${spot.type} \n` +
+              (spotReport.length === 0
                 ? "No recent reports"
                 : spotReport
                     .map(
@@ -77,7 +95,7 @@ const SpotModal = ({
                           report.created_at
                         )} \n Description: ${report.description}`
                     )
-                    .join("\n")
+                    .join("\n"))
             }
             onChange={(e) => setDescription(e.target.value)}
             rows={5}

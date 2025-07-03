@@ -121,14 +121,17 @@ const Report = ({ spots, handleReportSubmit, user, setSelectedSpot }) => {
                 Occupied
               </button>
             </div>
-            <input
-              type="text"
-              name="spot"
-              placeholder="Enter lot type"
+            <select
               className="spot-type"
               value={spotType}
               onChange={(e) => setSpotType(e.target.value)}
-            />
+            >
+              <option value=""> Select Lot Type</option>
+              <option value="Red"> Red</option>
+              <option value="Green"> Green</option>
+              <option value="White"> White</option>
+            </select>
+
             <textarea
               id="description"
               className="description"
@@ -139,7 +142,7 @@ Example: Spot is close To the Gym"
               rows={5}
               cols={50}
             />
-            <p>{error}</p>
+            <p className="error">{error}</p>
             <button className="close" onClick={handleSubmit}>
               Submit Report
             </button>
@@ -147,6 +150,10 @@ Example: Spot is close To the Gym"
               className="close"
               onClick={() => {
                 setShowReportForm(false);
+                setSearchKeyword("");
+                setSpotType("");
+                setDescription("");
+                setError("");
               }}
             >
               Cancel

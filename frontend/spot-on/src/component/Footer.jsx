@@ -3,7 +3,7 @@
 const Footer = () => {
   return (
     <div className="site-footer">
-      <p>footer</p>
+      <p>Copyright &copy;. 2025 SpotOn</p>
     </div>
   );
 };

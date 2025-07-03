@@ -59,7 +59,7 @@ const Home = () => {
         return;
       }
       const response = await fetch(
-        `http://localhost:3000/map/spots?lat=${35.8465869577069}&lng=${-86.3668367808604}&radius=200`
+        `http://localhost:3000/map/spots?lat=${35.8465869577069}&lng=${-86.3668367808604}&radius=100`
       );
       const data = await response.json();
       if (!data) {
@@ -126,6 +126,7 @@ const Home = () => {
           setShowModal={setShowModal}
           setActive={setActive}
           activeFilters={activeFilters}
+          userLocation={userLocation}
         />
 
         <Report

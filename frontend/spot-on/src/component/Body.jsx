@@ -4,6 +4,7 @@ import MapLoading from "./MapLoading";
 import { useAuth } from "./AuthContext";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { clusterSpots } from "../utils/clusterSpots";
+import { UNSAFE_getPatchRoutesOnNavigationFunction } from "react-router-dom";
 const containerStyle = {
   width: "100%",
   height: "100%",
@@ -18,6 +19,7 @@ const Body = ({
   setShowModal,
   setActive,
   activeFilters,
+  userLocation,
 }) => {
   const { loading } = useAuth();
   const [len, setLen] = useState(0);
@@ -92,6 +94,7 @@ const Body = ({
 
   return (
     <section className="map-container">
+      <div className="map-title"> Campus Pakring assistant</div>
       <LoadScript googleMapsApiKey={googleMapsApiKey}>
         {loading ? (
           <MapLoading />
@@ -100,7 +103,7 @@ const Body = ({
             mapContainerStyle={containerStyle}
             onLoad={onLoad}
             zoom={zoom}
-            center={center}
+            center={userLocation}
             onDblClick={handleMapClick}
           >
             {clustered.map((cluster, idx) => {
