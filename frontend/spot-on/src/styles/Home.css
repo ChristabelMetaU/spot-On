@@ -1,5 +1,8 @@
 /** @format */
-
+body {
+  margin: 0;
+  padding: 0;
+}
 :root {
   --primary-gradient: linear-gradient(135deg, #f5f4f2 0%, #e3e7ef 100%);
   --header-bg: #1c2e46;
@@ -38,7 +41,6 @@
 }
 
 .site-nav {
-  margin-top: calc((var(--spacing) * 1) + 0.1rem);
   text-align: center;
   width: 100%;
   background: var(--nav-bg);

@@ -1,10 +1,14 @@
 /** @format */
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import {
+  GoogleMap,
+  LoadScript,
+  Marker,
+  OverlayView,
+} from "@react-google-maps/api";
 import MapLoading from "./MapLoading";
 import { useAuth } from "./AuthContext";
-import { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { clusterSpots } from "../utils/clusterSpots";
-import { UNSAFE_getPatchRoutesOnNavigationFunction } from "react-router-dom";
 const containerStyle = {
   width: "100%",
   height: "100%",
@@ -112,20 +116,46 @@ const Body = ({
 
               if (zoom > CLUSTER_BREAKPOINT) {
                 map.panTo({ lat: centerLat, lng: centerLng });
-                return group.map((spot, i) => (
-                  <Marker
-                    key={spot.id}
-                    position={{ lat: spot.coordLat, lng: spot.coordLng }}
-                    icon={{
-                      url: spot.isOccupied
-                        ? "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
-                        : "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
-                    }}
-                    onClick={() => {
-                      displaySpotInfo(spot, i);
-                    }}
-                  />
-                ));
+
+                return group.map((spot, i) => {
+                  const nameArr = spot.lotName.split(" ");
+                  const name = nameArr[nameArr.length - 1];
+                  return (
+                    <React.Fragment key={spot.id}>
+                      <Marker
+                        key={spot.id}
+                        position={{ lat: spot.coordLat, lng: spot.coordLng }}
+                        icon={{
+                          url: spot.isOccupied
+                            ? "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+                            : "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
+                        }}
+                        onClick={() => {
+                          displaySpotInfo(spot, i);
+                        }}
+                      />
+                      <OverlayView
+                        position={{ lat: spot.coordLat, lng: spot.coordLng }}
+                        mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                      >
+                        <div
+                          style={{
+                            backgroundColor: "white",
+                            border: "1px solid black",
+                            paddingRight: "15px",
+                            borderRadius: "4px",
+                            fontSize: "12px",
+                            transform: "translate(10px -10px)",
+                            space: "nowrap",
+                            boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
+                          }}
+                        >
+                          {name}
+                        </div>
+                      </OverlayView>
+                    </React.Fragment>
+                  );
+                });
               }
               if (map) {
                 map.panTo({ lat: centerLat, lng: centerLng });
@@ -140,28 +170,51 @@ const Body = ({
                 circumference - (freePrcnt / 100) * circumference;
 
               const svg = `<svg width="60" height="60" viewBox = "0 0 60 60 " xmlns="http://www.w3.org/2000/svg" >
-              <circle cx="30" cy="30" r="${radius}" fill="none" stroke="red" stroke-width="${stroke}" />
-              <circle cx="30" cy="30" r="${radius}" fill="white" stroke="#4CAF50" stroke-width="${stroke}" stroke-dasharray="${circumference}" stroke-dashoffset="${freeOffset}" stroke-linecap="round" transform="rotate(-90 30 30)" />
-              <text x="30" y="35" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">${count}</text>
-              </svg>`;
+                <circle cx="30" cy="30" r="${radius}" fill="none" stroke="red" stroke-width="${stroke}" />
+                <circle cx="30" cy="30" r="${radius}" fill="white" stroke="#4CAF50" stroke-width="${stroke}" stroke-dasharray="${circumference}" stroke-dashoffset="${freeOffset}" stroke-linecap="round" transform="rotate(-90 30 30)" />
+                <text x="30" y="35" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">${count}</text>
+                </svg>`;
               const iconUrl = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
                 svg
               )}`;
               return (
-                <Marker
-                  key={`cluster-${idx}`}
-                  position={position}
-                  icon={{
-                    url: iconUrl,
-                    scaledSize: new window.google.maps.Size(
-                      radius * 2,
-                      radius * 2
-                    ),
-                  }}
-                  onClick={(e) => {
-                    handleClusterClick({ centerLat, centerLng });
-                  }}
-                />
+                <React.Fragment key={idx}>
+                  <Marker
+                    key={`cluster-${idx}`}
+                    position={position}
+                    icon={{
+                      url: iconUrl,
+                      scaledSize: new window.google.maps.Size(
+                        radius * 2,
+                        radius * 2
+                      ),
+                    }}
+                    onClick={(e) => {
+                      handleClusterClick({ centerLat, centerLng });
+                    }}
+                  />
+                  <OverlayView
+                    position={{ lat: centerLat, lng: centerLng }}
+                    mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                  >
+                    <div
+                      style={{
+                        backgroundColor: "#1c2e46",
+                        border: "1px solid white",
+                        paddingRight: "45px",
+                        paddingLeft: "8px",
+                        color: "white",
+                        borderRadius: "10px",
+                        fontSize: "12px",
+                        transform: "translate(10px -10px)",
+                        space: "nowrap",
+                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
+                      }}
+                    >
+                      {`Lot has ${count} spots`}
+                    </div>
+                  </OverlayView>
+                </React.Fragment>
               );
             })}
           </GoogleMap>

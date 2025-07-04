@@ -1,7 +1,26 @@
 /** @format */
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  z-index: 100;
+  background: linear-gradient(45deg, #1c2e46 0%, #7c94b4 100%);
+}
 .welcome-page {
   padding-top: 20rem;
   text-align: center;
+
+  width: 100%;
+  max-width: 500px;
+  margin: 10rem auto;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease;
 }
 
 .welcome-page h1 {

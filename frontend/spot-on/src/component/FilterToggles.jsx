@@ -27,7 +27,7 @@ const FilterToggles = ({ activeFilters, setActiveFilters }) => {
           label === "Spot Type " ||
           label === "Lot Type "
         ) {
-          return <h3>{label}</h3>;
+          return <h3 key={key}>{label}</h3>;
         }
         return (
           <div className="toggle-wrapper" key={key}>
