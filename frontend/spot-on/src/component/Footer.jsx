@@ -2,9 +2,9 @@
 
 const Footer = () => {
   return (
-    <div className="site-footer">
+    <footer className="site-footer">
       <p>Copyright &copy;. 2025 SpotOn</p>
-    </div>
+    </footer>
   );
 };
 

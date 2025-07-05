@@ -1,5 +1,4 @@
 /** @format */
-
 import { useAuth } from "../component/AuthContext";
 import Header from "../component/Header";
 import Nav from "../component/Nav";
@@ -9,7 +8,8 @@ import Report from "../component/Report";
 import { useState, useEffect } from "react";
 import Message from "../component/Message";
 import SpotModal from "../component/SpotModal";
-
+import MapLoading from "../component/MapLoading";
+import { connectWebSocket, sendWebSocket } from "../component/WebSocket";
 import "../styles/Home.css";
 const Home = () => {
   const [spots, setSpots] = useState([]);
@@ -68,7 +68,13 @@ const Home = () => {
         setSpots(data);
       }
     };
+    // connectWebSocket
     fetchSpots();
+    connectWebSocket((data) => {
+      if (data) {
+        setSelectedSpot(data);
+      }
+    });
   }, [user, userLocation, selectedSpot]);
   const updateIsOccupied = async (Occupied) => {
     const id = Number(selectedSpot.id);
@@ -92,6 +98,10 @@ const Home = () => {
       setMessage(`${selectedSpot.lotName} is now marked as occupied.`);
     }
     setIsVisible(true);
+    sendWebSocket({
+      type: "UPDATE_SPOT",
+      spot: data,
+    });
   };
   const handleReportSubmit = async (formData, occupied) => {
     const response = await fetch("http://localhost:3000/report/create", {
@@ -118,24 +128,28 @@ const Home = () => {
         activeFilters={activeFilters}
         setActiveFilters={setActiveFilters}
       />
-      <main className="site-main">
-        <Body
-          spots={spots}
-          setSpots={setSpots}
-          setSelectedSpot={setSelectedSpot}
-          setShowModal={setShowModal}
-          setActive={setActive}
-          activeFilters={activeFilters}
-          userLocation={userLocation}
-        />
+      {!userLocation ? (
+        <MapLoading />
+      ) : (
+        <main className="site-main">
+          <Body
+            spots={spots}
+            setSpots={setSpots}
+            setSelectedSpot={setSelectedSpot}
+            setShowModal={setShowModal}
+            setActive={setActive}
+            activeFilters={activeFilters}
+            userLocation={userLocation}
+          />
 
-        <Report
-          spots={spots}
-          handleReportSubmit={handleReportSubmit}
-          user={user}
-          setSelectedSpot={setSelectedSpot}
-        />
-      </main>
+          <Report
+            spots={spots}
+            handleReportSubmit={handleReportSubmit}
+            user={user}
+            setSelectedSpot={setSelectedSpot}
+          />
+        </main>
+      )}
       {showmodal && (
         <SpotModal
           setShowModal={setShowModal}
