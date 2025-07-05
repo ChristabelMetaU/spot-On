@@ -1,15 +1,22 @@
 /** @format */
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "../styles/Modal.css";
 import { getFormattedDate } from "../utils/getFormattedDate";
+import { useAuth } from "./AuthContext";
+import { sendWebSocket } from "../utils/WebSocket";
+import { formatTime } from "../utils/formatTime";
+import { use } from "react";
 const SpotModal = ({
   spot,
   setShowModal,
   spotIndex,
   handleReportSubmit,
   id,
+  setLocked,
 }) => {
+  const { user } = useAuth();
   const [spotReport, setSpotReport] = useState([]);
+  const [timeLeft, setTimeLeft] = useState(60);
   const handleGetDirections = () => {
     const { coordLat, coordLng, lotName } = spot;
     const label = `${lotName} spot ${spotIndex + 1}`;
@@ -37,15 +44,40 @@ const SpotModal = ({
       type: spot.type,
       user_id: id,
     };
+
     handleReportSubmit(formData, isOccupied);
+    sendWebSocket({
+      type: "UNLOCK_SPOT",
+      spotId: spot.id,
+      userId: user.id,
+    });
+    setLocked(false);
   };
+  const handleClose = () => {
+    setShowModal(false);
+    sendWebSocket({
+      type: "UNLOCK_SPOT",
+      spotId: spot.id,
+      userId: user.id,
+    });
+    setLocked(false);
+  };
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      return;
+    }
+    const interval = setInterval(() => {
+      setTimeLeft((prevTimeLeft) => prevTimeLeft - 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [timeLeft]);
 
   return (
     <div>
       <div className="modal-overlay">
         <div className="modal-content">
           <h2>{spot.lotName}</h2>
-
+          <p>Time left to update spot status: {formatTime(timeLeft)}</p>
           <div className="occupied">
             <div className="occupied-status">
               <div className={spot.isOccupied ? "red-dot" : "green-dot"}></div>
@@ -106,7 +138,7 @@ const SpotModal = ({
             <button className="get-direction" onClick={handleGetDirections}>
               Get directions
             </button>
-            <button className="close" onClick={() => setShowModal(false)}>
+            <button className="close" onClick={handleClose}>
               Close
             </button>
           </div>

@@ -9,6 +9,8 @@ import MapLoading from "./MapLoading";
 import { useAuth } from "./AuthContext";
 import React, { useState, useMemo, useCallback } from "react";
 import { clusterSpots } from "../utils/clusterSpots";
+import { sendWebSocket } from "../utils/WebSocket";
+import { set } from "date-fns";
 const containerStyle = {
   width: "100%",
   height: "100%",
@@ -24,8 +26,12 @@ const Body = ({
   setActive,
   activeFilters,
   userLocation,
+  locked,
+  setLocked,
+  lockedSpotId,
+  setLockedSpotId,
 }) => {
-  const { loading } = useAuth();
+  const { loading, user } = useAuth();
   const [len, setLen] = useState(0);
   const [map, setMap] = useState(null);
   const [zoom, setZoom] = useState(17);
@@ -78,7 +84,14 @@ const Body = ({
   const displaySpotInfo = (spot, i) => {
     setShowModal(true);
     setSelectedSpot(spot);
+    setLockedSpotId(spot.id);
+    setLocked(true);
     setActive({ spot, idx: i });
+    sendWebSocket({
+      type: "LOCK_SPOT",
+      spotId: spot.id,
+      userId: user.id,
+    });
   };
 
   const filtered = useMemo(() => {
@@ -95,7 +108,16 @@ const Body = ({
   const clustered = useMemo(() => {
     return clusterSpots(filtered, 80);
   }, [filtered]);
-
+  const getIcon = (spot) => {
+    if (lockedSpotId === spot.id && locked) {
+      return "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
+    }
+    if (spot.isOccupied) {
+      return "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
+    } else {
+      return "http://maps.google.com/mapfiles/ms/icons/green-dot.png";
+    }
+  };
   return (
     <section className="map-container">
       <div className="map-title"> Campus Pakring assistant</div>
@@ -120,16 +142,13 @@ const Body = ({
                 return group.map((spot, i) => {
                   const nameArr = spot.lotName.split(" ");
                   const name = nameArr[nameArr.length - 1];
+
                   return (
                     <React.Fragment key={spot.id}>
                       <Marker
                         key={spot.id}
                         position={{ lat: spot.coordLat, lng: spot.coordLng }}
-                        icon={{
-                          url: spot.isOccupied
-                            ? "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
-                            : "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
-                        }}
+                        icon={{ url: getIcon(spot) }}
                         onClick={() => {
                           displaySpotInfo(spot, i);
                         }}

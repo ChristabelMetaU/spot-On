@@ -1,5 +1,6 @@
 /** @format */
-
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 const express = require("express");
 const cors = require("cors");
 const auth = require("./routes/Auth");
@@ -13,6 +14,7 @@ const reportRouter = require("./routes/Report");
 const profileRouter = require("./routes/Profile");
 const webSocket = require("ws");
 const http = require("http");
+const e = require("express");
 dotenv.config();
 const app = express();
 
@@ -53,21 +55,132 @@ app.use("/user", profileRouter);
 
 const server = http.createServer(app);
 const wss = new webSocket.Server({ server });
+let lockedSpots = {};
 wss.on("connection", (ws) => {
-  ws.on("message", (message) => {
+  ws.on("message", async (message) => {
     const data = JSON.parse(message);
-    let updatedSpot = [];
-    if (data.type === "UPDATE_SPOT") {
-      updatedSpot = [data.spot];
-    }
-    wss.clients.forEach((client) => {
-      if (client !== ws && client.readyState === ws.OPEN) {
-        client.send(JSON.stringify(updatedSpot));
+    let broadCastData = null;
+
+    if (data.type == "LOCK_SPOT") {
+      const now = Date.now();
+      const expires = new Date(now + 60_000);
+      const activeLock = await prisma.lockedSpot.findFirst({
+        where: {
+          spotId: data.spotId,
+          expiresAt: {
+            gte: new Date(now),
+          },
+        },
+      });
+
+      if (activeLock) {
+        ws.send(
+          JSON.stringify({
+            type: "ERROR",
+            message: "This spot is being updated by another user",
+          })
+        );
+        return;
       }
-    });
+      const lockSpot = await prisma.lockedSpot.create({
+        data: {
+          spotId: data.spotId,
+          userId: data.userId,
+          expiresAt: expires,
+        },
+      });
+      lockedSpots[data.spotId] = lockSpot;
+      broadCastData = {
+        type: "SPOT_LOCKED",
+        locked: true,
+        spotId: data.spotId,
+        userId: data.userId,
+      };
+      setTimeout(async () => {
+        if (
+          lockedSpots[data.spotId] &&
+          lockedSpots[data.spotId].expiresAt <= Date.now()
+        ) {
+          await prisma.lockedSpot.delete({
+            where: {
+              id: lockedSpots[data.spotId].id,
+            },
+          });
+          delete lockedSpots[data.spotId];
+          broadCastAll(
+            {
+              type: "SPOT_UNLOCKED",
+              locked: false,
+              spotId: data.spotId,
+              userId: data.userId,
+            },
+            ws
+          );
+        }
+      }, 60000);
+    }
+    if (data.type === "UNCLOCK_SPOT") {
+      if (lockedSpots[data.spotId]?.userId === data.userId) {
+        await prisma.lockedSpot.delete({
+          where: {
+            id: lockedSpots[data.spotId].id,
+          },
+        });
+        delete lockedSpots[data.spotId];
+        broadCastData = {
+          type: "SPOT_UNLOCKED",
+          locked: false,
+          spotId: data.spotId,
+          userId: data.userId,
+        };
+      }
+    }
+    if (data.type === "UPDATE_SPOT") {
+      if (lockedSpots[data.spotId]) {
+        broadCastAll(
+          {
+            type: "SPOT_UPDATED",
+            data: data.spot,
+          },
+          ws
+        );
+
+        broadCastData = {
+          type: "SPOT_UNLOCKED",
+          locked: false,
+          spotId: data.spotId,
+        };
+        await prisma.lockedSpot.delete({
+          where: {
+            id: lockedSpots[data.spotId].id,
+          },
+        });
+        delete lockedSpots[data.spotId];
+      } else {
+        ws.send(
+          JSON.stringify({
+            type: "ERROR",
+            message: "You are not the owner of this LOCKED_SPOT",
+          })
+        );
+      }
+    }
+
+    if (broadCastData) {
+      broadCastAll(broadCastData, ws);
+    }
   });
 });
 
+function broadCastAll(data, excludes) {
+  const updatedSpot = JSON.stringify(data);
+
+  wss.clients.forEach((client) => {
+    if (client !== excludes && client.readyState === excludes.OPEN) {
+      client.send(updatedSpot);
+    }
+  });
+}
 wss.on("close", () => {});
 
 const PORT = process.env.PORT || 9000;
