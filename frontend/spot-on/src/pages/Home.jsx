@@ -9,8 +9,9 @@ import { useState, useEffect } from "react";
 import Message from "../component/Message";
 import SpotModal from "../component/SpotModal";
 import MapLoading from "../component/MapLoading";
-import { connectWebSocket, sendWebSocket } from "../component/WebSocket";
+import { connectWebSocket, sendWebSocket } from "../utils/WebSocket";
 import "../styles/Home.css";
+import { set } from "date-fns";
 const Home = () => {
   const [spots, setSpots] = useState([]);
   const [active, setActive] = useState([]);
@@ -20,6 +21,8 @@ const Home = () => {
   const [selectedSpot, setSelectedSpot] = useState([]);
   const [showmodal, setShowModal] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [locked, setLocked] = useState(false);
+  const [lockedSpotId, setLockedSpotId] = useState(null);
   const [activeFilters, setActiveFilters] = useState({
     red: true,
     green: true,
@@ -72,10 +75,26 @@ const Home = () => {
     fetchSpots();
     connectWebSocket((data) => {
       if (data) {
-        setSelectedSpot(data);
+        if (data.type === "SPOT_UPDATED") {
+          setSelectedSpot(data.data);
+        }
+        if (data.type === "SPOT_LOCKED") {
+          setLocked(data.locked);
+          setLockedSpotId(data.spotId);
+        }
+        if (data.type === "SPOT_UNLOCKED") {
+          setLocked(data.locked);
+          setShowModal(false);
+        }
+        if (data.type === "ERROR") {
+          setShowModal(false);
+          setIsVisible(true);
+          setMessage(data.message);
+        }
       }
     });
   }, [user, userLocation, selectedSpot]);
+
   const updateIsOccupied = async (Occupied) => {
     const id = Number(selectedSpot.id);
     const response = await fetch(`http://localhost:3000/map/spots/${id}`, {
@@ -90,6 +109,12 @@ const Home = () => {
       alert(data.error);
       return;
     }
+    sendWebSocket({
+      type: "UPDATE_SPOT",
+      spot: data,
+      spotId: data.id,
+      userId: user.id,
+    });
     setShowModal(false);
     setSelectedSpot(data);
     if (!data.isOccupied) {
@@ -99,9 +124,11 @@ const Home = () => {
     }
     setIsVisible(true);
     sendWebSocket({
-      type: "UPDATE_SPOT",
-      spot: data,
+      type: "UNLOCK_SPOT",
+      spotId: selectedSpot.id,
+      userId: user.id,
     });
+    setLocked(false);
   };
   const handleReportSubmit = async (formData, occupied) => {
     const response = await fetch("http://localhost:3000/report/create", {
@@ -140,6 +167,10 @@ const Home = () => {
             setActive={setActive}
             activeFilters={activeFilters}
             userLocation={userLocation}
+            locked={locked}
+            setLocked={setLocked}
+            lockedSpotId={lockedSpotId}
+            setLockedSpotId={setLockedSpotId}
           />
 
           <Report
@@ -157,6 +188,7 @@ const Home = () => {
           spotIndex={active.idx}
           handleReportSubmit={handleReportSubmit}
           id={user.id}
+          setLocked={setLocked}
         />
       )}
       {isVisible && <Message message={message} setIsVisible={setIsVisible} />}
