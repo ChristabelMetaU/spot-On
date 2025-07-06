@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import "../styles/Modal.css";
 import { getFormattedDate } from "../utils/getFormattedDate";
 import { useAuth } from "./AuthContext";
-import { sendWebSocket } from "../utils/WebSocket";
 import { formatTime } from "../utils/formatTime";
+import { sendWebSocket } from "../utils/websocket";
 import { use } from "react";
 const SpotModal = ({
   spot,

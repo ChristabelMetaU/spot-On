@@ -9,8 +9,8 @@ import MapLoading from "./MapLoading";
 import { useAuth } from "./AuthContext";
 import React, { useState, useMemo, useCallback } from "react";
 import { clusterSpots } from "../utils/clusterSpots";
-import { sendWebSocket } from "../utils/WebSocket";
 import { set } from "date-fns";
+import { sendWebSocket } from "../utils/websocket";
 const containerStyle = {
   width: "100%",
   height: "100%",
@@ -87,6 +87,7 @@ const Body = ({
     setLockedSpotId(spot.id);
     setLocked(true);
     setActive({ spot, idx: i });
+    console.log(spot);
     sendWebSocket({
       type: "LOCK_SPOT",
       spotId: spot.id,

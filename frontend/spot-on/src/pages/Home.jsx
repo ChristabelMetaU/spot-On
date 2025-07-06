@@ -5,13 +5,12 @@ import Nav from "../component/Nav";
 import Body from "../component/Body";
 import Footer from "../component/Footer";
 import Report from "../component/Report";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Message from "../component/Message";
 import SpotModal from "../component/SpotModal";
 import MapLoading from "../component/MapLoading";
-import { connectWebSocket, sendWebSocket } from "../utils/WebSocket";
 import "../styles/Home.css";
-import { set } from "date-fns";
+import { connectWebSocket, sendWebSocket } from "../utils/websocket";
 const Home = () => {
   const [spots, setSpots] = useState([]);
   const [active, setActive] = useState([]);
@@ -74,26 +73,29 @@ const Home = () => {
     // connectWebSocket
     fetchSpots();
     connectWebSocket((data) => {
-      if (data) {
-        if (data.type === "SPOT_UPDATED") {
-          setSelectedSpot(data.data);
-        }
-        if (data.type === "SPOT_LOCKED") {
-          setLocked(data.locked);
-          setLockedSpotId(data.spotId);
-        }
-        if (data.type === "SPOT_UNLOCKED") {
-          setLocked(data.locked);
-          setShowModal(false);
-        }
-        if (data.type === "ERROR") {
-          setShowModal(false);
-          setIsVisible(true);
-          setMessage(data.message);
-        }
+      console.log("data", data);
+      if (data.type === "SPOT_UPDATED") {
+        console.log("SPOT_UPDATED", data);
+        setSelectedSpot(data.data);
+      }
+      if (data.type === "SPOT_LOCKED") {
+        console.log("SPOT_LOCKED", data);
+        setLocked(data.locked);
+        setLockedSpotId(data.spotId);
+      }
+      if (data.type === "SPOT_UNLOCKED") {
+        console.log("SPOT_UNLOCKED", data);
+        setLocked(data.locked);
+        setShowModal(false);
+      }
+      if (data.type === "ERROR") {
+        console.log(data.message);
+        setShowModal(false);
+        setIsVisible(true);
+        setMessage(data.message);
       }
     });
-  }, [user, userLocation, selectedSpot]);
+  }, [user, userLocation, selectedSpot, locked, lockedSpotId]);
 
   const updateIsOccupied = async (Occupied) => {
     const id = Number(selectedSpot.id);
@@ -109,12 +111,14 @@ const Home = () => {
       alert(data.error);
       return;
     }
+    console.log("updfsteisp=occupied ran and is back", data);
     sendWebSocket({
       type: "UPDATE_SPOT",
       spot: data,
       spotId: data.id,
       userId: user.id,
     });
+    console.log("updated spot", data);
     setShowModal(false);
     setSelectedSpot(data);
     if (!data.isOccupied) {
@@ -143,7 +147,6 @@ const Home = () => {
     if (!data) {
       setMessage("Something went wrong");
     }
-    setMessage(data.message);
     updateIsOccupied(occupied);
   };
   return (
@@ -178,6 +181,8 @@ const Home = () => {
             handleReportSubmit={handleReportSubmit}
             user={user}
             setSelectedSpot={setSelectedSpot}
+            setIsVisible={setIsVisible}
+            setMessage={setMessage}
           />
         </main>
       )}

@@ -1,6 +1,15 @@
 /** @format */
-import { useState } from "react";
-const Report = ({ spots, handleReportSubmit, user, setSelectedSpot }) => {
+import { useState, useEffect } from "react";
+import { sendWebSocket } from "../utils/websocket";
+import { connectWebSocket } from "../utils/websocket";
+const Report = ({
+  spots,
+  handleReportSubmit,
+  user,
+  setSelectedSpot,
+  setIsVisible,
+  setMessage,
+}) => {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [showReportForm, setShowReportForm] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
@@ -8,7 +17,9 @@ const Report = ({ spots, handleReportSubmit, user, setSelectedSpot }) => {
   const [showResults, setShowResults] = useState(false);
   const [spotType, setSpotType] = useState("");
   const [description, setDescription] = useState("");
+  const [occupiedText, setOccupiedText] = useState("");
   const [error, setError] = useState("");
+
   const handleShowReportForm = () => {
     setShowReportForm(!showReportForm);
   };
@@ -32,14 +43,14 @@ const Report = ({ spots, handleReportSubmit, user, setSelectedSpot }) => {
       setShowResults(false);
     }, 100);
   };
+
   const handleResultClick = (result) => {
     setSelectedSpot(result);
     setSearchKeyword(result.lotName);
     setShowResults(false);
     setSearchResults([]);
   };
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmitSuccess = () => {
     const formData = {
       spot_name: searchKeyword,
       description: description,
@@ -59,11 +70,39 @@ const Report = ({ spots, handleReportSubmit, user, setSelectedSpot }) => {
     }
     setError("");
     setShowReportForm(false);
+    console.log("report is ran");
     handleReportSubmit(formData, occupied);
     setSearchKeyword("");
     setSpotType("");
     setDescription("");
   };
+  useEffect(() => {
+    if (showReportForm) {
+      connectWebSocket((data) => {
+        if (data.type === "REPORT_ERROR" && data.spotName == searchKeyword) {
+          console.log("spot locked,", data);
+          setShowReportForm(false);
+          setIsVisible(true);
+          setMessage(data.message);
+          setSearchKeyword("");
+          setSpotType("");
+          setDescription("");
+        }
+        if (data.type === "REPORT_SUCCESS" && data.spotName == searchKeyword) {
+          handleSubmitSuccess();
+        }
+      });
+    }
+  }, [searchKeyword, handleSubmitSuccess]);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    sendWebSocket({
+      type: "UPDATE_SPOT_BY_REPORT",
+      spotName: searchKeyword,
+      userId: user.id,
+    });
+  };
+
   return (
     <div className="reserve-container">
       <button className="report-btn" onClick={handleShowReportForm}>
@@ -106,6 +145,7 @@ const Report = ({ spots, handleReportSubmit, user, setSelectedSpot }) => {
                 className="spot-free"
                 onClick={(e) => {
                   e.preventDefault();
+                  setOccupiedText("This spot will be displayed as available");
                   setOccupied(false);
                 }}
               >
@@ -115,12 +155,14 @@ const Report = ({ spots, handleReportSubmit, user, setSelectedSpot }) => {
                 className="spot-taken"
                 onClick={(e) => {
                   e.preventDefault();
+                  setOccupiedText("This spot  will be displayed as occupied");
                   setOccupied(true);
                 }}
               >
                 Occupied
               </button>
             </div>
+            <p className="text"> {occupiedText}</p>
             <select
               className="spot-type"
               value={spotType}

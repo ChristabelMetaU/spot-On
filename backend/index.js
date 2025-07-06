@@ -59,37 +59,69 @@ let lockedSpots = {};
 wss.on("connection", (ws) => {
   ws.on("message", async (message) => {
     const data = JSON.parse(message);
+    console.log("data", data);
     let broadCastData = null;
-
-    if (data.type == "LOCK_SPOT") {
+    //check to see before user update a spot through a report it is not locked
+    if (data.type === "UPDATE_SPOT_BY_REPORT") {
+      console.log("update spot by report", data);
       const now = Date.now();
-      const expires = new Date(now + 60_000);
+      //get spot id by data.spotName return only id
+      const spot = await prisma.spots.findFirst({
+        where: {
+          lotName: data.spotName,
+        },
+      });
+      if (!spot) {
+        console.log("spot does not exist");
+        ws.send(
+          JSON.stringify({
+            type: "REPORT_ERROR",
+            spotName: data.spotName,
+            message: "This spot does not exist",
+          })
+        );
+        return;
+      }
+
       const activeLock = await prisma.lockedSpot.findFirst({
         where: {
-          spotId: data.spotId,
+          spotId: spot.id,
           expiresAt: {
             gte: new Date(now),
           },
         },
       });
-
+      console.log("spot", lockedSpots);
+      console.log("active lock", activeLock);
       if (activeLock) {
+        console.log("spot is locked );");
         ws.send(
           JSON.stringify({
-            type: "ERROR",
+            type: "REPORT_ERROR",
+            spotName: spot.lotName,
             message: "This spot is being updated by another user",
           })
         );
         return;
+      } else {
+        console.log("spot is not locked");
+        ws.send(
+          JSON.stringify({
+            type: "REPORT_SUCCESS",
+            spotName: spot.lotName,
+          })
+        );
       }
+      //create a lock for the spot
       const lockSpot = await prisma.lockedSpot.create({
         data: {
-          spotId: data.spotId,
+          spotId: spot.id,
           userId: data.userId,
-          expiresAt: expires,
+          expiresAt: new Date(now + 2000),
         },
       });
-      lockedSpots[data.spotId] = lockSpot;
+      console.log("lock spot", lockSpot);
+      lockedSpots[spot.id] = lockSpot;
       broadCastData = {
         type: "SPOT_LOCKED",
         locked: true,
@@ -107,6 +139,69 @@ wss.on("connection", (ws) => {
             },
           });
           delete lockedSpots[data.spotId];
+          broadCastAll(
+            {
+              type: "SPOT_UNLOCKED",
+              locked: false,
+              spotId: data.spotId,
+              userId: data.userId,
+            },
+            ws
+          );
+        }
+      }, 3000);
+    }
+    if (data.type == "LOCK_SPOT") {
+      console.log("lock spot on line 154");
+      const now = Date.now();
+      const expires = new Date(now + 60_000);
+      const activeLock = await prisma.lockedSpot.findFirst({
+        where: {
+          spotId: data.spotId,
+          expiresAt: {
+            gte: new Date(now),
+          },
+        },
+      });
+
+      if (activeLock) {
+        console.log("spot is sending an error` on line 167);");
+        ws.send(
+          JSON.stringify({
+            type: "ERROR",
+            message: "This spot is being updated by another user",
+          })
+        );
+        console.log("active lock  on line 174", activeLock);
+        return;
+      }
+      const lockSpot = await prisma.lockedSpot.create({
+        data: {
+          spotId: data.spotId,
+          userId: data.userId,
+          expiresAt: expires,
+        },
+      });
+      lockedSpots[data.spotId] = lockSpot;
+      console.log("lock spot  on line 184", lockSpot);
+      broadCastData = {
+        type: "SPOT_LOCKED",
+        locked: true,
+        spotId: data.spotId,
+        userId: data.userId,
+      };
+      setTimeout(async () => {
+        if (
+          lockedSpots[data.spotId] &&
+          lockedSpots[data.spotId].expiresAt <= Date.now()
+        ) {
+          await prisma.lockedSpot.delete({
+            where: {
+              id: lockedSpots[data.spotId].id,
+            },
+          });
+          delete lockedSpots[data.spotId];
+
           broadCastAll(
             {
               type: "SPOT_UNLOCKED",
@@ -136,7 +231,9 @@ wss.on("connection", (ws) => {
       }
     }
     if (data.type === "UPDATE_SPOT") {
+      console.log("update spot on line 215");
       if (lockedSpots[data.spotId]) {
+        console.log("spot is locked on line 218");
         broadCastAll(
           {
             type: "SPOT_UPDATED",
@@ -157,10 +254,11 @@ wss.on("connection", (ws) => {
         });
         delete lockedSpots[data.spotId];
       } else {
+        console.log("spot is not locked on line 228");
         ws.send(
           JSON.stringify({
             type: "ERROR",
-            message: "You are not the owner of this LOCKED_SPOT",
+            message: "An error occoured, Please try again.",
           })
         );
       }
