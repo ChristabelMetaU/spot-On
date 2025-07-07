@@ -10,32 +10,45 @@ datasource db {
 
 model Users {
   id Int  @id @default(autoincrement())
+  username String
   email String @unique
   password_hash String
   role String
   created_at DateTime @default(now())
   report reports[]
+  LockedSpot LockedSpot[]
 }
 
 model spots{
   id Int @id @default(autoincrement())
-  lot_name String @unique
-  coord_lat Float
-  coord_lng Float
+  lotName String @unique
   type String
+    coordLat Float
+    coordLng Float
+  isOccupied Boolean @default(false)
+  LockedSpot LockedSpot[]
   report reports[]
 
 }
-
+model LockedSpot{
+  id Int @id @default(autoincrement())
+  spotId Int
+  userId Int
+  spot spots @relation(fields: [spotId], references: [id])
+  user Users @relation(fields: [userId], references: [id])
+  lockeAt DateTime @default(now())
+  expiresAt DateTime
+}
 
 model reports{
   id Int @id @default(autoincrement())
-  status Boolean
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
-  user Users @relation(fields: [user_id], references: [id])
-  spot spots @relation(fields: [spot_id], references: [id])
+  description String
+  type String
   user_id Int
-  spot_id Int
+  spot_name String
+   user Users @relation(fields: [user_id], references: [id])
+  spot spots @relation(fields: [spot_name], references: [lotName])
+  updated_at DateTime @default(now())
+   created_at DateTime @default(now())
 
 }
