@@ -37,6 +37,7 @@ const SpotModal = ({
     };
     fetchSpotReports();
   }, [spot, setSpotReport]);
+
   const handleSubmit = (spot, isOccupied) => {
     const formData = {
       spot_name: spot.lotName,

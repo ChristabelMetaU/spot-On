@@ -70,7 +70,6 @@ const Report = ({
     }
     setError("");
     setShowReportForm(false);
-    console.log("report is ran");
     handleReportSubmit(formData, occupied);
     setSearchKeyword("");
     setSpotType("");
@@ -79,8 +78,7 @@ const Report = ({
   useEffect(() => {
     if (showReportForm) {
       connectWebSocket((data) => {
-        if (data.type === "REPORT_ERROR" && data.spotName == searchKeyword) {
-          console.log("spot locked,", data);
+        if (data.type === "REPORT_ERROR" && data.spotName === searchKeyword) {
           setShowReportForm(false);
           setIsVisible(true);
           setMessage(data.message);

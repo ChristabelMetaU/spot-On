@@ -73,23 +73,16 @@ const Home = () => {
     // connectWebSocket
     fetchSpots();
     connectWebSocket((data) => {
-      console.log("data", data);
       if (data.type === "SPOT_UPDATED") {
-        console.log("SPOT_UPDATED", data);
-        setSelectedSpot(data.data);
       }
       if (data.type === "SPOT_LOCKED") {
-        console.log("SPOT_LOCKED", data);
         setLocked(data.locked);
         setLockedSpotId(data.spotId);
       }
       if (data.type === "SPOT_UNLOCKED") {
-        console.log("SPOT_UNLOCKED", data);
         setLocked(data.locked);
-        setShowModal(false);
       }
       if (data.type === "ERROR") {
-        console.log(data.message);
         setShowModal(false);
         setIsVisible(true);
         setMessage(data.message);
@@ -111,14 +104,14 @@ const Home = () => {
       alert(data.error);
       return;
     }
-    console.log("updfsteisp=occupied ran and is back", data);
+
     sendWebSocket({
       type: "UPDATE_SPOT",
       spot: data,
       spotId: data.id,
       userId: user.id,
     });
-    console.log("updated spot", data);
+
     setShowModal(false);
     setSelectedSpot(data);
     if (!data.isOccupied) {

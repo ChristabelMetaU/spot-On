@@ -11,6 +11,7 @@ import React, { useState, useMemo, useCallback } from "react";
 import { clusterSpots } from "../utils/clusterSpots";
 import { set } from "date-fns";
 import { sendWebSocket } from "../utils/websocket";
+import { useEffect } from "react";
 const containerStyle = {
   width: "100%",
   height: "100%",
@@ -84,10 +85,11 @@ const Body = ({
   const displaySpotInfo = (spot, i) => {
     setShowModal(true);
     setSelectedSpot(spot);
+
     setLockedSpotId(spot.id);
     setLocked(true);
     setActive({ spot, idx: i });
-    console.log(spot);
+
     sendWebSocket({
       type: "LOCK_SPOT",
       spotId: spot.id,

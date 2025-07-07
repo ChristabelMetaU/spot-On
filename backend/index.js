@@ -59,11 +59,9 @@ let lockedSpots = {};
 wss.on("connection", (ws) => {
   ws.on("message", async (message) => {
     const data = JSON.parse(message);
-    console.log("data", data);
     let broadCastData = null;
     //check to see before user update a spot through a report it is not locked
     if (data.type === "UPDATE_SPOT_BY_REPORT") {
-      console.log("update spot by report", data);
       const now = Date.now();
       //get spot id by data.spotName return only id
       const spot = await prisma.spots.findFirst({
@@ -72,7 +70,6 @@ wss.on("connection", (ws) => {
         },
       });
       if (!spot) {
-        console.log("spot does not exist");
         ws.send(
           JSON.stringify({
             type: "REPORT_ERROR",
@@ -91,10 +88,8 @@ wss.on("connection", (ws) => {
           },
         },
       });
-      console.log("spot", lockedSpots);
-      console.log("active lock", activeLock);
+
       if (activeLock) {
-        console.log("spot is locked );");
         ws.send(
           JSON.stringify({
             type: "REPORT_ERROR",
@@ -104,7 +99,6 @@ wss.on("connection", (ws) => {
         );
         return;
       } else {
-        console.log("spot is not locked");
         ws.send(
           JSON.stringify({
             type: "REPORT_SUCCESS",
@@ -120,7 +114,7 @@ wss.on("connection", (ws) => {
           expiresAt: new Date(now + 2000),
         },
       });
-      console.log("lock spot", lockSpot);
+
       lockedSpots[spot.id] = lockSpot;
       broadCastData = {
         type: "SPOT_LOCKED",
@@ -139,20 +133,16 @@ wss.on("connection", (ws) => {
             },
           });
           delete lockedSpots[data.spotId];
-          broadCastAll(
-            {
-              type: "SPOT_UNLOCKED",
-              locked: false,
-              spotId: data.spotId,
-              userId: data.userId,
-            },
-            ws
-          );
+          broadCastAll({
+            type: "SPOT_UNLOCKED",
+            locked: false,
+            spotId: data.spotId,
+            userId: data.userId,
+          });
         }
       }, 3000);
     }
     if (data.type == "LOCK_SPOT") {
-      console.log("lock spot on line 154");
       const now = Date.now();
       const expires = new Date(now + 60_000);
       const activeLock = await prisma.lockedSpot.findFirst({
@@ -165,14 +155,13 @@ wss.on("connection", (ws) => {
       });
 
       if (activeLock) {
-        console.log("spot is sending an error` on line 167);");
         ws.send(
           JSON.stringify({
             type: "ERROR",
             message: "This spot is being updated by another user",
           })
         );
-        console.log("active lock  on line 174", activeLock);
+
         return;
       }
       const lockSpot = await prisma.lockedSpot.create({
@@ -183,7 +172,7 @@ wss.on("connection", (ws) => {
         },
       });
       lockedSpots[data.spotId] = lockSpot;
-      console.log("lock spot  on line 184", lockSpot);
+
       broadCastData = {
         type: "SPOT_LOCKED",
         locked: true,
@@ -202,15 +191,12 @@ wss.on("connection", (ws) => {
           });
           delete lockedSpots[data.spotId];
 
-          broadCastAll(
-            {
-              type: "SPOT_UNLOCKED",
-              locked: false,
-              spotId: data.spotId,
-              userId: data.userId,
-            },
-            ws
-          );
+          broadCastAll({
+            type: "SPOT_UNLOCKED",
+            locked: false,
+            spotId: data.spotId,
+            userId: data.userId,
+          });
         }
       }, 60000);
     }
@@ -231,16 +217,12 @@ wss.on("connection", (ws) => {
       }
     }
     if (data.type === "UPDATE_SPOT") {
-      console.log("update spot on line 215");
       if (lockedSpots[data.spotId]) {
-        console.log("spot is locked on line 218");
-        broadCastAll(
-          {
-            type: "SPOT_UPDATED",
-            data: data.spot,
-          },
-          ws
-        );
+        broadCastAll({
+          type: "SPOT_UPDATED",
+          spotId: data.spotId,
+          data: data.spot,
+        });
 
         broadCastData = {
           type: "SPOT_UNLOCKED",
@@ -254,7 +236,6 @@ wss.on("connection", (ws) => {
         });
         delete lockedSpots[data.spotId];
       } else {
-        console.log("spot is not locked on line 228");
         ws.send(
           JSON.stringify({
             type: "ERROR",
@@ -270,11 +251,11 @@ wss.on("connection", (ws) => {
   });
 });
 
-function broadCastAll(data, excludes) {
+function broadCastAll(data, excludeWs = null) {
   const updatedSpot = JSON.stringify(data);
 
   wss.clients.forEach((client) => {
-    if (client !== excludes && client.readyState === excludes.OPEN) {
+    if (client.readyState === webSocket.OPEN && client !== excludeWs) {
       client.send(updatedSpot);
     }
   });
