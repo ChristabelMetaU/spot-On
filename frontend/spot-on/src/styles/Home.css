@@ -7,6 +7,7 @@ body {
   --primary-gradient: linear-gradient(135deg, #f5f4f2 0%, #e3e7ef 100%);
   --header-bg: #1c2e46;
   --nav-bg: #dcdee5;
+  --nav-life: #dcdee5;
   --nav-color: #1c2e46;
   --btn-color: #1c2e46;
   --footer-color: #1c2e46;
@@ -26,7 +27,114 @@ body {
   padding-bottom: 1.5rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
+.route-header {
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: var(--header-bg);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  color: #ccc;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+.header-icon {
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.header-text {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  flex: 1;
+  justify-content: center;
+}
+.route-header p {
+  margin: 0;
+  margin-bottom: 10px;
+}
+.router-toggle {
+  display: flex;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  gap: 1rem;
+  margin-left: 2rem;
+  margin-right: 2rem;
+}
 
+.toggle-button {
+  flex: 1;
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 2px solid #ccc;
+  font-size: 10px;
+  background: var(--nav-bg);
+  color: #1c2e46;
+  cursor: pointer;
+}
+
+.active {
+  flex: 1;
+  background: #1c2e46;
+  color: #fff;
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 2px solid #1c2e46;
+  font-size: 10px;
+  cursor: pointer;
+}
+.search-bar {
+  display: flex;
+}
+.search-bar input {
+  flex: 1;
+  padding: 10px;
+  margin-left: 2rem;
+  margin-right: 2rem;
+}
+.route-summary {
+  display: flex;
+  flex-direction: column;
+}
+.route-summary-header {
+  background-color: #1c2e46;
+  text-align: center;
+  margin-left: 2rem;
+  margin-right: 2rem;
+}
+.route-summary-header h2 {
+  color: #fff;
+  margin: 0;
+  padding: 0.9rem;
+}
+.route-summary-body {
+  background-color: var(--nav-bg);
+  display: flex;
+  justify-content: space-around;
+  margin-left: 2rem;
+  margin-right: 2rem;
+  margin-bottom: 2rem;
+}
+
+.route-summary-item {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.route-summary-item h2 {
+  margin: 0;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+.route-summary-item p {
+  margin: 0;
+  padding: 0;
+  margin-top: 1rem;
+}
 .site-header img {
   width: 5rem;
   height: 5rem;
@@ -71,11 +179,11 @@ body {
 }
 .site-main {
   display: flex;
-  flex-wrap: wrap;
   gap: var(--spacing);
   padding: var(--spacing) 2rem;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   min-height: calc(100vh - 200px);
+  flex-direction: column;
 }
 .map-title {
   background-color: #1c2e46;
@@ -83,6 +191,33 @@ body {
   color: #fff;
   text-align: center;
   font-size: 1.4rem;
+}
+.live-stats {
+  display: flex;
+  flex-direction: column;
+  background: var(--nav-life);
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+.stat-numbers {
+  display: flex;
+  justify-content: space-around;
+}
+.stat-body {
+  text-align: center;
+}
+.stat-body p {
+  margin: 0;
+  margin-bottom: 1rem;
+}
+.live-stats h4 {
+  margin: 0;
+  padding: 0;
+  margin-bottom: 1rem;
+  margin-left: 10px;
+  margin-top: 10px;
+  text-align: justify;
 }
 .map-container {
   flex: 1 1 600px;
@@ -98,7 +233,45 @@ body {
   align-items: flex-start;
   justify-content: center;
 }
+.quuick-actions {
+  display: flex;
+  flex-direction: column;
+}
+.actions-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.actions-div {
+  text-align: left;
+  margin: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: var(--nav-life);
+  cursor: pointer;
+  box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.3);
+}
+.actions-div h3 {
+  font-weight: 600;
+}
 
+.fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #1c2e46;
+  color: #fff;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  font-size: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
 .report-btn {
   background: var(--nav-color);
   color: #fff;
@@ -114,7 +287,6 @@ body {
 .report-btn:hover {
   transform: translateY(-3px);
 }
-
 .site-footer {
   background: var(--footer-color);
   color: white;
