@@ -6,31 +6,45 @@ import Body from "../component/Body";
 import Footer from "../component/Footer";
 import Report from "../component/Report";
 import { useState, useEffect, useRef } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Message from "../component/Message";
+import QuickActions from "../component/QuickActions";
+import LiveStatus from "../component/LiveStatus";
+import RouteDetails from "../component/RouteDetails";
+import Fab from "../component/Fab";
 import SpotModal from "../component/SpotModal";
 import MapLoading from "../component/MapLoading";
 import "../styles/Home.css";
 import { connectWebSocket, sendWebSocket } from "../utils/websocket";
-const Home = () => {
-  const [spots, setSpots] = useState([]);
-  const [active, setActive] = useState([]);
+const Home = ({
+  spots,
+  setSpots,
+  selectedSpot,
+  setSelectedSpot,
+  showmodal,
+  setShowModal,
+  active,
+  setActive,
+  userLocation,
+  setUserLocation,
+  locked,
+  setLocked,
+  lockedSpotId,
+  setLockedSpotId,
+  freeCount,
+  setFreeCount,
+  activeFilters,
+  setActiveFilters,
+}) => {
   const [message, setMessage] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const { user } = useAuth();
-  const [selectedSpot, setSelectedSpot] = useState([]);
-  const [showmodal, setShowModal] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [locked, setLocked] = useState(false);
-  const [lockedSpotId, setLockedSpotId] = useState(null);
-  const [activeFilters, setActiveFilters] = useState({
-    red: true,
-    green: true,
-    white: true,
-    handicap: true,
-    free: true,
-    occupied: true,
-  });
-  const [userLocation, setUserLocation] = useState(null);
   const [userLocationError, setUserLocationError] = useState(null);
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -68,10 +82,12 @@ const Home = () => {
         setSpots([]);
       } else {
         setSpots(data);
+        setFreeCount(data.filter((spot) => spot.isOccupied === false).length);
       }
     };
     // connectWebSocket
     fetchSpots();
+
     connectWebSocket((data) => {
       if (data.type === "SPOT_UPDATED") {
       }
@@ -155,7 +171,10 @@ const Home = () => {
         <MapLoading />
       ) : (
         <main className="site-main">
+          <LiveStatus freeCount={freeCount} />
           <Body
+            mode="Home"
+            name={"Your campus Parking Assistant"}
             spots={spots}
             setSpots={setSpots}
             setSelectedSpot={setSelectedSpot}
@@ -167,6 +186,7 @@ const Home = () => {
             setLocked={setLocked}
             lockedSpotId={lockedSpotId}
             setLockedSpotId={setLockedSpotId}
+            setFreeCount={setFreeCount}
           />
 
           <Report
@@ -176,7 +196,11 @@ const Home = () => {
             setSelectedSpot={setSelectedSpot}
             setIsVisible={setIsVisible}
             setMessage={setMessage}
+            count={freeCount}
           />
+          <QuickActions />
+
+          <Fab />
         </main>
       )}
       {showmodal && (

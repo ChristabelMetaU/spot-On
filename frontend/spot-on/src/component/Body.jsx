@@ -11,7 +11,6 @@ import React, { useState, useMemo, useCallback } from "react";
 import { clusterSpots } from "../utils/clusterSpots";
 import { set } from "date-fns";
 import { sendWebSocket } from "../utils/websocket";
-import { useEffect } from "react";
 const containerStyle = {
   width: "100%",
   height: "100%",
@@ -20,6 +19,8 @@ const containerStyle = {
 };
 
 const Body = ({
+  mode,
+  name,
   spots,
   setSpots,
   setSelectedSpot,
@@ -32,9 +33,11 @@ const Body = ({
   lockedSpotId,
   setLockedSpotId,
 }) => {
+  const isHome = mode === "Home" ? true : false;
   const { loading, user } = useAuth();
   const [len, setLen] = useState(0);
   const [map, setMap] = useState(null);
+  let count = 0;
   const [zoom, setZoom] = useState(17);
   const center = { lat: 35.8486, lng: -86.3669 };
   const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_KEY;
@@ -56,63 +59,72 @@ const Body = ({
   };
 
   const handleMapClick = async (e) => {
-    setLen(len + 1);
-    const newSpot = {
-      lotName: `East of Gree spot ${len}`,
-      type: "white handicap",
-      coordLat: e.latLng.lat(),
-      coordLng: e.latLng.lng(),
-      isOccupied: false,
-    };
-    try {
-      const response = await fetch("http://localhost:3000/spots/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newSpot),
-      });
-      if (!response.ok) {
-        throw new Error("Error now adding new spot");
+    if (isHome) {
+      setLen(len + 1);
+      const newSpot = {
+        lotName: `East of Gree spot ${len}`,
+        type: "white handicap",
+        coordLat: e.latLng.lat(),
+        coordLng: e.latLng.lng(),
+        isOccupied: false,
+      };
+      try {
+        const response = await fetch("http://localhost:3000/spots/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newSpot),
+        });
+        if (!response.ok) {
+          throw new Error("Error now adding new spot");
+        }
+        const savedSpot = await response.json();
+        setSpots([...spots, savedSpot]);
+      } catch (error) {
+        throw new Error("Error adding new spot");
       }
-      const savedSpot = await response.json();
-      setSpots([...spots, savedSpot]);
-    } catch (error) {
-      throw new Error("Error adding new spot");
     }
   };
 
   const displaySpotInfo = (spot, i) => {
-    setShowModal(true);
-    setSelectedSpot(spot);
+    if (isHome) {
+      setShowModal(true);
+      setSelectedSpot(spot);
 
-    setLockedSpotId(spot.id);
-    setLocked(true);
-    setActive({ spot, idx: i });
+      setLockedSpotId(spot.id);
+      setLocked(true);
+      setActive({ spot, idx: i });
 
-    sendWebSocket({
-      type: "LOCK_SPOT",
-      spotId: spot.id,
-      userId: user.id,
-    });
+      sendWebSocket({
+        type: "LOCK_SPOT",
+        spotId: spot.id,
+        userId: user.id,
+      });
+    }
   };
 
   const filtered = useMemo(() => {
-    return spots.filter((spot) => {
-      const types = spot.type.split(/\s+/);
-      const typeOk = types.some((t) => activeFilters[t.toLowerCase()]);
-      const occOk = spot.isOccupied
-        ? activeFilters.occupied
-        : activeFilters.free;
-      return typeOk && occOk;
-    });
+    if (isHome) {
+      return spots.filter((spot) => {
+        const types = spot.type.split(/\s+/);
+        const typeOk = types.some((t) => activeFilters[t.toLowerCase()]);
+        const occOk = spot.isOccupied
+          ? activeFilters.occupied
+          : activeFilters.free;
+        return typeOk && occOk;
+      });
+    } else {
+      return spots;
+    }
   }, [activeFilters, spots]);
 
   const clustered = useMemo(() => {
     return clusterSpots(filtered, 80);
   }, [filtered]);
+
   const getIcon = (spot) => {
-    if (lockedSpotId === spot.id && locked) {
+    if (lockedSpotId === spot.id && locked && isHome) {
       return "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
     }
     if (spot.isOccupied) {
@@ -123,7 +135,7 @@ const Body = ({
   };
   return (
     <section className="map-container">
-      <div className="map-title"> Campus Pakring assistant</div>
+      <div className="map-title"> {name}</div>
       <LoadScript googleMapsApiKey={googleMapsApiKey}>
         {loading ? (
           <MapLoading />
@@ -145,7 +157,6 @@ const Body = ({
                 return group.map((spot, i) => {
                   const nameArr = spot.lotName.split(" ");
                   const name = nameArr[nameArr.length - 1];
-
                   return (
                     <React.Fragment key={spot.id}>
                       <Marker
