@@ -90,7 +90,6 @@ function AppRoutes() {
                 setShowModal={setShowModal}
                 setActive={setActive}
                 activeFilters={activeFilters}
-                userLocation={userLocation}
                 locked={locked}
                 setLocked={setLocked}
                 lockedSpotId={lockedSpotId}

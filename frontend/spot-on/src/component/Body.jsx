@@ -4,6 +4,7 @@ import {
   LoadScript,
   Marker,
   OverlayView,
+  Polyline,
 } from "@react-google-maps/api";
 import MapLoading from "./MapLoading";
 import { useAuth } from "./AuthContext";
@@ -11,6 +12,7 @@ import React, { useState, useMemo, useCallback } from "react";
 import { clusterSpots } from "../utils/clusterSpots";
 import { set } from "date-fns";
 import { sendWebSocket } from "../utils/websocket";
+const LIBRARIES = ["places"];
 const containerStyle = {
   width: "100%",
   height: "100%",
@@ -32,6 +34,7 @@ const Body = ({
   setLocked,
   lockedSpotId,
   setLockedSpotId,
+  routePath,
 }) => {
   const isHome = mode === "Home" ? true : false;
   const { loading, user } = useAuth();
@@ -39,9 +42,9 @@ const Body = ({
   const [map, setMap] = useState(null);
   let count = 0;
   const [zoom, setZoom] = useState(17);
-  const center = { lat: 35.8486, lng: -86.3669 };
   const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_KEY;
   const CLUSTER_BREAKPOINT = 19;
+
   const onLoad = useCallback((mapInstance) => {
     setMap(mapInstance);
 
@@ -62,8 +65,8 @@ const Body = ({
     if (isHome) {
       setLen(len + 1);
       const newSpot = {
-        lotName: `East of Gree spot ${len}`,
-        type: "white handicap",
+        lotName: `Jones Lot spot ${len}`,
+        type: "white",
         coordLat: e.latLng.lat(),
         coordLng: e.latLng.lng(),
         isOccupied: false,
@@ -136,7 +139,7 @@ const Body = ({
   return (
     <section className="map-container">
       <div className="map-title"> {name}</div>
-      <LoadScript googleMapsApiKey={googleMapsApiKey}>
+      <LoadScript googleMapsApiKey={googleMapsApiKey} libraries={LIBRARIES}>
         {loading ? (
           <MapLoading />
         ) : (
@@ -167,6 +170,19 @@ const Body = ({
                           displaySpotInfo(spot, i);
                         }}
                       />
+                      {routePath && routePath.length > 0 && (
+                        <Polyline
+                          path={routePath.map((p) => ({
+                            lat: p.lat,
+                            lng: p.lng,
+                          }))}
+                          options={{
+                            strokeColor: "#4285F4",
+                            strokeOpacity: 0.8,
+                            strokeWeight: 4,
+                          }}
+                        />
+                      )}
                       <OverlayView
                         position={{ lat: spot.coordLat, lng: spot.coordLng }}
                         mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
@@ -244,7 +260,7 @@ const Body = ({
                         boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
                       }}
                     >
-                      {`Lot has ${count} spots`}
+                      {`spots: ${count}`}
                     </div>
                   </OverlayView>
                 </React.Fragment>
