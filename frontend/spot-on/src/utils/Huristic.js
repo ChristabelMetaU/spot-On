@@ -1,6 +1,5 @@
 /** @format */
-
-function getDistance(lat1, lng1, lat2, lng2) {
+export function getDistance(lat1, lng1, lat2, lng2) {
   const RaduisEarth = 6371;
   const toRad = (value) => (value * Math.PI) / 180;
   const dLat = toRad(lat2 - lat1);
@@ -37,7 +36,9 @@ export function buildGraph(userLocation, nearbySpots) {
   const nodes = [];
   const userNode = new Node("user", userLocation.lat, userLocation.lng);
   nodes.push(userNode);
-
+  if (nearbySpots.length === 0) {
+    return { userNode, spotNodes: [], allNodes: nodes };
+  }
   const spotNodes = nearbySpots.map((spot, i) => {
     const node = new Node(`spot-${i}`, spot.coordLat, spot.coordLng);
     nodes.push(node);
@@ -64,7 +65,7 @@ export function customPathFinder(startNode, goalNodes) {
   queue.push({ node: startNode, cost: 0 });
   while (queue.length > 0) {
     queue.sort((a, b) => a.cost - b.cost);
-    const current = queue.shift().node;
+    const { node: current } = queue.shift();
     if (visited.has(current.id)) {
       continue;
     }
@@ -87,16 +88,16 @@ export function customPathFinder(startNode, goalNodes) {
         costSoFar[neighbor.id] = newCost;
         cameFrom[neighbor.id] = current;
 
-        const Heurestic = Math.min(
-          ...goalNodes.map((g) =>
-            getDistance(neighbor.lat, neighbor.lng, g.lat, g.lng)
-          )
+        const Heurestic = getDistance(
+          neighbor.lat,
+          neighbor.lng,
+          goalNodes[0].lat,
+          goalNodes[0].lng
         );
 
-        const priority = newCost + Heurestic; //will be customized later
+        const priority = newCost + Heurestic; //will be customized more
         queue.push({ node: neighbor, cost: priority });
       }
     }
   }
-  return null;
 }

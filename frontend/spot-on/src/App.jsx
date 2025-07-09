@@ -28,6 +28,8 @@ function AppRoutes() {
   const [locked, setLocked] = useState(false);
   const [lockedSpotId, setLockedSpotId] = useState(null);
   const [freeCount, setFreeCount] = useState(0);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [destinationLocation, setDestinationLocation] = useState(null);
   const [activeFilters, setActiveFilters] = useState({
     red: true,
     green: true,
@@ -75,6 +77,8 @@ function AppRoutes() {
                 setFreeCount={setFreeCount}
                 activeFilters={activeFilters}
                 setActiveFilters={setActiveFilters}
+                setIsMapLoaded={setIsMapLoaded}
+                destinationLocation={destinationLocation}
               />
             </ProtectedRoute>
           }
@@ -95,6 +99,9 @@ function AppRoutes() {
                 lockedSpotId={lockedSpotId}
                 setLockedSpotId={setLockedSpotId}
                 setFreeCount={setFreeCount}
+                isMapLoaded={isMapLoaded}
+                destinationLocation={destinationLocation}
+                setDestinationLocation={setDestinationLocation}
               />
             </ProtectedRoute>
           }

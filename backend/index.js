@@ -60,10 +60,10 @@ wss.on("connection", (ws) => {
   ws.on("message", async (message) => {
     const data = JSON.parse(message);
     let broadCastData = null;
-    //check to see before user update a spot through a report it is not locked
+
     if (data.type === "UPDATE_SPOT_BY_REPORT") {
       const now = Date.now();
-      //get spot id by data.spotName return only id
+
       const spot = await prisma.spots.findFirst({
         where: {
           lotName: data.spotName,
@@ -106,7 +106,7 @@ wss.on("connection", (ws) => {
           })
         );
       }
-      //create a lock for the spot
+
       const lockSpot = await prisma.lockedSpot.create({
         data: {
           spotId: spot.id,
