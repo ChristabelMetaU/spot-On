@@ -2,7 +2,11 @@
 import "../styles/Home.css";
 import { useNavigate } from "react-router-dom";
 import Body from "./Body";
-import { use, useState } from "react";
+import { useRef, useEffect, useState } from "react";
+import { buildGraph } from "../utils/Huristic";
+import DestSearch from "./DestSearch";
+import { customPathFinder } from "../utils/Huristic";
+import { getDaysInYear, set } from "date-fns";
 const RouteDetails = ({
   spots,
   setSpots,
@@ -10,7 +14,6 @@ const RouteDetails = ({
   setShowModal,
   setActive,
   activeFilters,
-  userLocation,
   locked,
   setLocked,
   lockedSpotId,
@@ -18,8 +21,16 @@ const RouteDetails = ({
   setFreeCount,
 }) => {
   const navigate = useNavigate();
+  let userLocation = {
+    lat: 35.8486,
+    lng: -86.3669,
+  };
   const [clicked, setClicked] = useState(false);
-  const [showSearch, setShowSearch] = useState(false);
+  const [mode, setMode] = useState("user-to-spot");
+  const [destinationLocation, setDestinationLocation] = useState("");
+  const [routePath, setRoutePath] = useState([]);
+  const [destSpots, setDestSpots] = useState(spots);
+
   return (
     <>
       <div className="route-header">
@@ -42,7 +53,7 @@ const RouteDetails = ({
           className={!clicked ? "active" : "toggle-button"}
           onClick={() => {
             setClicked(false);
-            setShowSearch(false);
+            setMode("user-to-spot");
           }}
         >
           From me to spot
@@ -51,16 +62,14 @@ const RouteDetails = ({
           className={clicked ? "active" : "toggle-button"}
           onClick={() => {
             setClicked((f) => !f);
-            setShowSearch(true);
+            setMode("destination-to-spot");
           }}
         >
           From destination to Spot
         </div>
       </div>
-      {showSearch && (
-        <div className="search-bar">
-          <input type="text" placeholder="Search for a destination" />
-        </div>
+      {mode === "destination-to-spot" && (
+        <DestSearch onSelect={(loc) => setDestinationLocation(loc)} />
       )}
       <div className="site-main">
         <Body
@@ -78,6 +87,7 @@ const RouteDetails = ({
           lockedSpotId={lockedSpotId}
           setLockedSpotId={setLockedSpotId}
           setFreeCount={setFreeCount}
+          routePath={routePath}
         />
       </div>
       <div className="route-summary">
