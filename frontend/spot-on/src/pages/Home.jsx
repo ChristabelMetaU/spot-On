@@ -6,16 +6,9 @@ import Body from "../component/Body";
 import Footer from "../component/Footer";
 import Report from "../component/Report";
 import { useState, useEffect, useRef } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
 import Message from "../component/Message";
 import QuickActions from "../component/QuickActions";
 import LiveStatus from "../component/LiveStatus";
-import RouteDetails from "../component/RouteDetails";
 import Fab from "../component/Fab";
 import SpotModal from "../component/SpotModal";
 import MapLoading from "../component/MapLoading";
@@ -41,6 +34,7 @@ const Home = ({
   activeFilters,
   setActiveFilters,
 }) => {
+  const mode = "Home";
   const [message, setMessage] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const { user } = useAuth();
@@ -67,6 +61,10 @@ const Home = ({
   }, []);
   useEffect(() => {
     const fetchSpots = async () => {
+      let userLocation = {
+        lat: 35.8486,
+        lng: -86.3669,
+      };
       if (!userLocation) {
         return;
       }
@@ -75,7 +73,7 @@ const Home = ({
         return;
       }
       const response = await fetch(
-        `http://localhost:3000/map/spots?lat=${35.8465869577069}&lng=${-86.3668367808604}&radius=200`
+        `http://localhost:3000/map/spots?lat=${lat}&lng=${lng}&radius=200`
       );
       const data = await response.json();
       if (!data) {
@@ -104,7 +102,7 @@ const Home = ({
         setMessage(data.message);
       }
     });
-  }, [user, userLocation, selectedSpot, locked, lockedSpotId]);
+  }, [user, userLocation, selectedSpot, locked, lockedSpotId, mode]);
 
   const updateIsOccupied = async (Occupied) => {
     const id = Number(selectedSpot.id);
@@ -173,7 +171,7 @@ const Home = ({
         <main className="site-main">
           <LiveStatus freeCount={freeCount} />
           <Body
-            mode="Home"
+            mode={mode}
             name={"Your campus Parking Assistant"}
             spots={spots}
             setSpots={setSpots}
