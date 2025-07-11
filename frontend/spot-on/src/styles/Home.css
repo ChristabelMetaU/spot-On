@@ -272,6 +272,51 @@ body {
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
+.fab-route {
+  position: fixed;
+  right: 20px;
+  background-color: #1c2e46;
+  color: #fff;
+  width: 70px;
+  height: 60px;
+  border-radius: 50%;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+.fab-route:hover {
+  transform: rotate(360deg);
+  background-color: #dcdee5;
+  color: #1c2e46;
+}
+.fab-rotate {
+  position: fixed;
+  background-color: #1c2e46;
+  color: #fff;
+  left: 25px;
+  bottom: 30px;
+  width: 70px;
+  height: 60px;
+  border-radius: 50%;
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
+}
+
+.fab-rotate:hover {
+  transform: rotate(360deg);
+  background-color: #dcdee5;
+  color: #1c2e46;
+}
 .report-btn {
   background: var(--nav-color);
   color: #fff;
@@ -283,7 +328,9 @@ body {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   transition: transform 0.2s;
 }
-
+.fab-route p {
+  margin: 0;
+}
 .report-btn:hover {
   transform: translateY(-3px);
 }

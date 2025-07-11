@@ -1,6 +1,6 @@
 /** @format */
 import { useNavigate } from "react-router-dom";
-const Fab = ({ onClick }) => {
+const Fab = () => {
   const navigate = useNavigate();
   return (
     <button className="fab" onClick={() => navigate("/Home/RouteDetails")}>
