@@ -15,7 +15,7 @@ import Welcome from "./pages/Welcome";
 import RouteDetails from "./component/RouteDetails";
 import { AuthProvider } from "./component/AuthContext";
 import { useAuth } from "./component/AuthContext";
-
+import { MapProvider } from "./component/MapContext";
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
   return user ? <Outlet /> : <Navigate to="/Welcome" />;
@@ -103,6 +103,7 @@ function AppRoutes() {
                 isMapLoaded={isMapLoaded}
                 destinationLocation={destinationLocation}
                 setDestinationLocation={setDestinationLocation}
+                userLocation={userLocation}
               />
             }
           />
@@ -116,11 +117,13 @@ function AppRoutes() {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppRoutes />
-      </Router>
-    </AuthProvider>
+    <MapProvider>
+      <AuthProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </AuthProvider>
+    </MapProvider>
   );
 }
 

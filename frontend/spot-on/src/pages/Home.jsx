@@ -76,27 +76,22 @@ const Home = ({
       if (!lat || !lng) {
         return;
       }
-
-      const dist = getDistance(
-        userLocation.lat,
-        userLocation.lng,
-        MTSU_CENTER.lat,
-        MTSU_CENTER.lng
-      );
-      if (dist > 0.5) {
-        lat = MTSU_CENTER.lat;
-        lng = MTSU_CENTER.lng;
-      }
-
-      const response = await fetch(
-        `http://localhost:3000/map/spots?lat=${lat}&lng=${lng}&radius=200`
-      );
-      const data = await response.json();
-      if (!data) {
-        setSpots([]);
-      } else {
-        setSpots(data);
-        setFreeCount(data.filter((spot) => spot.isOccupied === false).length);
+      let tempSPots = [];
+      let raduis = 200;
+      while (tempSPots.length < 1) {
+        const response = await fetch(
+          `http://localhost:3000/map/spots?lat=${lat}&lng=${lng}&radius=${raduis}`
+        );
+        const data = await response.json();
+        if (!data || data.length < 1) {
+          setSpots([]);
+          setFreeCount(0);
+          raduis += 1000000;
+        } else {
+          tempSPots = data;
+          setSpots(data);
+          setFreeCount(data.filter((spot) => spot.isOccupied === false).length);
+        }
       }
     };
     // connectWebSocket
@@ -104,6 +99,14 @@ const Home = ({
 
     connectWebSocket((data) => {
       if (data.type === "SPOT_UPDATED") {
+        const index = spots.findIndex((spot) => spot.id === data.spotId);
+        if (index !== -1) {
+          let newSpots = [...spots];
+          newSpots[index] = data.spot;
+          if (activeFilters.length > 0) {
+            setSpots(newSpots);
+          }
+        }
       }
       if (data.type === "SPOT_LOCKED") {
         setLocked(data.locked);

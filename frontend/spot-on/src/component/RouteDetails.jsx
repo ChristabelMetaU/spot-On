@@ -8,6 +8,7 @@ import DestSearch from "./DestSearch";
 import { customPathFinder } from "../utils/Huristic";
 import { getDistance } from "../utils/Huristic";
 import { formatTime } from "../utils/formatTime";
+import { useMap } from "./MapContext";
 const RouteDetails = ({
   spots,
   setSpots,
@@ -24,11 +25,14 @@ const RouteDetails = ({
   setDestinationLocation,
 }) => {
   const navigate = useNavigate();
+  //for production
   const userLocation = useRef({
-    lat: 35.849342346191406,
-    lng: -86.47401428222656,
+    lat: 35.8457602,
+    lng: -86.3789569,
   }).current;
+  const { map } = useMap();
   const directionsService = useRef(new window.google.maps.DirectionsService());
+  const [originlalSpots, setOriginalSpots] = useState(spots);
   const [clicked, setClicked] = useState(false);
   const [mode, setMode] = useState("user-to-spot");
   const [routePath, setRoutePath] = useState([]);
@@ -37,15 +41,11 @@ const RouteDetails = ({
   const [stats, setStats] = useState({});
   const [isDriving, setIsDriving] = useState(true);
   const [heading, setHeading] = useState(0);
-  function computeHeading(from, to) {
-    const fromLatLng = new window.google.maps.LatLng(from.lat, from.lng);
-    const toLatLng = new window.google.maps.LatLng(to.lat, to.lng);
-    const heading = window.google.maps.geometry.spherical.computeHeading(
-      fromLatLng,
-      toLatLng
-    );
-    return heading;
-  }
+  const rotateMap = () => {
+    const newHeading = (heading + 45) % 360;
+    setHeading(newHeading);
+    map.setHeading(newHeading);
+  };
   function getGoogleDirections(start, end) {
     directionsService.current.route(
       {
@@ -86,7 +86,7 @@ const RouteDetails = ({
       );
     }
     distance = distance * 1000;
-    let speedinMetersPerSecond = isDriving ? 30 : 6;
+    let speedinMetersPerSecond = isDriving ? 10 : 1.4;
     speedinMetersPerSecond = (speedinMetersPerSecond * 1000) / 3600;
     let etaSeconds = distance / speedinMetersPerSecond;
     //round seconds
@@ -106,7 +106,17 @@ const RouteDetails = ({
       accuracy: accuracy,
     };
   }
+  const computeShortestPath = (nearByFreeSpots) => {
+    const { userNode, spotNodes } = buildGraph(startLocation, nearByFreeSpots);
+    const path = customPathFinder(userNode, spotNodes);
 
+    if (path.length > 0) {
+      setEndLocation(path[path.length - 1]);
+    }
+    getGoogleDirections(startLocation, path[path.length - 1]);
+    const tempStats = computeStats(path);
+    setStats(tempStats);
+  };
   useEffect(() => {
     let nearByFreeSpots = [];
     const upsateRoute = async () => {
@@ -120,10 +130,7 @@ const RouteDetails = ({
             `http://localhost:3000/map/spots?lat=${destinationLocation.lat}&lng=${destinationLocation.lng}&radius=${raduis}`
           );
           const data = await response.json();
-          if (!data) {
-            raduis += 200;
-            continue;
-          } else if (data.length < 1) {
+          if (!data || data.length < 1) {
             raduis += 200;
             continue;
           } else if (data.length >= 1) {
@@ -133,25 +140,23 @@ const RouteDetails = ({
           }
         }
       }
-
-      const { userNode, spotNodes } = buildGraph(
-        startLocation,
-        nearByFreeSpots
-      );
-
-      const path = customPathFinder(userNode, spotNodes);
-
-      if (path.length > 0) {
-        setEndLocation(path[path.length - 1]);
-      }
-      getGoogleDirections(startLocation, path[path.length - 1]);
-      const tempStats = computeStats(path);
-      setStats(tempStats);
+      computeShortestPath(nearByFreeSpots);
     };
 
     upsateRoute();
-  }, [mode, destinationLocation, startLocation, isDriving]);
+    setDestinationLocation(null);
+  }, [mode, destinationLocation, startLocation, isDriving, clicked]);
 
+  useEffect(() => {
+    if (!clicked) {
+      setMode("user-to-spot");
+      setSpots(originlalSpots);
+      const nearByFreeSpots = originlalSpots.filter(
+        (spot) => spot.isOccupied === false
+      );
+      computeShortestPath(nearByFreeSpots);
+    }
+  }, [clicked]);
   return (
     <>
       <div className="route-header">
@@ -192,13 +197,7 @@ const RouteDetails = ({
       {mode === "destination-to-spot" && (
         <DestSearch onSelect={(loc) => setDestinationLocation(loc)} />
       )}
-      <button
-        className="fab-rotate"
-        onClick={() => {
-          const heading = computeHeading(startLocation, endLocation);
-          setHeading(heading);
-        }}
-      >
+      <button className="fab-rotate" onClick={rotateMap}>
         Rotate Map
       </button>
       <button className="fab-route" onClick={() => setIsDriving(!isDriving)}>
@@ -212,6 +211,7 @@ const RouteDetails = ({
       <div className="site-main">
         <Body
           mode="route"
+          routeMode={mode}
           name={"Your Smart Router"}
           spots={spots}
           setSpots={setSpots}
