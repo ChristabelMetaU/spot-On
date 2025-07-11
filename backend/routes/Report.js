@@ -5,7 +5,6 @@ const reportRouter = Router();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-//create new reports
 reportRouter.post("/create", async (req, res) => {
   try {
     const { description, type, user_id, spot_name } = req.body;
@@ -29,7 +28,6 @@ reportRouter.post("/create", async (req, res) => {
   }
 });
 
-//fetch report for a spot
 reportRouter.get("/spot/:name", async (req, res) => {
   try {
     const { name } = req.params;
@@ -47,4 +45,30 @@ reportRouter.get("/spot/:name", async (req, res) => {
   }
 });
 
+reportRouter.get("/spot/latlng/:lat/:lng", async (req, res) => {
+  try {
+    const { lat, lng } = req.params;
+
+    const spot = await prisma.spots.findFirst({
+      where: {
+        coordLat: parseFloat(lat),
+        coordLng: parseFloat(lng),
+      },
+    });
+    if (!spot) {
+      return res.status(404).json({ message: "Spot not found" });
+    }
+    const reports = await prisma.reports.findMany({
+      where: {
+        spot_name: spot.name,
+      },
+    });
+    if (!reports) {
+      return res.status(404).json({ message: "Reports not found" });
+    }
+    res.json(reports);
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 module.exports = reportRouter;

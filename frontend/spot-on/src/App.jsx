@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   Navigate,
+  Outlet,
 } from "react-router-dom";
 import { useState } from "react";
 import Login from "./pages/Login";
@@ -17,7 +18,7 @@ import { useAuth } from "./component/AuthContext";
 
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
-  return user ? children : <Navigate to="/Welcome" />;
+  return user ? <Outlet /> : <Navigate to="/Welcome" />;
 }
 function AppRoutes() {
   const [spots, setSpots] = useState([]);
@@ -54,10 +55,11 @@ function AppRoutes() {
           path="/Login"
           element={!user ? <Login /> : <Navigate to="/" />}
         />
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
+
+        <Route element={<ProtectedRoute />}>
+          <Route
+            path="/"
+            element={
               <Home
                 spots={spots}
                 setSpots={setSpots}
@@ -80,13 +82,12 @@ function AppRoutes() {
                 setIsMapLoaded={setIsMapLoaded}
                 destinationLocation={destinationLocation}
               />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/Home/RouteDetails"
-          element={
-            <ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/Home/RouteDetails"
+            element={
               <RouteDetails
                 spots={spots}
                 setSpots={setSpots}
@@ -103,17 +104,11 @@ function AppRoutes() {
                 destinationLocation={destinationLocation}
                 setDestinationLocation={setDestinationLocation}
               />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/Profile"
-          element={
-            <ProtectedRoute>
-              <UserProfile />
-            </ProtectedRoute>
-          }
-        />
+            }
+          />
+
+          <Route path="/Profile" element={<UserProfile />} />
+        </Route>
       </Routes>
     </>
   );

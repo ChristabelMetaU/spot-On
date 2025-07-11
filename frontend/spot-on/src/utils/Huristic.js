@@ -1,4 +1,41 @@
 /** @format */
+
+const FREQUENCY_THRESHOLD = 4;
+const WINDOW_MINUTES = 10;
+const WINDOW_SIZE = 60 * 1000 * WINDOW_MINUTES; // 10 minutes
+function isTooFrequent(times) {
+  const now = Date.now();
+  const recentReports = times.filter((time) => now - time <= WINDOW_SIZE);
+  return recentReports.length >= FREQUENCY_THRESHOLD;
+}
+
+const fetchReports = async (lat, lng) => {
+  const reports = await fetch(
+    `http://localhost:3000/report/spot/latlng/${lat}/${lng}`
+  );
+  const reportsSpots = await reports.json();
+  if (reportsSpots.length === 0) {
+    return [];
+  }
+  return reportsSpots;
+};
+const processSpotReports = async (spot) => {
+  if (!spot) {
+    return false;
+  }
+  const reports = await fetchReports(spot.lat, spot.lng);
+  if (reports.length === 0) {
+    return false;
+  }
+  //get createdat times for spot's reports
+  const times = reports.map((report) => report.created_at);
+
+  if (isTooFrequent(times)) {
+    return true;
+  } else {
+    return false;
+  }
+};
 export function getDistance(lat1, lng1, lat2, lng2) {
   const RaduisEarth = 6371;
   const toRad = (value) => (value * Math.PI) / 180;
@@ -31,7 +68,6 @@ function addedge(nodeA, nodeB, weight) {
   nodeB.edges.push({ node: nodeA, weight });
 }
 
-//TODO: will be replaced with actual data
 export function buildGraph(userLocation, nearbySpots) {
   const nodes = [];
   const userNode = new Node("user", userLocation.lat, userLocation.lng);
@@ -40,7 +76,7 @@ export function buildGraph(userLocation, nearbySpots) {
     return { userNode, spotNodes: [], allNodes: nodes };
   }
   const spotNodes = nearbySpots.map((spot, i) => {
-    const node = new Node(`spot-${i}`, spot.coordLat, spot.coordLng);
+    const node = new Node(spot.id, spot.coordLat, spot.coordLng);
     nodes.push(node);
     const dist = getDistance(
       userLocation.lat,
@@ -55,7 +91,6 @@ export function buildGraph(userLocation, nearbySpots) {
   return { userNode, spotNodes, allNodes: nodes };
 }
 
-//Heurestic guided greedy search
 export function customPathFinder(startNode, goalNodes) {
   const visited = new Set();
   const cameFrom = {};
@@ -76,7 +111,6 @@ export function customPathFinder(startNode, goalNodes) {
       while (cameFrom[path[0].id]) {
         path.unshift(cameFrom[path[0].id]);
       }
-
       return path;
     }
 
@@ -94,8 +128,15 @@ export function customPathFinder(startNode, goalNodes) {
           goalNodes[0].lat,
           goalNodes[0].lng
         );
-
-        const priority = newCost + Heurestic; //will be customized more
+        let adjustedCost = newCost;
+        const isTooFrequent = processSpotReports(neighbor);
+        if (isTooFrequent) {
+          adjustedCost -= 0.5;
+          adjustedCost = Math.max(0, adjustedCost);
+        } else {
+          adjustedCost += 0.2;
+        }
+        const priority = adjustedCost + Heurestic;
         queue.push({ node: neighbor, cost: priority });
       }
     }

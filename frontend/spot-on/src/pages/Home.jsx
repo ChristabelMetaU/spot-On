@@ -12,7 +12,11 @@ import LiveStatus from "../component/LiveStatus";
 import Fab from "../component/Fab";
 import SpotModal from "../component/SpotModal";
 import MapLoading from "../component/MapLoading";
+import { getDistance } from "../utils/Huristic";
 import "../styles/Home.css";
+
+// TODO:
+// IF USER FAR FROM SCHOOL DISPLAY SPOTS CLOSEST TO USER IN HOME MAP
 import { connectWebSocket, sendWebSocket } from "../utils/websocket";
 const Home = ({
   spots,
@@ -40,6 +44,10 @@ const Home = ({
   const { user } = useAuth();
   const [showFilters, setShowFilters] = useState(false);
   const [userLocationError, setUserLocationError] = useState(null);
+  const MTSU_CENTER = {
+    lat: 35.8486,
+    lng: -86.3669,
+  };
   useEffect(() => {
     if (!navigator.geolocation) {
       setUserLocationError("Geolocation is not supported by your browser");
@@ -61,17 +69,25 @@ const Home = ({
   }, []);
   useEffect(() => {
     const fetchSpots = async () => {
-      let userLocation = {
-        lat: 35.8486,
-        lng: -86.3669,
-      };
       if (!userLocation) {
         return;
       }
-      const { lat, lng } = userLocation;
+      let { lat, lng } = userLocation;
       if (!lat || !lng) {
         return;
       }
+
+      const dist = getDistance(
+        userLocation.lat,
+        userLocation.lng,
+        MTSU_CENTER.lat,
+        MTSU_CENTER.lng
+      );
+      if (dist > 0.5) {
+        lat = MTSU_CENTER.lat;
+        lng = MTSU_CENTER.lng;
+      }
+
       const response = await fetch(
         `http://localhost:3000/map/spots?lat=${lat}&lng=${lng}&radius=200`
       );

@@ -7,7 +7,7 @@ import { buildGraph } from "../utils/Huristic";
 import DestSearch from "./DestSearch";
 import { customPathFinder } from "../utils/Huristic";
 import { getDistance } from "../utils/Huristic";
-import { set } from "date-fns";
+import { formatTime } from "../utils/formatTime";
 const RouteDetails = ({
   spots,
   setSpots,
@@ -25,8 +25,8 @@ const RouteDetails = ({
 }) => {
   const navigate = useNavigate();
   const userLocation = useRef({
-    lat: 35.8486,
-    lng: -86.3669,
+    lat: 35.849342346191406,
+    lng: -86.47401428222656,
   }).current;
   const directionsService = useRef(new window.google.maps.DirectionsService());
   const [clicked, setClicked] = useState(false);
@@ -35,13 +35,25 @@ const RouteDetails = ({
   const [startLocation, setStartLocation] = useState(userLocation);
   const [endLocation, setEndLocation] = useState(null);
   const [stats, setStats] = useState({});
-
-  function getGoodleDirections(start, end) {
+  const [isDriving, setIsDriving] = useState(true);
+  const [heading, setHeading] = useState(0);
+  function computeHeading(from, to) {
+    const fromLatLng = new window.google.maps.LatLng(from.lat, from.lng);
+    const toLatLng = new window.google.maps.LatLng(to.lat, to.lng);
+    const heading = window.google.maps.geometry.spherical.computeHeading(
+      fromLatLng,
+      toLatLng
+    );
+    return heading;
+  }
+  function getGoogleDirections(start, end) {
     directionsService.current.route(
       {
         origin: start,
         destination: end,
-        travelMode: google.maps.TravelMode.DRIVING,
+        travelMode: isDriving
+          ? google.maps.TravelMode.DRIVING
+          : google.maps.TravelMode.WALKING,
       },
       (result, status) => {
         if (status === "OK") {
@@ -73,36 +85,53 @@ const RouteDetails = ({
         path[i].lng
       );
     }
-    distance = distance * 16000; // convert to miles
-    const avgWalkspeed = 1.4; // miles per second
-    const etaSeconds = distance / avgWalkspeed;
+    distance = distance * 1000;
+    let speedinMetersPerSecond = isDriving ? 30 : 6;
+    speedinMetersPerSecond = (speedinMetersPerSecond * 1000) / 3600;
+    let etaSeconds = distance / speedinMetersPerSecond;
+    //round seconds
+    etaSeconds = Math.round(etaSeconds);
+    const eta = formatTime(etaSeconds);
+    distance = Math.round(distance);
+    distance = distance.toLocaleString("en-US", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
+    distance = distance + "m";
+    const accuracy = "90%";
 
     return {
-      totalDistance: Math.round(distance),
-      eta: Math.round(etaSeconds / 60),
+      totalDistance: distance,
+      eta: eta,
+      accuracy: accuracy,
     };
   }
 
   useEffect(() => {
     let nearByFreeSpots = [];
     const upsateRoute = async () => {
-      if (destinationLocation) {
-        const response = await fetch(
-          `http://localhost:3000/map/spots?lat=${destinationLocation.lat}&lng=${destinationLocation.lng}&radius=200`
-        );
-
-        const data = await response.json();
-
-        if (!data) {
-          return;
-        } else {
-          setSpots(data);
-          nearByFreeSpots = data.filter((spot) => spot.isOccupied === false);
-        }
-      }
-
-      if (mode === "user-to-spot") {
+      if (!destinationLocation) {
         nearByFreeSpots = spots.filter((spot) => spot.isOccupied === false);
+      } else if (destinationLocation) {
+        let tempSpots = [];
+        let raduis = 200;
+        while (tempSpots.length < 1) {
+          const response = await fetch(
+            `http://localhost:3000/map/spots?lat=${destinationLocation.lat}&lng=${destinationLocation.lng}&radius=${raduis}`
+          );
+          const data = await response.json();
+          if (!data) {
+            raduis += 200;
+            continue;
+          } else if (data.length < 1) {
+            raduis += 200;
+            continue;
+          } else if (data.length >= 1) {
+            tempSpots = data;
+            setSpots(data);
+            nearByFreeSpots = data.filter((spot) => spot.isOccupied === false);
+          }
+        }
       }
 
       const { userNode, spotNodes } = buildGraph(
@@ -112,14 +141,16 @@ const RouteDetails = ({
 
       const path = customPathFinder(userNode, spotNodes);
 
-      setEndLocation(path[path.length - 1]);
-      getGoodleDirections(startLocation, path[path.length - 1]);
+      if (path.length > 0) {
+        setEndLocation(path[path.length - 1]);
+      }
+      getGoogleDirections(startLocation, path[path.length - 1]);
       const tempStats = computeStats(path);
       setStats(tempStats);
     };
 
     upsateRoute();
-  }, [mode, destinationLocation, startLocation]);
+  }, [mode, destinationLocation, startLocation, isDriving]);
 
   return (
     <>
@@ -151,7 +182,7 @@ const RouteDetails = ({
         <div
           className={clicked ? "active" : "toggle-button"}
           onClick={() => {
-            setClicked((f) => !f);
+            setClicked(true);
             setMode("destination-to-spot");
           }}
         >
@@ -161,6 +192,23 @@ const RouteDetails = ({
       {mode === "destination-to-spot" && (
         <DestSearch onSelect={(loc) => setDestinationLocation(loc)} />
       )}
+      <button
+        className="fab-rotate"
+        onClick={() => {
+          const heading = computeHeading(startLocation, endLocation);
+          setHeading(heading);
+        }}
+      >
+        Rotate Map
+      </button>
+      <button className="fab-route" onClick={() => setIsDriving(!isDriving)}>
+        {isDriving ? (
+          <i className="fas fa-car"></i>
+        ) : (
+          <i className="fas fa-walking"></i>
+        )}
+        <p>{isDriving ? "Driving" : "Walking"}</p>
+      </button>
       <div className="site-main">
         <Body
           mode="route"
@@ -180,6 +228,7 @@ const RouteDetails = ({
           routePath={routePath}
           destinationLocation={destinationLocation}
           endLocation={endLocation}
+          heading={heading}
         />
       </div>
       <div className="route-summary">
@@ -189,20 +238,17 @@ const RouteDetails = ({
         <div className="route-summary-body">
           <div className="route-summary-item">
             <p>distance</p>
-            <h2>
-              {stats.totalDistance}
-              cm
-            </h2>
+            <h2>{stats.totalDistance}</h2>
           </div>
 
           <div className="route-summary-item">
             <p>ETA</p>
-            <h2>{stats.eta} sec</h2>
+            <h2>{stats.eta}</h2>
           </div>
 
           <div className="route-summary-item">
             <p>Accuracy</p>
-            <h2>100%</h2>
+            <h2>99%</h2>
           </div>
         </div>
       </div>
