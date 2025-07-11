@@ -1,9 +1,10 @@
 /** @format */
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import MapLoading from "./MapLoading";
 import React from "react";
-import { GoogleMap, Marker, OverlayView } from "@react-google-maps/api";
+import { GoogleMap, Marker } from "@react-google-maps/api";
+import Overlay from "./OverlayView";
 const containerStyle = {
   width: "100%",
   height: "100%",
@@ -26,13 +27,41 @@ const Map = ({
   isHome,
   map,
   Heading,
+  routeMode,
 }) => {
   const polyLine = useRef(null);
+  const [hasPanned, setHasPanned] = useState(false);
   useEffect(() => {
-    if (isHome || !map || routePath.length < 2) return;
-    if (polyLine.current) {
+    if (map && !hasPanned && clustered.length > 0) {
+      const firstCluster = clustered[0];
+      if (firstCluster && firstCluster.centerLat && firstCluster.centerLng) {
+        const center = {
+          lat: firstCluster.centerLat,
+          lng: firstCluster.centerLng,
+        };
+        map.panTo(center);
+        setHasPanned(true);
+      }
+    }
+  }, [hasPanned, map, clustered]);
+  useEffect(() => {
+    if (isHome || !map || routePath.length < 2 || !window.google) return;
+    if (
+      polyLine.current ||
+      (polyLine.current && routeMode === "user-to-spot")
+    ) {
       polyLine.current.setMap(null);
     }
+    const glowline = new window.google.maps.Polyline({
+      path: routePath,
+      map: map,
+      strokeColor: "#00ffff",
+      strokeOpacity: 0.4,
+      strokeWeight: 15,
+      zIndex: 1,
+      geodesic: true,
+    });
+
     const newPolyLine = new window.google.maps.Polyline({
       path: routePath,
       map: map,
@@ -45,7 +74,6 @@ const Map = ({
             path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
             scale: 3,
             strokeColor: "#1e90ff",
-            boxShadow: "0 0 5px #1e90ff",
           },
           offset: "0%",
           repeat: "50px",
@@ -56,7 +84,11 @@ const Map = ({
       geodesic: true,
     });
     polyLine.current = newPolyLine;
-  }, [routePath, map]);
+    return () => {
+      glowline.setMap(null);
+      newPolyLine.setMap(null);
+    };
+  }, [routePath, map, routeMode]);
   return (
     <>
       {loading ? (
@@ -70,9 +102,13 @@ const Map = ({
           options={
             !isHome
               ? {
+                  mapId: "f4f5f6b0d0b3b3b3",
                   heading: Heading,
                   tilt: 45,
-                  disableDefaultUI: true,
+                  mapTypeId: "roadmap",
+                  disableDefaultUI: false,
+                  streetViewControl: false,
+                  zoomControl: true,
                 }
               : null
           }
@@ -81,10 +117,7 @@ const Map = ({
           {clustered.map((cluster, idx) => {
             const { centerLat, centerLng, spots: group } = cluster;
             const position = { lat: centerLat, lng: centerLng };
-
             if (zoom > CLUSTER_BREAKPOINT) {
-              map.panTo({ lat: centerLat, lng: centerLng });
-
               return group.map((spot, i) => {
                 const nameArr = spot.lotName.split(" ");
                 const name = nameArr[nameArr.length - 1];
@@ -109,35 +142,39 @@ const Map = ({
                         icon={{
                           url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
                         }}
+                        animation={window.google.maps.Animation.BOUNCE}
                       />
                     )}
-                    <OverlayView
-                      position={{ lat: spot.coordLat, lng: spot.coordLng }}
-                      mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-                    >
-                      <div
-                        style={{
-                          backgroundColor: "white",
-                          border: "1px solid black",
-                          paddingRight: "15px",
-                          borderRadius: "4px",
-                          fontSize: "12px",
-                          transform: "translate(10px -10px)",
-                          space: "nowrap",
-                          boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
-                        }}
-                      >
-                        {name}
-                      </div>
-                    </OverlayView>
+
+                    {!isHome &&
+                      endLocation &&
+                      spot.coordLat === endLocation.lat && (
+                        <Overlay
+                          title={"Your spot"}
+                          lat={spot.coordLat}
+                          lng={spot.coordLng}
+                        />
+                      )}
+                    {spot.coordLat !== endLocation?.lat && (
+                      <Overlay
+                        title={name}
+                        lat={spot.coordLat}
+                        lng={spot.coordLng}
+                      />
+                    )}
+
+                    {userLocation && (
+                      <Overlay
+                        title={"YOU"}
+                        lat={userLocation.lat}
+                        lng={userLocation.lng}
+                      />
+                    )}
                   </React.Fragment>
                 );
               });
             }
 
-            if (map) {
-              map.panTo({ lat: centerLat, lng: centerLng });
-            }
             const count = group.length;
             const radius = 24;
             const freePrcnt =
@@ -177,31 +214,22 @@ const Map = ({
                     icon={{
                       url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
                     }}
-                    animation={window.google.maps.Animation.DROP}
+                    animation={window.google.maps.Animation.BOUNCE}
+                  />
+                )}
+                {userLocation && (
+                  <Overlay
+                    title={"YOU"}
+                    lat={userLocation.lat}
+                    lng={userLocation.lng}
                   />
                 )}
 
-                <OverlayView
-                  position={{ lat: centerLat, lng: centerLng }}
-                  mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-                >
-                  <div
-                    style={{
-                      backgroundColor: "#1c2e46",
-                      border: "1px solid white",
-                      paddingRight: "45px",
-                      paddingLeft: "8px",
-                      color: "white",
-                      borderRadius: "10px",
-                      fontSize: "12px",
-                      transform: "translate(10px -10px)",
-                      space: "nowrap",
-                      boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
-                    }}
-                  >
-                    {`spots: ${count}`}
-                  </div>
-                </OverlayView>
+                <Overlay
+                  title={`spots: ${count}`}
+                  lat={centerLat}
+                  lng={centerLng}
+                />
               </React.Fragment>
             );
           })}

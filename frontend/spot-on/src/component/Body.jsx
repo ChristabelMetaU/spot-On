@@ -1,9 +1,11 @@
 /** @format */
-import { LoadScript } from "@react-google-maps/api";
+import { LoadScript, useJsApiLoader } from "@react-google-maps/api";
 import { useAuth } from "./AuthContext";
 import { useState, useMemo, useCallback } from "react";
 import { clusterSpots } from "../utils/clusterSpots";
 import { sendWebSocket } from "../utils/websocket";
+import { useMap } from "./MapContext";
+import MapLoading from "./MapLoading";
 import Map from "./Map";
 const LIBRARIES = ["geometry", "places", "routes"];
 
@@ -25,22 +27,25 @@ const Body = ({
   destinationLocation,
   endLocation,
   Heading,
+  routeMode,
 }) => {
+  const { map, onLoad } = useMap();
   const { loading, user } = useAuth();
   const [len, setLen] = useState(0);
-  const [map, setMap] = useState(null);
   let count = 0;
   const [zoom, setZoom] = useState(17);
-  const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_KEY;
   const CLUSTER_BREAKPOINT = 19;
   const isHome = mode === "Home" ? true : false;
-  const onLoad = useCallback((mapInstance) => {
-    setMap(mapInstance);
+  const onMapReady = useCallback(
+    (map) => {
+      onLoad(map);
 
-    mapInstance.addListener("zoom_changed", () => {
-      setZoom(mapInstance.getZoom());
-    });
-  }, []);
+      map.addListener("zoom_changed", () => {
+        setZoom(map.getZoom());
+      });
+    },
+    [onLoad]
+  );
 
   const handleClusterClick = ({ centerLat, centerLng }) => {
     if (!map) return;
@@ -131,29 +136,36 @@ const Body = ({
       return "http://maps.google.com/mapfiles/ms/icons/green-dot.png";
     }
   };
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_KEY,
+    libraries: LIBRARIES,
+  });
+  if (!isLoaded) {
+    return <MapLoading />;
+  }
   return (
     <section className="map-container">
       <div className="map-title"> {name}</div>
-      <LoadScript googleMapsApiKey={googleMapsApiKey} libraries={LIBRARIES}>
-        <Map
-          loading={loading}
-          userLocation={userLocation}
-          clustered={clustered}
-          handleMapClick={handleMapClick}
-          handleClusterClick={handleClusterClick}
-          displaySpotInfo={displaySpotInfo}
-          zoom={zoom}
-          getIcon={getIcon}
-          routePath={routePath}
-          count={count}
-          onLoad={onLoad}
-          CLUSTER_BREAKPOINT={CLUSTER_BREAKPOINT}
-          map={map}
-          isHome={isHome}
-          destinationLocation={destinationLocation}
-          Heading={Heading}
-        />
-      </LoadScript>
+      <Map
+        loading={loading}
+        userLocation={userLocation}
+        clustered={clustered}
+        handleMapClick={handleMapClick}
+        handleClusterClick={handleClusterClick}
+        displaySpotInfo={displaySpotInfo}
+        zoom={zoom}
+        getIcon={getIcon}
+        routePath={routePath}
+        count={count}
+        onLoad={onMapReady}
+        CLUSTER_BREAKPOINT={CLUSTER_BREAKPOINT}
+        map={map}
+        isHome={isHome}
+        destinationLocation={destinationLocation}
+        endLocation={endLocation}
+        Heading={Heading}
+        routeMode={routeMode}
+      />
     </section>
   );
 };
