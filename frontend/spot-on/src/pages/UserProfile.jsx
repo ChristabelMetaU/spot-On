@@ -6,7 +6,7 @@ import ProfileLoading from "../component/profileLoading";
 import { useAuth } from "../component/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { getFormattedDate } from "../utils/getFormattedDate";
-const UserProfile = () => {
+const UserProfile = ({ setIsRoutingToHome }) => {
   const navigate = useNavigate();
   const { logout, user, loading } = useAuth();
   const [userReport, setUserReport] = useState([]);
@@ -39,6 +39,7 @@ const UserProfile = () => {
           className="fa fa-arrow-left fa-2x go-back"
           aria-hidden="true"
           onClick={() => {
+            setIsRoutingToHome(true);
             navigate("/");
           }}
         ></i>

@@ -28,11 +28,13 @@ const Map = ({
   map,
   Heading,
   routeMode,
+  isRoutingToHome,
+  selectedSpot,
 }) => {
   const polyLine = useRef(null);
   const [hasPanned, setHasPanned] = useState(false);
   useEffect(() => {
-    if (map && !hasPanned && clustered.length > 0) {
+    if ((map && !hasPanned && clustered.length > 0) || isRoutingToHome) {
       const firstCluster = clustered[0];
       if (firstCluster && firstCluster.centerLat && firstCluster.centerLng) {
         const center = {
@@ -40,10 +42,24 @@ const Map = ({
           lng: firstCluster.centerLng,
         };
         map.panTo(center);
-        setHasPanned(true);
       }
     }
-  }, [hasPanned, map, clustered]);
+    if (map) {
+      //if selected spot is not in the current view, pan to it
+      if (
+        selectedSpot &&
+        selectedSpot.coordLat &&
+        selectedSpot.coordLng &&
+        !clustered.some((cluster) => cluster.spots.includes(selectedSpot))
+      ) {
+        const center = {
+          lat: selectedSpot.coordLat,
+          lng: selectedSpot.coordLng,
+        };
+        map.panTo(center);
+      }
+    }
+  }, [hasPanned, map, clustered, isRoutingToHome, selectedSpot]);
   useEffect(() => {
     if (isHome || !map || routePath.length < 2 || !window.google) return;
     if (

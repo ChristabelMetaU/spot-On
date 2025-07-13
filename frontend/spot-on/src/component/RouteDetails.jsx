@@ -23,6 +23,7 @@ const RouteDetails = ({
   setFreeCount,
   destinationLocation,
   setDestinationLocation,
+  setIsRoutingToHome,
 }) => {
   const navigate = useNavigate();
   //for production
@@ -165,6 +166,7 @@ const RouteDetails = ({
             className="fa fa-arrow-left fa-2x go-back"
             aria-hidden="true"
             onClick={() => {
+              setIsRoutingToHome(true);
               navigate("/");
             }}
           ></i>

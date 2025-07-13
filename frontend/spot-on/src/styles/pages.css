@@ -22,7 +22,21 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.3s ease;
 }
-
+@keyframes drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-200px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.welcome-page .spotOn {
+  opacity: 0;
+  animation: drop 0.3s ease-out forwards;
+  animation-delay: 0.5s;
+}
 .welcome-page h1 {
   font-size: 3rem;
   color: black;
