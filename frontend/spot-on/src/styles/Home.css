@@ -345,3 +345,13 @@ body {
 .error {
   color: red;
 }
+.reserve-btn {
+  margin: 5px;
+}
+
+.reserve-icon {
+  margin: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

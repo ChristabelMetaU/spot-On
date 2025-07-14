@@ -8,6 +8,7 @@ const dotenv = require("dotenv");
 const session = require("express-session");
 const connectRedis = require("connect-redis");
 const redis = require("redis");
+const reserveRouter = require("./routes/Reserve");
 const map = require("./routes/Map");
 const spots = require("./routes/Spots");
 const reportRouter = require("./routes/Report");
@@ -52,6 +53,7 @@ app.use("/map", map);
 app.use("/spots", spots);
 app.use("/report", reportRouter);
 app.use("/user", profileRouter);
+app.use("/spots", reserveRouter);
 
 const server = http.createServer(app);
 const wss = new webSocket.Server({ server });
