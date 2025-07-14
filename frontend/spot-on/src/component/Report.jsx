@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { sendWebSocket } from "../utils/websocket";
 import { connectWebSocket } from "../utils/websocket";
+import SearchForSpot from "./SearchForSpot";
 const Report = ({
   spots,
   handleReportSubmit,
@@ -9,12 +10,15 @@ const Report = ({
   setSelectedSpot,
   setIsVisible,
   setMessage,
+  searchKeyword,
+  setSearchKeyword,
+  showResults,
+  setShowResults,
+  searchResults,
+  setSearchResults,
 }) => {
-  const [searchKeyword, setSearchKeyword] = useState("");
   const [showReportForm, setShowReportForm] = useState(false);
-  const [searchResults, setSearchResults] = useState([]);
   const [occupied, setOccupied] = useState(false);
-  const [showResults, setShowResults] = useState(false);
   const [spotType, setSpotType] = useState("");
   const [description, setDescription] = useState("");
   const [occupiedText, setOccupiedText] = useState("");
@@ -23,33 +27,7 @@ const Report = ({
   const handleShowReportForm = () => {
     setShowReportForm(!showReportForm);
   };
-  const fetchLots = async (value) => {
-    const searchedSpots = spots.filter((spot) => {
-      return spot.lotName.toLowerCase().includes(value.toLowerCase());
-    });
-    setSearchResults(searchedSpots);
-    setShowResults(value.length > 0);
-  };
-  const handleSearch = (e) => {
-    const value = e.target.value;
-    setSearchKeyword(value);
-    fetchLots(value);
-  };
-  const handleInputFocus = (e) => {
-    setShowResults(searchKeyword.length > 0);
-  };
-  const handleBlur = () => {
-    setTimeout(() => {
-      setShowResults(false);
-    }, 100);
-  };
 
-  const handleResultClick = (result) => {
-    setSelectedSpot(result);
-    setSearchKeyword(result.lotName);
-    setShowResults(false);
-    setSearchResults([]);
-  };
   const handleSubmitSuccess = () => {
     const formData = {
       spot_name: searchKeyword,
@@ -111,33 +89,17 @@ const Report = ({
           <form className="modal-content" onSubmit={handleSubmit}>
             <h2>Report Parking spot </h2>
             <p>Help others find parking</p>
-            <div className="search-container">
-              <input
-                type="text"
-                name="spot"
-                placeholder="Search for Parking spot"
-                value={searchKeyword}
-                onChange={handleSearch}
-                onBlur={handleBlur}
-                onFocus={handleInputFocus}
-                className="spot-search"
-              />
-              {showResults && (
-                <ul>
-                  {searchResults.map((result) => {
-                    return (
-                      <li
-                        key={result.id}
-                        onClick={() => handleResultClick(result)}
-                      >
-                        {result.lotName}
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </div>
-
+            <SearchForSpot
+              mode="report"
+              spots={spots}
+              searchKeyword={searchKeyword}
+              setSearchKeyword={setSearchKeyword}
+              showResults={showResults}
+              setShowResults={setShowResults}
+              searchResults={searchResults}
+              setSearchResults={setSearchResults}
+              setSelectedSpot={setSelectedSpot}
+            />
             <div className="spotOccupied-btns">
               <button
                 className="spot-free"

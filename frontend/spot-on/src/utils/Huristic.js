@@ -96,6 +96,9 @@ export function customPathFinder(startNode, goalNodes) {
   const cameFrom = {};
   const costSoFar = {};
   const queue = [];
+  if (startNode.id === goalNodes[0].id || goalNodes.length == 0) {
+    return [];
+  }
   costSoFar[startNode.id] = 0;
   queue.push({ node: startNode, cost: 0 });
   while (queue.length > 0) {
@@ -141,4 +144,5 @@ export function customPathFinder(startNode, goalNodes) {
       }
     }
   }
+  return [];
 }

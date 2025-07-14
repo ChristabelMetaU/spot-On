@@ -6,8 +6,8 @@ body {
 :root {
   --primary-gradient: linear-gradient(135deg, #f5f4f2 0%, #e3e7ef 100%);
   --header-bg: #1c2e46;
-  --nav-bg: #dcdee5;
-  --nav-life: #dcdee5;
+  --nav-bg: #e3e7ef;
+  --nav-life: #e3e7ef;
   --nav-color: #1c2e46;
   --btn-color: #1c2e46;
   --footer-color: #1c2e46;
@@ -195,10 +195,10 @@ body {
 .live-stats {
   display: flex;
   flex-direction: column;
-  background: var(--nav-life);
+  background-color: var(--nav-life);
   border-radius: 8px;
   border: none;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 .stat-numbers {
   display: flex;
@@ -246,10 +246,9 @@ body {
   margin: 0.5rem;
   padding: 0.5rem;
   border-radius: 8px;
-  border: 1px solid #ccc;
   background: var(--nav-life);
   cursor: pointer;
-  box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 .actions-div h3 {
   font-weight: 600;

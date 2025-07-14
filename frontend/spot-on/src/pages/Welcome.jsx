@@ -6,7 +6,7 @@ const welcome = () => {
   return (
     <div className="overlay">
       <div className="welcome-page">
-        <h1>Spot On</h1>
+        <h1 className="spotOn">SpotOn</h1>
         <p>Parking made easier for YOU</p>
         <p>find the parking spot for you</p>
         <Link to="/signup">

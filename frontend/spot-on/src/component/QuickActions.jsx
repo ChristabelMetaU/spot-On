@@ -11,7 +11,8 @@ const QuickActions = () => {
           onClick={() => navigate("/Home/RouteDetails")}
         >
           <h3> Smart Routing</h3>
-          <p>Find fastest path </p>
+          <p>Find shortest path to closest spot </p>
+          <p>Find shortest path from u to closest spot to dest</p>
         </div>
 
         <div className="actions-div">
@@ -21,7 +22,7 @@ const QuickActions = () => {
 
         <div className="actions-div">
           <h3>Analytics</h3>
-          <p>Your parking pattern</p>
+          <p>Your parking pattern and more</p>
         </div>
 
         <div className="actions-div">

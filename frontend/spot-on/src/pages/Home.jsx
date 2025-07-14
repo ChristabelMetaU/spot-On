@@ -12,7 +12,7 @@ import LiveStatus from "../component/LiveStatus";
 import Fab from "../component/Fab";
 import SpotModal from "../component/SpotModal";
 import MapLoading from "../component/MapLoading";
-import { getDistance } from "../utils/Huristic";
+import SearchForSpot from "../component/SearchForSpot";
 import "../styles/Home.css";
 
 // TODO:
@@ -37,6 +37,8 @@ const Home = ({
   setFreeCount,
   activeFilters,
   setActiveFilters,
+  setIsRoutingToHome,
+  isRoutingToHome,
 }) => {
   const mode = "Home";
   const [message, setMessage] = useState("");
@@ -44,6 +46,9 @@ const Home = ({
   const { user } = useAuth();
   const [showFilters, setShowFilters] = useState(false);
   const [userLocationError, setUserLocationError] = useState(null);
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [showResults, setShowResults] = useState(false);
   const MTSU_CENTER = {
     lat: 35.8486,
     lng: -86.3669,
@@ -183,17 +188,30 @@ const Home = ({
         setShowFilters={setShowFilters}
         activeFilters={activeFilters}
         setActiveFilters={setActiveFilters}
+        setIsRoutingToHome={setIsRoutingToHome}
       />
       {!userLocation ? (
         <MapLoading />
       ) : (
         <main className="site-main">
           <LiveStatus freeCount={freeCount} />
+          <SearchForSpot
+            mode={mode}
+            spots={spots}
+            searchKeyword={searchKeyword}
+            setSearchKeyword={setSearchKeyword}
+            showResults={showResults}
+            setShowResults={setShowResults}
+            searchResults={searchResults}
+            setSearchResults={setSearchResults}
+            setSelectedSpot={setSelectedSpot}
+          />
           <Body
             mode={mode}
             name={"Your campus Parking Assistant"}
             spots={spots}
             setSpots={setSpots}
+            selectedSpot={selectedSpot}
             setSelectedSpot={setSelectedSpot}
             setShowModal={setShowModal}
             setActive={setActive}
@@ -204,6 +222,7 @@ const Home = ({
             lockedSpotId={lockedSpotId}
             setLockedSpotId={setLockedSpotId}
             setFreeCount={setFreeCount}
+            isRoutingToHome={isRoutingToHome}
           />
 
           <Report
@@ -211,6 +230,12 @@ const Home = ({
             handleReportSubmit={handleReportSubmit}
             user={user}
             setSelectedSpot={setSelectedSpot}
+            searchKeyword={searchKeyword}
+            setSearchKeyword={setSearchKeyword}
+            showResults={showResults}
+            setShowResults={setShowResults}
+            searchResults={searchResults}
+            setSearchResults={setSearchResults}
             setIsVisible={setIsVisible}
             setMessage={setMessage}
             count={freeCount}

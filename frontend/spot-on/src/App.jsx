@@ -22,6 +22,7 @@ function ProtectedRoute({ children }) {
 }
 function AppRoutes() {
   const [spots, setSpots] = useState([]);
+  const [isRoutingToHome, setIsRoutingToHome] = useState(false);
   const [selectedSpot, setSelectedSpot] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [active, setActive] = useState([]);
@@ -81,6 +82,7 @@ function AppRoutes() {
                 setActiveFilters={setActiveFilters}
                 setIsMapLoaded={setIsMapLoaded}
                 destinationLocation={destinationLocation}
+                isRoutingToHome={isRoutingToHome}
               />
             }
           />
@@ -104,11 +106,15 @@ function AppRoutes() {
                 destinationLocation={destinationLocation}
                 setDestinationLocation={setDestinationLocation}
                 userLocation={userLocation}
+                setIsRoutingToHome={setIsRoutingToHome}
               />
             }
           />
 
-          <Route path="/Profile" element={<UserProfile />} />
+          <Route
+            path="/Profile"
+            element={<UserProfile setIsRoutingToHome={setIsRoutingToHome} />}
+          />
         </Route>
       </Routes>
     </>

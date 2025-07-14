@@ -14,6 +14,7 @@ const Body = ({
   name,
   spots,
   setSpots,
+  selectedSpot,
   setSelectedSpot,
   setShowModal,
   setActive,
@@ -28,6 +29,7 @@ const Body = ({
   endLocation,
   Heading,
   routeMode,
+  isRoutingToHome,
 }) => {
   const { map, onLoad } = useMap();
   const { loading, user } = useAuth();
@@ -165,6 +167,8 @@ const Body = ({
         endLocation={endLocation}
         Heading={Heading}
         routeMode={routeMode}
+        isRoutingToHome={isRoutingToHome}
+        selectedSpot={selectedSpot}
       />
     </section>
   );
