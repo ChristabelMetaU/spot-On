@@ -38,6 +38,8 @@ function AppRoutes() {
   const [showResults, setShowResults] = useState(false);
   const [message, setMessage] = useState("");
   const [isVisible, setIsVisible] = useState(false);
+  const [isReserved, setIsReserved] = useState(false);
+  const [showTimer, setShowTimer] = useState(false);
   const [activeFilters, setActiveFilters] = useState({
     red: true,
     green: true,
@@ -99,6 +101,10 @@ function AppRoutes() {
                 setMessage={setMessage}
                 isVisible={isVisible}
                 setIsVisible={setIsVisible}
+                isReserved={isReserved}
+                setIsReserved={setIsReserved}
+                showTimer={showTimer}
+                setShowTimer={setShowTimer}
               />
             }
           />
@@ -150,6 +156,10 @@ function AppRoutes() {
                 setMessage={setMessage}
                 isVisible={isVisible}
                 setIsVisible={setIsVisible}
+                isReserved={isReserved}
+                setIsReserved={setIsReserved}
+                showTimer={showTimer}
+                setShowTimer={setShowTimer}
               />
             }
           />
