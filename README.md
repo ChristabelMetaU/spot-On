@@ -14,7 +14,7 @@
 
 ## Links
 
-**Project Plan**: [doc]<https://docs.google.com/document/d/1LkKYKh1WW_9y6B1muTMsE6WbKj9iHvFBQfIP3HhKDMA/edit?tab=t.0>
+**Project Plan**: [doc](<https://docs.google.com/document/d/1LkKYKh1WW_9y6B1muTMsE6WbKj9iHvFBQfIP3HhKDMA/edit?tab=t.0>)
 **Wireframes**:
 <Links will be added here soon.>
 
