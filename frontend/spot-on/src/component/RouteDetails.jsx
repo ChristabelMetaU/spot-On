@@ -70,6 +70,15 @@ const RouteDetails = ({
       }
     );
   }
+  function getSpeedWithMutiplier(hour) {
+    if (hour >= 7 || hour <= 11) {
+      return 0.6;
+    }
+    if (hour >= 11 || hour <= 14) {
+      return 0.8;
+    }
+    return 1;
+  }
   function computeStats(path) {
     if (!path || path.length < 2) {
       return {
@@ -88,6 +97,9 @@ const RouteDetails = ({
     }
     distance = distance * 1000;
     let speedinMetersPerSecond = isDriving ? 10 : 1.4;
+    const currentHour = new Date().getHours();
+    speedinMetersPerSecond =
+      speedinMetersPerSecond * getSpeedWithMutiplier(currentHour);
     speedinMetersPerSecond = (speedinMetersPerSecond * 1000) / 3600;
     let etaSeconds = distance / speedinMetersPerSecond;
     //round seconds
@@ -113,10 +125,14 @@ const RouteDetails = ({
 
     if (path.length > 0) {
       setEndLocation(path[path.length - 1]);
+      getGoogleDirections(startLocation, path[path.length - 1]);
+      const tempStats = computeStats(path);
+      setStats(tempStats);
+    } else {
+      setEndLocation(null);
+      setStats({});
+      setRoutePath([]);
     }
-    getGoogleDirections(startLocation, path[path.length - 1]);
-    const tempStats = computeStats(path);
-    setStats(tempStats);
   };
   useEffect(() => {
     let nearByFreeSpots = [];

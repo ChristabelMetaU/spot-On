@@ -13,6 +13,7 @@ import Fab from "../component/Fab";
 import SpotModal from "../component/SpotModal";
 import MapLoading from "../component/MapLoading";
 import SearchForSpot from "../component/SearchForSpot";
+import { getDistance } from "../utils/Huristic";
 import "../styles/Home.css";
 
 // TODO:
@@ -49,6 +50,7 @@ const Home = ({
   const [searchKeyword, setSearchKeyword] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
+  const [activeUsers, setActiveUsers] = useState([]);
   const MTSU_CENTER = {
     lat: 35.8486,
     lng: -86.3669,
@@ -73,6 +75,15 @@ const Home = ({
     );
   }, []);
   useEffect(() => {
+    if (user && userLocation) {
+      sendWebSocket({
+        type: "USER_ENTERED_MAP",
+        userId: user.id,
+        location: userLocation,
+      });
+    }
+  }, [user, userLocation]);
+  useEffect(() => {
     const fetchSpots = async () => {
       if (!userLocation) {
         return;
@@ -91,7 +102,12 @@ const Home = ({
         if (!data || data.length < 1) {
           setSpots([]);
           setFreeCount(0);
-          raduis += 1000000;
+          //check if user is in mtsu campus or not and distance is outside the state
+          if (getDistance(lat, lng, MTSU_CENTER.lat, MTSU_CENTER.lng) > 10) {
+            raduis += 1000000;
+          } else {
+            raduis += 200;
+          }
         } else {
           tempSPots = data;
           setSpots(data);
@@ -103,6 +119,11 @@ const Home = ({
     fetchSpots();
 
     connectWebSocket((data) => {
+      if (data.type === "PRESENCE_UPDATE") {
+        if (data.userId !== user.id) {
+          setActiveUsers(data.users);
+        }
+      }
       if (data.type === "SPOT_UPDATED") {
         const index = spots.findIndex((spot) => spot.id === data.spotId);
         if (index !== -1) {
@@ -194,7 +215,7 @@ const Home = ({
         <MapLoading />
       ) : (
         <main className="site-main">
-          <LiveStatus freeCount={freeCount} />
+          <LiveStatus freeCount={freeCount} activeUsers={activeUsers} />
           <SearchForSpot
             mode={mode}
             spots={spots}

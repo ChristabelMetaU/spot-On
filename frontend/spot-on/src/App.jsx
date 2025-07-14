@@ -16,6 +16,7 @@ import RouteDetails from "./component/RouteDetails";
 import { AuthProvider } from "./component/AuthContext";
 import { useAuth } from "./component/AuthContext";
 import { MapProvider } from "./component/MapContext";
+import Reserve from "./component/Reserve";
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
   return user ? <Outlet /> : <Navigate to="/Welcome" />;
@@ -114,6 +115,11 @@ function AppRoutes() {
           <Route
             path="/Profile"
             element={<UserProfile setIsRoutingToHome={setIsRoutingToHome} />}
+          />
+
+          <Route
+            path="/Home/ReserveDetails"
+            element={<Reserve setIsRoutingToHome={setIsRoutingToHome} />}
           />
         </Route>
       </Routes>

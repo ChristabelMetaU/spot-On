@@ -91,7 +91,21 @@ const UserProfile = ({ setIsRoutingToHome }) => {
         )}
       </div>
       <div className="legend">
-        <h2>No legends yet</h2>
+        <div className="activity">
+          <h2>Reserve a spot</h2>
+        </div>
+        <div className="activity">
+          <h2>Find route to closest spot </h2>
+        </div>
+        <div className="activity">
+          <h2>Find route to closest spot to your destination </h2>
+        </div>
+        <div className="activity">
+          <h2>Notifications </h2>
+        </div>
+        <div className="activity">
+          <h2>Recent analytics </h2>
+        </div>
       </div>
       <div className="log-out">
         <button onClick={handleLogout}>Log out </button>

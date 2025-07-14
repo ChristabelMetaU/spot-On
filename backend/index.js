@@ -56,10 +56,23 @@ app.use("/user", profileRouter);
 const server = http.createServer(app);
 const wss = new webSocket.Server({ server });
 let lockedSpots = {};
+const presenceMap = new Map();
 wss.on("connection", (ws) => {
   ws.on("message", async (message) => {
     const data = JSON.parse(message);
     let broadCastData = null;
+    if (data.type === "USER_ENTERED_MAP") {
+      currentUserId = data.userId;
+      presenceMap.set(data.userId, {
+        userId: data.userId,
+        location: data.location,
+      });
+      const allUsers = Array.from(presenceMap.values());
+      broadCastAll({
+        type: "PRESENCE_UPDATE",
+        users: allUsers,
+      });
+    }
 
     if (data.type === "UPDATE_SPOT_BY_REPORT") {
       const now = Date.now();
@@ -260,7 +273,18 @@ function broadCastAll(data, excludeWs = null) {
     }
   });
 }
-wss.on("close", () => {});
+wss.on("close", () => {
+  setTimeout(() => {
+    if (!Array.from(wss.clients).some((c) => c.userId === currentUserId)) {
+      presenceMap.delete(currentUserId);
+      const allUsers = Array.from(presenceMap.values());
+      broadCastAll({
+        type: "PRESENCE_UPDATE",
+        users: allUsers,
+      });
+    }
+  }, 3000);
+});
 
 const PORT = process.env.PORT || 9000;
 server.listen(PORT, () => {});
