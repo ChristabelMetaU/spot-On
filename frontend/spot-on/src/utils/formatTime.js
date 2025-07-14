@@ -1,7 +1,6 @@
 /** @format */
 
 export const formatTime = (second) => {
-  //format sconds to 00:00 and 00:00:00 if greater than 3600
   if (second > 3600) {
     const hours = Math.floor(second / 3600);
     const minutes = Math.floor((second % 3600) / 60);

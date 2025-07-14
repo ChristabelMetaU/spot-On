@@ -1,6 +1,6 @@
 /** @format */
 
-const LiveStatus = ({ freeCount }) => {
+const LiveStatus = ({ freeCount, activeUsers }) => {
   return (
     <div className="live-stats">
       <h4>App status</h4>
@@ -10,8 +10,8 @@ const LiveStatus = ({ freeCount }) => {
           <p>Free Lots near u</p>
         </div>
         <div className="stat-body">
-          <p>0</p>
-          <p>average week max</p>
+          <p>{`${activeUsers.length} viewing`}</p>
+          <i className="fa fa-eye" aria-hidden="true"></i>
         </div>
         <div className="stat-body">
           <p>100%</p>

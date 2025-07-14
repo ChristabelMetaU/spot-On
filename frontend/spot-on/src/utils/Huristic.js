@@ -90,13 +90,25 @@ export function buildGraph(userLocation, nearbySpots) {
 
   return { userNode, spotNodes, allNodes: nodes };
 }
-
+export function getTimePenalty(hour) {
+  if (hour >= 7 && hour <= 10) {
+    return 0.8; //morning rush
+  }
+  if (hour >= 11 && hour <= 14) {
+    return 0.4; //lunch period
+  }
+  if (hour >= 16 && hour <= 18) {
+    return 0.4; //Headung home rush
+  }
+  return 0;
+}
 export function customPathFinder(startNode, goalNodes) {
   const visited = new Set();
   const cameFrom = {};
   const costSoFar = {};
   const queue = [];
-  if (startNode.id === goalNodes[0].id || goalNodes.length == 0) {
+  const hour = new Date().getHours();
+  if (!startNode?.id || goalNodes.length == 0) {
     return [];
   }
   costSoFar[startNode.id] = 0;
@@ -113,6 +125,9 @@ export function customPathFinder(startNode, goalNodes) {
       let path = [current];
       while (cameFrom[path[0].id]) {
         path.unshift(cameFrom[path[0].id]);
+      }
+      if (!cameFrom[current.id]) {
+        return [];
       }
       return path;
     }
@@ -132,13 +147,17 @@ export function customPathFinder(startNode, goalNodes) {
           goalNodes[0].lng
         );
         let adjustedCost = newCost;
-        const isTooFrequent = processSpotReports(neighbor);
-        if (isTooFrequent) {
-          adjustedCost -= 0.5;
-          adjustedCost = Math.max(0, adjustedCost);
-        } else {
-          adjustedCost += 0.2;
+        if (neighbor) {
+          const isTooFrequent = processSpotReports(neighbor);
+          if (isTooFrequent) {
+            adjustedCost += 0.5; //boost the cost of the spot
+          } else {
+            adjustedCost -= 0.2;
+            adjustedCost = Math.max(0, adjustedCost);
+          }
         }
+        const timePenalty = getTimePenalty(hour);
+        adjustedCost *= timePenalty;
         const priority = adjustedCost + Heurestic;
         queue.push({ node: neighbor, cost: priority });
       }

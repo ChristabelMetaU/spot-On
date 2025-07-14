@@ -15,7 +15,10 @@ const QuickActions = () => {
           <p>Find shortest path from u to closest spot to dest</p>
         </div>
 
-        <div className="actions-div">
+        <div
+          className="actions-div"
+          onClick={() => navigate("/Home/ReserveDetails")}
+        >
           <h3>Reserve a Spot</h3>
           <p>Reserve any spot for 10 min</p>
         </div>
