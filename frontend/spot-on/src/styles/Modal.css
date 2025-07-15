@@ -39,7 +39,27 @@
   min-width: 200px;
   transition: transform 0.3s ease, box-shadow 0.3s ease, background 0;
 }
-
+.modal-reserve {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0.25rem;
+}
+.reserve {
+  width: 70%;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  padding-left: 5rem;
+  padding-right: 5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: black;
+  background-color: #f8f082;
+  border: none;
+  cursor: pointer;
+  min-width: 200px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0;
+}
 .spotOccupied-btns {
   padding: 0.75rem;
   display: flex;

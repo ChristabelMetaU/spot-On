@@ -15,9 +15,6 @@ import MapLoading from "../component/MapLoading";
 import SearchForSpot from "../component/SearchForSpot";
 import { getDistance } from "../utils/Huristic";
 import "../styles/Home.css";
-
-// TODO:
-// IF USER FAR FROM SCHOOL DISPLAY SPOTS CLOSEST TO USER IN HOME MAP
 import { connectWebSocket, sendWebSocket } from "../utils/websocket";
 const Home = ({
   spots,
@@ -50,6 +47,7 @@ const Home = ({
   setMessage,
   isVisible,
   setIsVisible,
+  setIsReserveBtnClicked,
 }) => {
   const mode = "Home";
   const { user } = useAuth();
@@ -107,7 +105,6 @@ const Home = ({
         if (!data || data.length < 1) {
           setSpots([]);
           setFreeCount(0);
-          //check if user is in mtsu campus or not and distance is outside the state
           if (getDistance(lat, lng, MTSU_CENTER.lat, MTSU_CENTER.lng) > 10) {
             raduis += 1000000;
           } else {
@@ -129,22 +126,21 @@ const Home = ({
           setActiveUsers(data.users);
         }
       }
-      if (data.type === "SPOT_UPDATED") {
-        const index = spots.findIndex((spot) => spot.id === data.spotId);
-        if (index !== -1) {
-          let newSpots = [...spots];
-          newSpots[index] = data.spot;
-          if (activeFilters.length > 0) {
-            setSpots(newSpots);
-          }
-        }
-      }
       if (data.type === "SPOT_LOCKED") {
         setLocked(data.locked);
         setLockedSpotId(data.spotId);
       }
       if (data.type === "SPOT_UNLOCKED") {
         setLocked(data.locked);
+        setLockedSpotId(null);
+        const index = spots.findIndex((spot) => spot.id === data.spotId);
+        if (index !== -1) {
+          const newSpots = [...spots];
+          if (newSpots[index].isOccupied !== data.isOccupied) {
+            newSpots[index].isOccupied = data.isOccupied;
+            setSpots(newSpots);
+          }
+        }
       }
       if (data.type === "ERROR") {
         setShowModal(false);
@@ -173,9 +169,9 @@ const Home = ({
       type: "UPDATE_SPOT",
       spot: data,
       spotId: data.id,
+      isOccupied: data.isOccupied,
       userId: user.id,
     });
-
     setShowModal(false);
     setSelectedSpot(data);
     if (!data.isOccupied) {
@@ -184,11 +180,6 @@ const Home = ({
       setMessage(`${selectedSpot.lotName} is now marked as occupied.`);
     }
     setIsVisible(true);
-    sendWebSocket({
-      type: "UNLOCK_SPOT",
-      spotId: selectedSpot.id,
-      userId: user.id,
-    });
     setLocked(false);
   };
   const handleReportSubmit = async (formData, occupied) => {
@@ -250,7 +241,6 @@ const Home = ({
             setFreeCount={setFreeCount}
             isRoutingToHome={isRoutingToHome}
           />
-
           <Report
             spots={spots}
             handleReportSubmit={handleReportSubmit}
@@ -279,6 +269,9 @@ const Home = ({
           handleReportSubmit={handleReportSubmit}
           id={user.id}
           setLocked={setLocked}
+          setSearchKeyword={setSearchKeyword}
+          setSelectedSpot={setSelectedSpot}
+          setIsReserveBtnClicked={setIsReserveBtnClicked}
         />
       )}
       {isVisible && <Message message={message} setIsVisible={setIsVisible} />}

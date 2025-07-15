@@ -7,6 +7,8 @@ import Message from "./Message";
 import { sendWebSocket, connectWebSocket } from "../utils/websocket";
 import { getFormattedDate } from "../utils/getFormattedDate";
 import Timer from "./Timer";
+import { formatTime } from "../utils/formatTime";
+import { useTime } from "./ReserveContext";
 const Reserve = ({
   setIsRoutingToHome,
   spots,
@@ -26,31 +28,70 @@ const Reserve = ({
   setIsReserved,
   showTimer,
   setShowTimer,
+  userLocation,
+  isReserveBtnClicked,
+  setIsReserveBtnClicked,
 }) => {
-  const [isReserveBtnClicked, setIsReserveBtnClicked] = useState(false);
   const { user } = useAuth();
+  const { timeLeft, setTimeLeft, currentReservation, setCurrentReservation } =
+    useTime();
   const [error, setError] = useState("");
-  const [currentReservation, setCurrentReservation] = useState([]);
   const [pastReservations, setPastReservations] = useState([]);
-  const [timeLeft, setTimeLeft] = useState(0);
   const navigate = useNavigate();
+  const [showFullText, setShowFullText] = useState(false);
+  const limit = 5;
+  let displayedReservations = showFullText
+    ? pastReservations
+    : pastReservations.slice(0, limit);
   useEffect(() => {
     const fetchReservations = async () => {
       const response = await fetch("http://localhost:3000/spots/get/reserve");
       const data = await response.json();
       if (data) {
-        setPastReservations(data);
+        setPastReservations(
+          data
+            .filter(
+              (reservation) =>
+                new Date(reservation.reservedAt) > new Date() - 60480000
+            )
+            .sort((a, b) => {
+              return new Date(b.reservedAt) - new Date(a.reservedAt);
+            })
+        );
       } else {
         setPastReservations([]);
       }
     };
     fetchReservations();
   }, []);
+  useEffect(() => {
+    const fetchCurrentReservation = async () => {
+      const response = await fetch(
+        `http://localhost:3000/spots/current/reserve/${user.id}`
+      );
+      const data = await response.json();
+      if (data) {
+        setCurrentReservation(data);
+        const now = new Date();
+        const reservedAt = new Date(data.reservedAt);
+        const timeDiff = now.getTime() - reservedAt.getTime();
+        const timeLeftNow = 600 - Math.round(timeDiff / 1000);
+        setTimeLeft(timeLeftNow);
+        setShowTimer(true);
+      } else {
+        setCurrentReservation([]);
+      }
+    };
+    if (user.id) {
+      fetchCurrentReservation();
+    }
+  }, [user.id]);
+
   const resetForm = () => {
     setSearchKeyword("");
-    setSelectedSpot([]);
     setShowResults(false);
     setSearchResults([]);
+    setSelectedSpot([]);
   };
 
   const handleReservation = async () => {
@@ -76,6 +117,7 @@ const Reserve = ({
       setMessage("Reservation failed");
       setIsVisible(true);
       resetForm();
+      setSelectedSpot({});
     }
   };
   useEffect(() => {
@@ -83,9 +125,9 @@ const Reserve = ({
       connectWebSocket((data) => {
         if (data.type === "RESERVE_SUCCESS") {
           setIsReserved(true);
-          setShowTimer(true);
-          setTimeLeft(600);
           handleReservation();
+          setTimeLeft(600);
+          setShowTimer(true);
         }
         if (data.type === "RESERVE_ERROR") {
           setMessage(data.message);
@@ -116,17 +158,58 @@ const Reserve = ({
       userId: user.id,
     });
   };
+
   useEffect(() => {
-    if (timeLeft <= 0) {
-      setShowTimer(false);
-      setCurrentReservation([]);
-      return;
+    if (showTimer) {
+      if (timeLeft <= 0) {
+        setIsVisible(true);
+        setMessage("Your Reservation  has expired");
+        setIsVisible(true);
+        setShowTimer(false);
+        setCurrentReservation([]);
+        return;
+      }
+      const interval = setInterval(() => {
+        setTimeLeft((prevTimeLeft) => prevTimeLeft - 1);
+      }, 1000);
+      return () => clearInterval(interval);
     }
-    const interval = setInterval(() => {
-      setTimeLeft((prevTimeLeft) => prevTimeLeft - 1);
-    }, 1000);
-    return () => clearInterval(interval);
   }, [timeLeft]);
+
+  const updateReservation = async (formData) => {
+    const response = await fetch("http://localhost:3000/spots/cancel", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+    const data = await response.json();
+    return data;
+  };
+  const handleCancelReservation = async () => {
+    const now = new Date();
+    const formData = {
+      spotId: currentReservation.spotId,
+      userId: user.id,
+      cancelReservationAt: now,
+    };
+    const data = await updateReservation(formData);
+    if (data) {
+      setCurrentReservation([]);
+      setMessage(data.message);
+      setIsVisible(true);
+      setShowTimer(false);
+      setTimeLeft(0);
+    } else {
+      setMessage("Reservation updatelation failed");
+      setIsVisible(true);
+    }
+  };
+  const handleClose = () => {
+    setIsReserveBtnClicked(false);
+    resetForm();
+  };
   return (
     <div>
       <div className="route-header">
@@ -146,9 +229,15 @@ const Reserve = ({
         </div>
       </div>
       <div className="site-main">
-        <button onClick={() => setIsReserveBtnClicked(true)}>
-          Reserve a Spot
-        </button>
+        <div className="reserve-spot">
+          <button
+            onClick={() => setIsReserveBtnClicked(true)}
+            className="reserve-spot-btn"
+          >
+            Reserve a Spot
+          </button>
+          <p>Resserve your spot by searching</p>
+        </div>
         {showTimer && <Timer timeLeft={timeLeft} />}
         {isReserveBtnClicked && (
           <form onSubmit={handleSubmit}>
@@ -173,50 +262,84 @@ const Reserve = ({
                 </div>
                 <p>{error}</p>
                 <button className="reserve-btn">Reserve spot</button>
-                <button className="reserve-btn">Close</button>
+                <button className="reserve-btn" onClick={handleClose}>
+                  Close
+                </button>
               </div>
             </div>
           </form>
         )}
 
-        <div>
+        <div className="reserve-container">
           <h2>Reservations</h2>
-          <div>
-            <h2>Current Reservation</h2>
-            {currentReservation.reservedAt ? (
-              <div>
-                <h2>
-                  {
-                    spots.find((spot) => spot.id === currentReservation.spotId)
-                      .lotName
-                  }
-                </h2>
-                <p>
-                  {`Reserved ${getFormattedDate(
-                    currentReservation.reservedAt
-                  )}`}
-                </p>
-              </div>
-            ) : (
-              <div> No current reservation </div>
-            )}
+          <div className="reservation-card">
+            <div className="reservation-header">
+              <span className="status-dot"></span>
+              <h3>Current Reservation</h3>
+              <span className="timer">
+                {currentReservation.reservedAt
+                  ? `Time left: ${formatTime(timeLeft)}`
+                  : ""}
+              </span>
+            </div>
+
+            <div className="reservation-details">
+              {currentReservation.reservedAt &&
+              currentReservation.spotId &&
+              spots ? (
+                <div>
+                  <p>
+                    {
+                      spots.find(
+                        (spot) => spot.id === currentReservation.spotId
+                      ).lotName
+                    }
+                  </p>
+                  <p>
+                    {`Reserved ${getFormattedDate(
+                      currentReservation.reservedAt
+                    )}`}
+                  </p>
+                  <p>ETA: 10 minutes</p>
+                </div>
+              ) : (
+                <div className="reservation-details">
+                  <p> No current reservation</p>
+                </div>
+              )}
+            </div>
+            <div className="reservation-action">
+              {currentReservation.reservedAt && (
+                <button onClick={handleCancelReservation} className="cancel">
+                  Cancel Reservation
+                </button>
+              )}
+            </div>
           </div>
-          <div>
+          <div className="past">
             <h2>Past Reservations</h2>
-            {pastReservations &&
-              pastReservations
-                .filter(
-                  (reservation) =>
-                    new Date(reservation.reservedAt) > new Date() - 6048000
-                )
-                .map((reservation) => (
-                  <div key={reservation.id}>
-                    <h2>{reservation.lotName}</h2>
+            {pastReservations ? (
+              <div>
+                {displayedReservations.map((reservation) => (
+                  <div key={reservation.id} className="reservation-past">
+                    <p>{reservation.lotName}</p>
                     <p>
                       {`Reserved ${getFormattedDate(reservation.reservedAt)}`}
                     </p>
                   </div>
                 ))}
+                {pastReservations.length > limit && (
+                  <p
+                    onClick={() => setShowFullText(!showFullText)}
+                    className="show-All"
+                  >
+                    {showFullText ? "Show Less" : "Show All"}
+                  </p>
+                )}
+              </div>
+            ) : (
+              <div> No past reservations </div>
+            )}
           </div>
         </div>
       </div>

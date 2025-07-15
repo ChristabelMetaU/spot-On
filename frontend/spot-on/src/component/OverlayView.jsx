@@ -1,7 +1,22 @@
 /** @format */
 
 import { OverlayView } from "@react-google-maps/api";
-const Overlay = ({ title, lat, lng }) => {
+const Overlay = ({ title, lat, lng, mode }) => {
+  let backgroundColor;
+  let color;
+  let paddingRight;
+  let paddingLeft;
+  if (mode === "spot") {
+    backgroundColor = "white";
+    color = "black";
+    paddingRight = "20px";
+    paddingLeft = "10px";
+  } else {
+    backgroundColor = "#1c2e46";
+    color = "white";
+    paddingRight = "40px";
+    paddingLeft = "8px";
+  }
   return (
     <OverlayView
       position={{
@@ -13,13 +28,13 @@ const Overlay = ({ title, lat, lng }) => {
       <div
         style={{
           cursor: "pointer",
-          backgroundColor: "#1c2e46",
+          backgroundColor: backgroundColor,
           border: "1px solid white",
-          paddingRight: "40px",
-          paddingLeft: "8px",
+          paddingRight: paddingRight,
+          paddingLeft: paddingLeft,
           paddingTop: "8px",
           paddingBottom: "8px",
-          color: "white",
+          color: color,
           borderRadius: "10px",
           fontSize: "12px",
           transform: "translate(10px -10px)",

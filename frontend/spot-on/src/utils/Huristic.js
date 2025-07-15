@@ -1,5 +1,7 @@
 /** @format */
-
+//To use the driveable distance instead of point-to-point for getDistance functionp
+//search for the
+//
 const FREQUENCY_THRESHOLD = 4;
 const WINDOW_MINUTES = 10;
 const WINDOW_SIZE = 60 * 1000 * WINDOW_MINUTES; // 10 minutes
@@ -27,7 +29,7 @@ const processSpotReports = async (spot) => {
   if (reports.length === 0) {
     return false;
   }
-  //get createdat times for spot's reports
+
   const times = reports.map((report) => report.created_at);
 
   if (isTooFrequent(times)) {
@@ -150,7 +152,7 @@ export function customPathFinder(startNode, goalNodes) {
         if (neighbor) {
           const isTooFrequent = processSpotReports(neighbor);
           if (isTooFrequent) {
-            adjustedCost += 0.5; //boost the cost of the spot
+            adjustedCost += 0.5;
           } else {
             adjustedCost -= 0.2;
             adjustedCost = Math.max(0, adjustedCost);

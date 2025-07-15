@@ -30,6 +30,8 @@ const Body = ({
   Heading,
   routeMode,
   isRoutingToHome,
+  setSearchKeyword,
+  setIsReserveBtnClicked,
 }) => {
   const { map, onLoad } = useMap();
   const { loading, user } = useAuth();
@@ -98,6 +100,7 @@ const Body = ({
 
       sendWebSocket({
         type: "LOCK_SPOT",
+        isOccupied: spot.isOccupied,
         spotId: spot.id,
         userId: user.id,
       });
@@ -169,6 +172,9 @@ const Body = ({
         routeMode={routeMode}
         isRoutingToHome={isRoutingToHome}
         selectedSpot={selectedSpot}
+        setSelectedSpot={setSelectedSpot}
+        setSearchKeyword={setSearchKeyword}
+        setIsReserveBtnClicked={setIsReserveBtnClicked}
       />
     </section>
   );

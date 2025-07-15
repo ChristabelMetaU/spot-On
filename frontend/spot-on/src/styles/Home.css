@@ -227,7 +227,7 @@ body {
   overflow: hidden;
   background: #fff;
 }
-.reserve-container {
+.report-container {
   flex: 1 1 45%;
   display: flex;
   align-items: flex-start;
@@ -270,6 +270,25 @@ body {
   z-index: 9999;
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+.fab-timer {
+  position: fixed;
+  right: 10rem;
+  background-color: #1c2e46;
+  color: #ccc;
+  width: 200px;
+  height: 50px;
+  border-radius: 50px;
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+.fab-timer h2 {
+  color: #dcdee5;
 }
 .fab-route {
   position: fixed;
@@ -355,4 +374,129 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.reserve-spot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background-color: #1c2e46;
+  padding-top: 3rem;
+  padding-bottom: 2rem;
+  border-radius: 10px;
+}
+
+.reserve-spot-btn {
+  width: 70%;
+  background-color: #dcdee5;
+  color: #1c2e46;
+  border-radius: 30px;
+}
+
+.reserve-spot-btn:hover {
+  background: linear-gradient(45deg, #7c94b4 0%, #1c2e46 100%);
+  color: #dcdee5;
+}
+
+.reserve-spot p {
+  color: #dcdee5;
+}
+
+.reservation-card {
+  background: white;
+  border-radius: 12px;
+  border-left: 5px solid #32cd32;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin: 20px;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.reservation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #2e7d32;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  background-color: #2ecc71;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.timer {
+  font-size: 0.9em;
+  color: #555;
+}
+
+.reservation-details {
+  color: #444;
+  line-height: 1.5em;
+  margin-bottom: 15px;
+}
+
+.reservation-action {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.reservation-action button {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.cancel {
+  background-color: #d9534f;
+  color: white;
+}
+.past {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin: 20px;
+  font-family: "Segoe UI", sans-serif;
+}
+.past h2 {
+  color: #cd3232;
+}
+.show-All {
+  cursor: pointer;
+}
+.show-All:hover {
+  text-decoration: underline;
+}
+.reservation-past {
+  background: white;
+  border-radius: 12px;
+  border-left: 5px solid #cd3232;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin: 20px;
+  font-family: "Segoe UI", sans-serif;
+}
+.reservation-past p {
+  color: #444;
+  margin: 0;
+  padding: 5px;
+}
+
+.makeReservation-btns {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }

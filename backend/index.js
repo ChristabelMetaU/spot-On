@@ -9,6 +9,65 @@ const server = http.createServer(app);
 const wss = new webSocket.Server({ server });
 let lockedSpots = {};
 const presenceMap = new Map();
+const checkForReservedSpots = async (spotId, now) => {
+  const reservedSpot = await prisma.reservedSpots.findFirst({
+    where: {
+      spotId: spotId,
+      expiresAt: {
+        gte: new Date(now),
+      },
+    },
+  });
+  if (reservedSpot) {
+    return reservedSpot;
+  } else {
+    return null;
+  }
+};
+const isSpotLocked = async (spotId, now) => {
+  const activeLock = await prisma.lockedSpot.findFirst({
+    where: {
+      spotId: spotId,
+      expiresAt: {
+        gte: new Date(now),
+      },
+    },
+  });
+  if (activeLock) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+const createLockedSpot = async (spotId, userId, expires) => {
+  const lockSpot = await prisma.lockedSpot.create({
+    data: {
+      spotId: spotId,
+      userId: userId,
+      expiresAt: expires,
+    },
+  });
+  lockedSpots[spotId] = lockSpot;
+  return lockSpot;
+};
+const getSpotsByLotName = async (lotName, ws) => {
+  const spot = await prisma.spots.findFirst({
+    where: {
+      lotName: lotName,
+    },
+  });
+  if (!spot) {
+    ws.send(
+      JSON.stringify({
+        type: "REPORT_ERROR",
+        spotName: data.spotName,
+        message: "This spot does not exist",
+      })
+    );
+  }
+  return spot;
+};
 wss.on("connection", (ws) => {
   ws.on("message", async (message) => {
     const data = JSON.parse(message);
@@ -26,12 +85,10 @@ wss.on("connection", (ws) => {
       });
     }
     if (data.type === "RESERVE_SPOT") {
-      //get spot id from spot name
-      const spot = await prisma.spots.findFirst({
-        where: {
-          lotName: data.lotName,
-        },
-      });
+      const spot = await getSpotsByLotName(data.lotName, ws);
+      if (!spot) {
+        return;
+      }
       const now = Date.now();
       const activeReservation = await prisma.reservedSpots.findFirst({
         where: {
@@ -50,38 +107,14 @@ wss.on("connection", (ws) => {
         );
         return;
       }
-      const activeLock = await prisma.lockedSpot.findFirst({
-        where: {
-          spotId: spot.id,
-          expiresAt: {
-            gte: new Date(now),
-          },
-        },
-      });
+      const activeLock = await isSpotLocked(spot.id, now);
       if (activeLock) {
-        ws.send(
-          JSON.stringify({
-            type: "RESERVE_ERROR",
-            message: "This spot is being updated by another user",
-          })
-        );
+        sendToUserIfLocked(ws);
         return;
       }
-      const reservedSpot = await prisma.reservedSpots.findFirst({
-        where: {
-          spotId: spot.id,
-          expiresAt: {
-            gte: new Date(now),
-          },
-        },
-      });
+      const reservedSpot = await checkForReservedSpots(spot.id, now);
       if (reservedSpot) {
-        ws.send(
-          JSON.stringify({
-            type: "RESERVE_ERROR",
-            message: "This spot is already reserved",
-          })
-        );
+        sendToUserIfReserved(ws, data, reservedSpot);
         return;
       }
       ws.send(
@@ -94,58 +127,18 @@ wss.on("connection", (ws) => {
 
     if (data.type === "UPDATE_SPOT_BY_REPORT") {
       const now = Date.now();
-
-      const spot = await prisma.spots.findFirst({
-        where: {
-          lotName: data.spotName,
-        },
-      });
+      const spot = await getSpotsByLotName(data.spotName, ws);
       if (!spot) {
-        ws.send(
-          JSON.stringify({
-            type: "REPORT_ERROR",
-            spotName: data.spotName,
-            message: "This spot does not exist",
-          })
-        );
         return;
       }
-      const activeReservation = await prisma.reservedSpots.findFirst({
-        where: {
-          spotId: spot.id,
-          expiresAt: {
-            gte: new Date(now),
-          },
-        },
-      });
+      const activeReservation = await checkForReservedSpots(spot.id, now);
       if (activeReservation) {
-        ws.send(
-          JSON.stringify({
-            type: "REPORT_ERROR",
-            spotName: spot.lotName,
-            message: `This spot is reserved until ${new Date(
-              activeReservation.expiresAt
-            ).toLocaleString()}`,
-          })
-        );
+        sendToUserIfReserved(ws, data, activeReservation);
         return;
       }
-      const activeLock = await prisma.lockedSpot.findFirst({
-        where: {
-          spotId: spot.id,
-          expiresAt: {
-            gte: new Date(now),
-          },
-        },
-      });
+      const activeLock = await isSpotLocked(spot.id, now);
       if (activeLock) {
-        ws.send(
-          JSON.stringify({
-            type: "REPORT_ERROR",
-            spotName: spot.lotName,
-            message: "This spot is being updated by another user",
-          })
-        );
+        sendToUserIfLocked(ws);
         return;
       } else {
         ws.send(
@@ -155,16 +148,8 @@ wss.on("connection", (ws) => {
           })
         );
       }
-
-      const lockSpot = await prisma.lockedSpot.create({
-        data: {
-          spotId: spot.id,
-          userId: data.userId,
-          expiresAt: new Date(now + 2000),
-        },
-      });
-
-      lockedSpots[spot.id] = lockSpot;
+      const expires = new Date(now + 2000);
+      const lockSpot = await createLockedSpot(spot.id, data.userId, expires);
       broadCastData = {
         type: "SPOT_LOCKED",
         locked: true,
@@ -187,6 +172,7 @@ wss.on("connection", (ws) => {
             locked: false,
             spotId: data.spotId,
             userId: data.userId,
+            isOccupied: data.isOccupied,
           });
         }
       }, 3000);
@@ -194,53 +180,21 @@ wss.on("connection", (ws) => {
     if (data.type == "LOCK_SPOT") {
       const now = Date.now();
       const expires = new Date(now + 60_000);
-      const activeLock = await prisma.lockedSpot.findFirst({
-        where: {
-          spotId: data.spotId,
-          expiresAt: {
-            gte: new Date(now),
-          },
-        },
-      });
-
+      const activeLock = await isSpotLocked(data.spotId, now);
       if (activeLock) {
-        ws.send(
-          JSON.stringify({
-            type: "ERROR",
-            message: "This spot is being updated by another user",
-          })
-        );
-
+        sendToUserIfLocked(ws);
         return;
       }
-      const activeReservation = await prisma.reservedSpots.findFirst({
-        where: {
-          spotId: data.spotId,
-          expiresAt: {
-            gte: new Date(now),
-          },
-        },
-      });
+      const activeReservation = await checkForReservedSpots(data.spotId, now);
       if (activeReservation) {
-        ws.send(
-          JSON.stringify({
-            type: "ERROR",
-            message: `This spot is reserved until ${new Date(
-              activeReservation.expiresAt
-            ).toLocaleString()}`,
-          })
-        );
+        sendToUserIfReserved(ws, data, activeReservation);
         return;
       }
-      const lockSpot = await prisma.lockedSpot.create({
-        data: {
-          spotId: data.spotId,
-          userId: data.userId,
-          expiresAt: expires,
-        },
-      });
-      lockedSpots[data.spotId] = lockSpot;
-
+      const lockSpot = await createLockedSpot(
+        data.spotId,
+        data.userId,
+        expires
+      );
       broadCastData = {
         type: "SPOT_LOCKED",
         locked: true,
@@ -264,11 +218,12 @@ wss.on("connection", (ws) => {
             locked: false,
             spotId: data.spotId,
             userId: data.userId,
+            isOccupied: data.isOccupied,
           });
         }
       }, 60000);
     }
-    if (data.type === "UNCLOCK_SPOT") {
+    if (data.type === "UNLOCK_SPOT") {
       if (lockedSpots[data.spotId]?.userId === data.userId) {
         await prisma.lockedSpot.delete({
           where: {
@@ -278,6 +233,7 @@ wss.on("connection", (ws) => {
         delete lockedSpots[data.spotId];
         broadCastData = {
           type: "SPOT_UNLOCKED",
+          isOccupied: data.isOccupied,
           locked: false,
           spotId: data.spotId,
           userId: data.userId,
@@ -286,16 +242,11 @@ wss.on("connection", (ws) => {
     }
     if (data.type === "UPDATE_SPOT") {
       if (lockedSpots[data.spotId]) {
-        broadCastAll({
-          type: "SPOT_UPDATED",
-          spotId: data.spotId,
-          data: data.spot,
-        });
-
         broadCastData = {
           type: "SPOT_UNLOCKED",
           locked: false,
           spotId: data.spotId,
+          isOccupied: data.isOccupied,
         };
         await prisma.lockedSpot.delete({
           where: {
@@ -318,6 +269,32 @@ wss.on("connection", (ws) => {
     }
   });
 });
+function sendToUserIfReserved(ws, data, activeReservation) {
+  let message;
+  if (activeReservation.userId === data.userId) {
+    message = `This spot is reserved by you until ${new Date(
+      activeReservation.expiresAt
+    ).toLocaleString()}`;
+  } else {
+    message = `This spot is reserved by another user until ${new Date(
+      activeReservation.expiresAt
+    ).toLocaleString()}`;
+  }
+  ws.send(
+    JSON.stringify({
+      type: "ERROR",
+      message: message,
+    })
+  );
+}
+function sendToUserIfLocked(ws) {
+  ws.send(
+    JSON.stringify({
+      type: "ERROR",
+      message: "This spot is being updated by another user",
+    })
+  );
+}
 
 function broadCastAll(data, excludeWs = null) {
   const updatedSpot = JSON.stringify(data);

@@ -48,7 +48,7 @@ model ReservedSpots{
   spot spots @relation(fields: [spotId], references: [id])
   user Users @relation(fields: [userId], references: [id])
   reservedAt DateTime @default(now())
-  expiresAt DateTime
+  expiresAt DateTime?
 }
 model reports{
   id Int @id @default(autoincrement())

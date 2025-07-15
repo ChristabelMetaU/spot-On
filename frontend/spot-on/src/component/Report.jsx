@@ -76,11 +76,12 @@ const Report = ({
       type: "UPDATE_SPOT_BY_REPORT",
       spotName: searchKeyword,
       userId: user.id,
+      isOccupied: occupied,
     });
   };
 
   return (
-    <div className="reserve-container">
+    <div className="report-container">
       <button className="report-btn" onClick={handleShowReportForm}>
         Report free spot
       </button>

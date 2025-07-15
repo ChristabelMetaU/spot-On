@@ -66,4 +66,54 @@ reserveRouter.get("/get/reserve", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+reserveRouter.put("/cancel", async (req, res) => {
+  const { spotId, userId, cancelReservationAt } = req.body;
+  try {
+    const reserve = await prisma.reservedSpots.findFirst({
+      where: {
+        spotId,
+        userId,
+        expiresAt: {
+          gte: cancelReservationAt,
+        },
+      },
+    });
+    if (reserve) {
+      await prisma.reservedSpots.update({
+        where: {
+          id: reserve.id,
+        },
+        data: {
+          expiresAt: cancelReservationAt,
+        },
+      });
+      res.status(200).json({ message: "Reservation cancelled" });
+    } else {
+      res.status(404).json({ message: "No reservation found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+reserveRouter.get("/current/reserve/:id", async (req, res) => {
+  const { id } = req.params;
+  const userId = parseInt(id);
+  try {
+    const reserve = await prisma.reservedSpots.findFirst({
+      where: {
+        expiresAt: {
+          gte: new Date(),
+        },
+        userId,
+      },
+    });
+    if (reserve) {
+      res.json(reserve);
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 module.exports = reserveRouter;

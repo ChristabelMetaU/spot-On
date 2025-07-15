@@ -2,13 +2,15 @@
 import "../styles/Home.css";
 import { useNavigate } from "react-router-dom";
 import Body from "./Body";
-import { useRef, useEffect, useState, use } from "react";
+import { useRef, useEffect, useState } from "react";
 import { buildGraph } from "../utils/Huristic";
 import DestSearch from "./DestSearch";
 import { customPathFinder } from "../utils/Huristic";
 import { getDistance } from "../utils/Huristic";
 import { formatTime } from "../utils/formatTime";
 import { useMap } from "./MapContext";
+import MakeReservation from "./MakeReservation";
+import { set } from "date-fns";
 const RouteDetails = ({
   spots,
   setSpots,
@@ -24,6 +26,10 @@ const RouteDetails = ({
   destinationLocation,
   setDestinationLocation,
   setIsRoutingToHome,
+  searchKeyword,
+  setSearchKeyword,
+  isReserveBtnClicked,
+  setIsReserveBtnClicked,
 }) => {
   const navigate = useNavigate();
   //for production
@@ -42,12 +48,69 @@ const RouteDetails = ({
   const [stats, setStats] = useState({});
   const [isDriving, setIsDriving] = useState(true);
   const [heading, setHeading] = useState(0);
+  const [reserved, setReserved] = useState(false);
+  const [showMakeReservation, setShowMakeReservation] = useState(false);
+  const [noReservationCnt, setNoReservationCnt] = useState(0);
+  const [userBtnClickedCnt, setUserBtnClickedCnt] = useState(0);
+  const [eta, setEta] = useState(0);
   const rotateMap = () => {
     const newHeading = (heading + 45) % 360;
     setHeading(newHeading);
     map.setHeading(newHeading);
   };
-  function getGoogleDirections(start, end) {
+  useEffect(() => {
+    const displayMakeReservationModal = () => {
+      const duration = 5000;
+      setTimeout(() => {
+        const TENMINUTES_AWAY = 600;
+        if (eta > 0 && eta <= TENMINUTES_AWAY) {
+          setShowMakeReservation(true);
+        }
+      }, duration);
+    };
+    if (noReservationCnt < 3) {
+      if (!clicked) {
+        setNoReservationCnt(noReservationCnt + 1);
+        if (noReservationCnt < 2) {
+          displayMakeReservationModal();
+        }
+      } else if (
+        clicked &&
+        destinationLocation &&
+        destinationLocation.lat &&
+        destinationLocation.lng
+      ) {
+        setNoReservationCnt(0);
+        displayMakeReservationModal();
+      }
+    }
+  }, [eta, clicked, destinationLocation, noReservationCnt]);
+  useEffect(() => {
+    if (reserved) {
+      const spot = spots.find(
+        (spot) =>
+          spot.coordLat === endLocation.lat && spot.coordLng === endLocation.lng
+      );
+      if (spot) {
+        setSelectedSpot(spot);
+        setSearchKeyword(spot.lotName);
+        navigate("/Home/ReserveDetails");
+        setTimeout(() => {
+          setIsReserveBtnClicked(true);
+        }, 2000);
+      }
+    } else {
+      setReserved(false);
+    }
+  }, [
+    reserved,
+    navigate,
+    endLocation,
+    spots,
+    setSelectedSpot,
+    setSearchKeyword,
+  ]);
+  const getGoogleDirections = (start, end) => {
     directionsService.current.route(
       {
         origin: start,
@@ -69,7 +132,7 @@ const RouteDetails = ({
         }
       }
     );
-  }
+  };
   function getSpeedWithMutiplier(hour) {
     if (hour >= 7 || hour <= 11) {
       return 0.6;
@@ -103,6 +166,7 @@ const RouteDetails = ({
     speedinMetersPerSecond = (speedinMetersPerSecond * 1000) / 3600;
     let etaSeconds = distance / speedinMetersPerSecond;
     etaSeconds = Math.round(etaSeconds);
+    setEta(etaSeconds);
     const eta = formatTime(etaSeconds);
     distance = Math.round(distance);
     distance = distance.toLocaleString("en-US", {
@@ -111,7 +175,6 @@ const RouteDetails = ({
     });
     distance = distance + "m";
     const accuracy = "90%";
-
     return {
       totalDistance: distance,
       eta: eta,
@@ -246,6 +309,8 @@ const RouteDetails = ({
           destinationLocation={destinationLocation}
           endLocation={endLocation}
           heading={heading}
+          setSearchKeyword={setSearchKeyword}
+          setIsReserveBtnClicked={setIsReserveBtnClicked}
         />
       </div>
       <div className="route-summary">
@@ -268,6 +333,14 @@ const RouteDetails = ({
             <h2>99%</h2>
           </div>
         </div>
+        {showMakeReservation && (
+          <MakeReservation
+            setReserve={setReserved}
+            setShowMakeReservation={setShowMakeReservation}
+            noReservationCnt={noReservationCnt}
+            setNoReservationCnt={setNoReservationCnt}
+          />
+        )}
       </div>
     </>
   );

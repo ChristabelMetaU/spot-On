@@ -31,6 +31,9 @@ const Map = ({
   routeMode,
   isRoutingToHome,
   selectedSpot,
+  setSearchKeyword,
+  setSelectedSpot,
+  setIsReserveBtnClicked,
 }) => {
   const polyLine = useRef(null);
   const [hasPanned, setHasPanned] = useState(false);
@@ -48,7 +51,6 @@ const Map = ({
       }
     }
     if (map) {
-      //if selected spot is not in the current view, pan to it
       if (
         selectedSpot &&
         selectedSpot.coordLat &&
@@ -170,7 +172,12 @@ const Map = ({
                       spot.coordLat === endLocation.lat && (
                         <div
                           onClick={() => {
+                            setSearchKeyword(spot.lotName);
+                            setSelectedSpot(spot);
                             navigate("/Home/ReserveDetails");
+                            setTimeout(() => {
+                              setIsReserveBtnClicked(true);
+                            }, 2000);
                           }}
                           styule={{ cursor: "pointer" }}
                         >
@@ -184,6 +191,7 @@ const Map = ({
                     {spot.coordLat !== endLocation?.lat && (
                       <Overlay
                         title={name}
+                        mode="spot"
                         lat={spot.coordLat}
                         lng={spot.coordLng}
                       />
