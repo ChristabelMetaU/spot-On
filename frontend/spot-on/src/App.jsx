@@ -17,6 +17,7 @@ import { AuthProvider } from "./component/AuthContext";
 import { useAuth } from "./component/AuthContext";
 import { MapProvider } from "./component/MapContext";
 import Reserve from "./component/Reserve";
+import { ReserveProvider } from "./component/ReserveContext";
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
   return user ? <Outlet /> : <Navigate to="/Welcome" />;
@@ -40,6 +41,7 @@ function AppRoutes() {
   const [isVisible, setIsVisible] = useState(false);
   const [isReserved, setIsReserved] = useState(false);
   const [showTimer, setShowTimer] = useState(false);
+  const [isReserveBtnClicked, setIsReserveBtnClicked] = useState(false);
   const [activeFilters, setActiveFilters] = useState({
     red: true,
     green: true,
@@ -105,6 +107,8 @@ function AppRoutes() {
                 setIsReserved={setIsReserved}
                 showTimer={showTimer}
                 setShowTimer={setShowTimer}
+                isReserveBtnClicked={isReserveBtnClicked}
+                setIsReserveBtnClicked={setIsReserveBtnClicked}
               />
             }
           />
@@ -129,6 +133,10 @@ function AppRoutes() {
                 setDestinationLocation={setDestinationLocation}
                 userLocation={userLocation}
                 setIsRoutingToHome={setIsRoutingToHome}
+                searchKeyword={searchKeyword}
+                setSearchKeyword={setSearchKeyword}
+                isReserveBtnClicked={isReserveBtnClicked}
+                setIsReserveBtnClicked={setIsReserveBtnClicked}
               />
             }
           />
@@ -161,6 +169,8 @@ function AppRoutes() {
                 showTimer={showTimer}
                 setShowTimer={setShowTimer}
                 userLocation={userLocation}
+                isReserveBtnClicked={isReserveBtnClicked}
+                setIsReserveBtnClicked={setIsReserveBtnClicked}
               />
             }
           />
@@ -173,11 +183,13 @@ function AppRoutes() {
 function App() {
   return (
     <MapProvider>
-      <AuthProvider>
-        <Router>
-          <AppRoutes />
-        </Router>
-      </AuthProvider>
+      <ReserveProvider>
+        <AuthProvider>
+          <Router>
+            <AppRoutes />
+          </Router>
+        </AuthProvider>
+      </ReserveProvider>
     </MapProvider>
   );
 }

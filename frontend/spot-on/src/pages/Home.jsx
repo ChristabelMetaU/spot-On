@@ -15,9 +15,6 @@ import MapLoading from "../component/MapLoading";
 import SearchForSpot from "../component/SearchForSpot";
 import { getDistance } from "../utils/Huristic";
 import "../styles/Home.css";
-
-// TODO:
-// IF USER FAR FROM SCHOOL DISPLAY SPOTS CLOSEST TO USER IN HOME MAP
 import { connectWebSocket, sendWebSocket } from "../utils/websocket";
 const Home = ({
   spots,
@@ -50,6 +47,7 @@ const Home = ({
   setMessage,
   isVisible,
   setIsVisible,
+  setIsReserveBtnClicked,
 }) => {
   const mode = "Home";
   const { user } = useAuth();
@@ -107,7 +105,6 @@ const Home = ({
         if (!data || data.length < 1) {
           setSpots([]);
           setFreeCount(0);
-          //check if user is in mtsu campus or not and distance is outside the state
           if (getDistance(lat, lng, MTSU_CENTER.lat, MTSU_CENTER.lng) > 10) {
             raduis += 1000000;
           } else {
@@ -139,8 +136,10 @@ const Home = ({
         const index = spots.findIndex((spot) => spot.id === data.spotId);
         if (index !== -1) {
           const newSpots = [...spots];
-          newSpots[index].isOccupied = data.isOccupied;
-          setSpots(newSpots);
+          if (newSpots[index].isOccupied !== data.isOccupied) {
+            newSpots[index].isOccupied = data.isOccupied;
+            setSpots(newSpots);
+          }
         }
       }
       if (data.type === "ERROR") {
@@ -241,9 +240,7 @@ const Home = ({
             setLockedSpotId={setLockedSpotId}
             setFreeCount={setFreeCount}
             isRoutingToHome={isRoutingToHome}
-            setSearchKeyword={setSearchKeyword}
           />
-
           <Report
             spots={spots}
             handleReportSubmit={handleReportSubmit}
@@ -272,6 +269,9 @@ const Home = ({
           handleReportSubmit={handleReportSubmit}
           id={user.id}
           setLocked={setLocked}
+          setSearchKeyword={setSearchKeyword}
+          setSelectedSpot={setSelectedSpot}
+          setIsReserveBtnClicked={setIsReserveBtnClicked}
         />
       )}
       {isVisible && <Message message={message} setIsVisible={setIsVisible} />}

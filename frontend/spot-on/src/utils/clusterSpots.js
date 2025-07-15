@@ -12,7 +12,7 @@ const haversine = (lat1, lng1, lat2, lng2) => {
     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
   return earthRadius * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 };
-//imitates k means clustering to make clusters of spots
+
 export const clusterSpots = (spots, clusterRadius = 100) => {
   const clusters = [];
   spots.forEach((spot) => {

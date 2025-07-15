@@ -8,6 +8,7 @@ import { sendWebSocket, connectWebSocket } from "../utils/websocket";
 import { getFormattedDate } from "../utils/getFormattedDate";
 import Timer from "./Timer";
 import { formatTime } from "../utils/formatTime";
+import { useTime } from "./ReserveContext";
 const Reserve = ({
   setIsRoutingToHome,
   spots,
@@ -28,21 +29,20 @@ const Reserve = ({
   showTimer,
   setShowTimer,
   userLocation,
+  isReserveBtnClicked,
+  setIsReserveBtnClicked,
 }) => {
-  const [isReserveBtnClicked, setIsReserveBtnClicked] = useState(false);
   const { user } = useAuth();
+  const { timeLeft, setTimeLeft, currentReservation, setCurrentReservation } =
+    useTime();
   const [error, setError] = useState("");
-  const [currentReservation, setCurrentReservation] = useState([]);
   const [pastReservations, setPastReservations] = useState([]);
-  const [timeLeft, setTimeLeft] = useState(0);
   const navigate = useNavigate();
   const [showFullText, setShowFullText] = useState(false);
-  const [usedExtension, setUsedExtension] = useState(false);
   const limit = 5;
   let displayedReservations = showFullText
     ? pastReservations
     : pastReservations.slice(0, limit);
-
   useEffect(() => {
     const fetchReservations = async () => {
       const response = await fetch("http://localhost:3000/spots/get/reserve");
@@ -64,6 +64,29 @@ const Reserve = ({
     };
     fetchReservations();
   }, []);
+  useEffect(() => {
+    const fetchCurrentReservation = async () => {
+      const response = await fetch(
+        `http://localhost:3000/spots/current/reserve/${user.id}`
+      );
+      const data = await response.json();
+      if (data) {
+        setCurrentReservation(data);
+        const now = new Date();
+        const reservedAt = new Date(data.reservedAt);
+        const timeDiff = now.getTime() - reservedAt.getTime();
+        const timeLeftNow = 600 - Math.round(timeDiff / 1000);
+        setTimeLeft(timeLeftNow);
+        setShowTimer(true);
+      } else {
+        setCurrentReservation([]);
+      }
+    };
+    if (user.id) {
+      fetchCurrentReservation();
+    }
+  }, [user.id]);
+
   const resetForm = () => {
     setSearchKeyword("");
     setShowResults(false);
@@ -135,6 +158,7 @@ const Reserve = ({
       userId: user.id,
     });
   };
+
   useEffect(() => {
     if (showTimer) {
       if (timeLeft <= 0) {
@@ -143,7 +167,6 @@ const Reserve = ({
         setIsVisible(true);
         setShowTimer(false);
         setCurrentReservation([]);
-        setUsedExtension(true);
         return;
       }
       const interval = setInterval(() => {
@@ -261,7 +284,9 @@ const Reserve = ({
             </div>
 
             <div className="reservation-details">
-              {currentReservation.reservedAt ? (
+              {currentReservation.reservedAt &&
+              currentReservation.spotId &&
+              spots ? (
                 <div>
                   <p>
                     {

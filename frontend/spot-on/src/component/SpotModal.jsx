@@ -5,7 +5,7 @@ import { getFormattedDate } from "../utils/getFormattedDate";
 import { useAuth } from "./AuthContext";
 import { formatTime } from "../utils/formatTime";
 import { sendWebSocket } from "../utils/websocket";
-import { use } from "react";
+import { useNavigate } from "react-router-dom";
 const SpotModal = ({
   spot,
   setShowModal,
@@ -13,8 +13,12 @@ const SpotModal = ({
   handleReportSubmit,
   id,
   setLocked,
+  setSearchKeyword,
+  setSelectedSpot,
+  setIsReserveBtnClicked,
 }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [spotReport, setSpotReport] = useState([]);
   const [timeLeft, setTimeLeft] = useState(60);
   const handleGetDirections = (spot) => {
@@ -112,6 +116,21 @@ const SpotModal = ({
               }}
             >
               Report occupied
+            </button>
+          </div>
+          <div className="modal-reserve">
+            <button
+              className="reserve"
+              onClick={() => {
+                setSearchKeyword(spot.lotName);
+                setSelectedSpot(spot);
+                navigate("/Home/ReserveDetails");
+                setTimeout(() => {
+                  setIsReserveBtnClicked(true);
+                }, 2000);
+              }}
+            >
+              Reserve Spot
             </button>
           </div>
           <label>Spot's recent Activity </label>

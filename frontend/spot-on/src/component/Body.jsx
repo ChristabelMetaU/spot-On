@@ -31,6 +31,7 @@ const Body = ({
   routeMode,
   isRoutingToHome,
   setSearchKeyword,
+  setIsReserveBtnClicked,
 }) => {
   const { map, onLoad } = useMap();
   const { loading, user } = useAuth();
@@ -171,8 +172,9 @@ const Body = ({
         routeMode={routeMode}
         isRoutingToHome={isRoutingToHome}
         selectedSpot={selectedSpot}
-        setSearchKeyword={setSearchKeyword}
         setSelectedSpot={setSelectedSpot}
+        setSearchKeyword={setSearchKeyword}
+        setIsReserveBtnClicked={setIsReserveBtnClicked}
       />
     </section>
   );

@@ -19,9 +19,9 @@ const checkForReservedSpots = async (spotId, now) => {
     },
   });
   if (reservedSpot) {
-    return true;
+    return reservedSpot;
   } else {
-    return false;
+    return null;
   }
 };
 const isSpotLocked = async (spotId, now) => {
