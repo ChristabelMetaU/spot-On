@@ -17,14 +17,21 @@ const SpotModal = ({
   const { user } = useAuth();
   const [spotReport, setSpotReport] = useState([]);
   const [timeLeft, setTimeLeft] = useState(60);
-  const handleGetDirections = () => {
+  const handleGetDirections = (spot) => {
     const { coordLat, coordLng, lotName } = spot;
     const label = `${lotName} spot ${spotIndex + 1}`;
     const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-      `${label} @ ${coordLat},${coordLng}`
+      `${"Middle Tennessee State University"} @ ${coordLat},${coordLng}`
     )}`;
     window.open(url, "_blank");
     setShowModal(false);
+    sendWebSocket({
+      type: "UNLOCK_SPOT",
+      isOccupied: spot.isOccupied,
+      spotId: spot.id,
+      userId: user.id,
+    });
+    setLocked(false);
   };
 
   useEffect(() => {
@@ -45,14 +52,7 @@ const SpotModal = ({
       type: spot.type,
       user_id: id,
     };
-
     handleReportSubmit(formData, isOccupied);
-    sendWebSocket({
-      type: "UNLOCK_SPOT",
-      spotId: spot.id,
-      userId: user.id,
-    });
-    setLocked(false);
   };
   const handleClose = () => {
     setShowModal(false);
@@ -60,6 +60,7 @@ const SpotModal = ({
       type: "UNLOCK_SPOT",
       spotId: spot.id,
       userId: user.id,
+      isOccupied: spot.isOccupied,
     });
     setLocked(false);
   };
@@ -136,10 +137,13 @@ const SpotModal = ({
             readOnly={true}
           />
           <div className="exit-btns">
-            <button className="get-direction" onClick={handleGetDirections}>
+            <button
+              className="get-direction"
+              onClick={() => handleGetDirections(spot)}
+            >
               Get directions
             </button>
-            <button className="close" onClick={handleClose}>
+            <button className="close" onClick={() => handleClose(spot)}>
               Close
             </button>
           </div>

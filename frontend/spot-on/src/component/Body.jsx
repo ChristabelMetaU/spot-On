@@ -98,6 +98,7 @@ const Body = ({
 
       sendWebSocket({
         type: "LOCK_SPOT",
+        isOccupied: spot.isOccupied,
         spotId: spot.id,
         userId: user.id,
       });

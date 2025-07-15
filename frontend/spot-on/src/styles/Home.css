@@ -227,7 +227,7 @@ body {
   overflow: hidden;
   background: #fff;
 }
-.reserve-container {
+.report-container {
   flex: 1 1 45%;
   display: flex;
   align-items: flex-start;
@@ -270,6 +270,25 @@ body {
   z-index: 9999;
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+.fab-timer {
+  position: fixed;
+  right: 10rem;
+  background-color: #1c2e46;
+  color: #ccc;
+  width: 200px;
+  height: 50px;
+  border-radius: 50px;
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+.fab-timer h2 {
+  color: #dcdee5;
 }
 .fab-route {
   position: fixed;

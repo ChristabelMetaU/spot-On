@@ -129,22 +129,19 @@ const Home = ({
           setActiveUsers(data.users);
         }
       }
-      if (data.type === "SPOT_UPDATED") {
-        const index = spots.findIndex((spot) => spot.id === data.spotId);
-        if (index !== -1) {
-          let newSpots = [...spots];
-          newSpots[index] = data.spot;
-          if (activeFilters.length > 0) {
-            setSpots(newSpots);
-          }
-        }
-      }
       if (data.type === "SPOT_LOCKED") {
         setLocked(data.locked);
         setLockedSpotId(data.spotId);
       }
       if (data.type === "SPOT_UNLOCKED") {
         setLocked(data.locked);
+        setLockedSpotId(null);
+        const index = spots.findIndex((spot) => spot.id === data.spotId);
+        if (index !== -1) {
+          const newSpots = [...spots];
+          newSpots[index].isOccupied = data.isOccupied;
+          setSpots(newSpots);
+        }
       }
       if (data.type === "ERROR") {
         setShowModal(false);
@@ -173,9 +170,9 @@ const Home = ({
       type: "UPDATE_SPOT",
       spot: data,
       spotId: data.id,
+      isOccupied: data.isOccupied,
       userId: user.id,
     });
-
     setShowModal(false);
     setSelectedSpot(data);
     if (!data.isOccupied) {
@@ -184,11 +181,6 @@ const Home = ({
       setMessage(`${selectedSpot.lotName} is now marked as occupied.`);
     }
     setIsVisible(true);
-    sendWebSocket({
-      type: "UNLOCK_SPOT",
-      spotId: selectedSpot.id,
-      userId: user.id,
-    });
     setLocked(false);
   };
   const handleReportSubmit = async (formData, occupied) => {

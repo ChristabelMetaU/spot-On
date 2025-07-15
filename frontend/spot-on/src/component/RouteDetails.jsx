@@ -9,6 +9,8 @@ import { customPathFinder } from "../utils/Huristic";
 import { getDistance } from "../utils/Huristic";
 import { formatTime } from "../utils/formatTime";
 import { useMap } from "./MapContext";
+import MakeReservation from "./MakeReservation";
+import { set } from "date-fns";
 const RouteDetails = ({
   spots,
   setSpots,
@@ -42,12 +44,24 @@ const RouteDetails = ({
   const [stats, setStats] = useState({});
   const [isDriving, setIsDriving] = useState(true);
   const [heading, setHeading] = useState(0);
+  const [reserved, setReserved] = useState(false);
+  const [showMakeReservation, setShowMakeReservation] = useState(false);
+  const [eta, setEta] = useState(0);
   const rotateMap = () => {
     const newHeading = (heading + 45) % 360;
     setHeading(newHeading);
     map.setHeading(newHeading);
   };
-  function getGoogleDirections(start, end) {
+  useEffect(() => {
+    const duration = 5000;
+    setTimeout(() => {
+      const TENMINUTES_AWAY = 600;
+      if (eta > 0 && eta <= TENMINUTES_AWAY) {
+        setShowMakeReservation(true);
+      }
+    }, duration);
+  }, [eta, routePath]);
+  const getGoogleDirections = (start, end) => {
     directionsService.current.route(
       {
         origin: start,
@@ -69,7 +83,7 @@ const RouteDetails = ({
         }
       }
     );
-  }
+  };
   function getSpeedWithMutiplier(hour) {
     if (hour >= 7 || hour <= 11) {
       return 0.6;
@@ -103,6 +117,7 @@ const RouteDetails = ({
     speedinMetersPerSecond = (speedinMetersPerSecond * 1000) / 3600;
     let etaSeconds = distance / speedinMetersPerSecond;
     etaSeconds = Math.round(etaSeconds);
+    setEta(etaSeconds);
     const eta = formatTime(etaSeconds);
     distance = Math.round(distance);
     distance = distance.toLocaleString("en-US", {
@@ -111,7 +126,6 @@ const RouteDetails = ({
     });
     distance = distance + "m";
     const accuracy = "90%";
-
     return {
       totalDistance: distance,
       eta: eta,
@@ -268,6 +282,12 @@ const RouteDetails = ({
             <h2>99%</h2>
           </div>
         </div>
+        {showMakeReservation && (
+          <MakeReservation
+            setReserve={setReserved}
+            setShowMakeReservation={setShowMakeReservation}
+          />
+        )}
       </div>
     </>
   );

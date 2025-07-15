@@ -160,6 +160,7 @@ function AppRoutes() {
                 setIsReserved={setIsReserved}
                 showTimer={showTimer}
                 setShowTimer={setShowTimer}
+                userLocation={userLocation}
               />
             }
           />

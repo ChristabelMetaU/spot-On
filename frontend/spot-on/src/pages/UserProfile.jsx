@@ -80,9 +80,9 @@ const UserProfile = ({ setIsRoutingToHome }) => {
             {userReport.length > limit && (
               <p
                 onClick={() => setShowFullText(!showFullText)}
-                className="show-more"
+                className="show-All"
               >
-                {showFullText ? "Show Less" : "Show More"}
+                {showFullText ? "Show Less" : "Show All"}
               </p>
             )}
           </div>
