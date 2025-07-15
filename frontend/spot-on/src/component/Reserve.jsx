@@ -7,6 +7,7 @@ import Message from "./Message";
 import { sendWebSocket, connectWebSocket } from "../utils/websocket";
 import { getFormattedDate } from "../utils/getFormattedDate";
 import Timer from "./Timer";
+import { formatTime } from "../utils/formatTime";
 const Reserve = ({
   setIsRoutingToHome,
   spots,
@@ -182,6 +183,10 @@ const Reserve = ({
       setIsVisible(true);
     }
   };
+  const handleClose = () => {
+    setIsReserveBtnClicked(false);
+    resetForm();
+  };
   return (
     <div>
       <div className="route-header">
@@ -201,9 +206,15 @@ const Reserve = ({
         </div>
       </div>
       <div className="site-main">
-        <button onClick={() => setIsReserveBtnClicked(true)}>
-          Reserve a Spot
-        </button>
+        <div className="reserve-spot">
+          <button
+            onClick={() => setIsReserveBtnClicked(true)}
+            className="reserve-spot-btn"
+          >
+            Reserve a Spot
+          </button>
+          <p>Resserve your spot by searching</p>
+        </div>
         {showTimer && <Timer timeLeft={timeLeft} />}
         {isReserveBtnClicked && (
           <form onSubmit={handleSubmit}>
@@ -228,7 +239,9 @@ const Reserve = ({
                 </div>
                 <p>{error}</p>
                 <button className="reserve-btn">Reserve spot</button>
-                <button className="reserve-btn">Close</button>
+                <button className="reserve-btn" onClick={handleClose}>
+                  Close
+                </button>
               </div>
             </div>
           </form>
@@ -236,36 +249,55 @@ const Reserve = ({
 
         <div className="reserve-container">
           <h2>Reservations</h2>
-          <div className="current-reservation">
-            <h2>Current Reservation</h2>
-            {currentReservation.reservedAt ? (
-              <div>
-                <h2>
-                  {
-                    spots.find((spot) => spot.id === currentReservation.spotId)
-                      .lotName
-                  }
-                </h2>
-                <p>
-                  {`Reserved ${getFormattedDate(
-                    currentReservation.reservedAt
-                  )}`}
-                </p>
-                <button onClick={handleCancelReservation}>
+          <div className="reservation-card">
+            <div className="reservation-header">
+              <span className="status-dot"></span>
+              <h3>Current Reservation</h3>
+              <span className="timer">
+                {currentReservation.reservedAt
+                  ? `Time left: ${formatTime(timeLeft)}`
+                  : ""}
+              </span>
+            </div>
+
+            <div className="reservation-details">
+              {currentReservation.reservedAt ? (
+                <div>
+                  <p>
+                    {
+                      spots.find(
+                        (spot) => spot.id === currentReservation.spotId
+                      ).lotName
+                    }
+                  </p>
+                  <p>
+                    {`Reserved ${getFormattedDate(
+                      currentReservation.reservedAt
+                    )}`}
+                  </p>
+                  <p>ETA: 10 minutes</p>
+                </div>
+              ) : (
+                <div className="reservation-details">
+                  <p> No current reservation</p>
+                </div>
+              )}
+            </div>
+            <div className="reservation-action">
+              {currentReservation.reservedAt && (
+                <button onClick={handleCancelReservation} className="cancel">
                   Cancel Reservation
                 </button>
-              </div>
-            ) : (
-              <div> No current reservation </div>
-            )}
+              )}
+            </div>
           </div>
-          <div className="past-reservation">
+          <div className="past">
             <h2>Past Reservations</h2>
             {pastReservations ? (
               <div>
                 {displayedReservations.map((reservation) => (
-                  <div key={reservation.id}>
-                    <h2>{reservation.lotName}</h2>
+                  <div key={reservation.id} className="reservation-past">
+                    <p>{reservation.lotName}</p>
                     <p>
                       {`Reserved ${getFormattedDate(reservation.reservedAt)}`}
                     </p>

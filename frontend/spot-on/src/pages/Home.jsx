@@ -241,6 +241,7 @@ const Home = ({
             setLockedSpotId={setLockedSpotId}
             setFreeCount={setFreeCount}
             isRoutingToHome={isRoutingToHome}
+            setSearchKeyword={setSearchKeyword}
           />
 
           <Report
