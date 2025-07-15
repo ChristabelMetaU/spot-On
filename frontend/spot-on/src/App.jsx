@@ -33,6 +33,13 @@ function AppRoutes() {
   const [freeCount, setFreeCount] = useState(0);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [destinationLocation, setDestinationLocation] = useState(null);
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [showResults, setShowResults] = useState(false);
+  const [message, setMessage] = useState("");
+  const [isVisible, setIsVisible] = useState(false);
+  const [isReserved, setIsReserved] = useState(false);
+  const [showTimer, setShowTimer] = useState(false);
   const [activeFilters, setActiveFilters] = useState({
     red: true,
     green: true,
@@ -84,6 +91,20 @@ function AppRoutes() {
                 setIsMapLoaded={setIsMapLoaded}
                 destinationLocation={destinationLocation}
                 isRoutingToHome={isRoutingToHome}
+                searchKeyword={searchKeyword}
+                setSearchKeyword={setSearchKeyword}
+                searchResults={searchResults}
+                setSearchResults={setSearchResults}
+                showResults={showResults}
+                setShowResults={setShowResults}
+                message={message}
+                setMessage={setMessage}
+                isVisible={isVisible}
+                setIsVisible={setIsVisible}
+                isReserved={isReserved}
+                setIsReserved={setIsReserved}
+                showTimer={showTimer}
+                setShowTimer={setShowTimer}
               />
             }
           />
@@ -119,7 +140,28 @@ function AppRoutes() {
 
           <Route
             path="/Home/ReserveDetails"
-            element={<Reserve setIsRoutingToHome={setIsRoutingToHome} />}
+            element={
+              <Reserve
+                setIsRoutingToHome={setIsRoutingToHome}
+                spots={spots}
+                searchKeyword={searchKeyword}
+                setSearchKeyword={setSearchKeyword}
+                showResults={showResults}
+                setShowResults={setShowResults}
+                searchResults={searchResults}
+                setSearchResults={setSearchResults}
+                selectedSpot={selectedSpot}
+                setSelectedSpot={setSelectedSpot}
+                message={message}
+                setMessage={setMessage}
+                isVisible={isVisible}
+                setIsVisible={setIsVisible}
+                isReserved={isReserved}
+                setIsReserved={setIsReserved}
+                showTimer={showTimer}
+                setShowTimer={setShowTimer}
+              />
+            }
           />
         </Route>
       </Routes>

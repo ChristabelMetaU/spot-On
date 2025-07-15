@@ -12,10 +12,13 @@ const Overlay = ({ title, lat, lng }) => {
     >
       <div
         style={{
+          cursor: "pointer",
           backgroundColor: "#1c2e46",
           border: "1px solid white",
-          paddingRight: "45px",
+          paddingRight: "40px",
           paddingLeft: "8px",
+          paddingTop: "8px",
+          paddingBottom: "8px",
           color: "white",
           borderRadius: "10px",
           fontSize: "12px",

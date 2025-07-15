@@ -1,6 +1,7 @@
 /** @format */
 
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import MapLoading from "./MapLoading";
 import React from "react";
 import { GoogleMap, Marker } from "@react-google-maps/api";
@@ -33,6 +34,7 @@ const Map = ({
 }) => {
   const polyLine = useRef(null);
   const [hasPanned, setHasPanned] = useState(false);
+  const navigate = useNavigate();
   useEffect(() => {
     if ((map && !hasPanned && clustered.length > 0) || isRoutingToHome) {
       const firstCluster = clustered[0];
@@ -42,6 +44,7 @@ const Map = ({
           lng: firstCluster.centerLng,
         };
         map.panTo(center);
+        setHasPanned(true);
       }
     }
     if (map) {
@@ -165,11 +168,18 @@ const Map = ({
                     {!isHome &&
                       endLocation &&
                       spot.coordLat === endLocation.lat && (
-                        <Overlay
-                          title={"Your spot"}
-                          lat={spot.coordLat}
-                          lng={spot.coordLng}
-                        />
+                        <div
+                          onClick={() => {
+                            navigate("/Home/ReserveDetails");
+                          }}
+                          styule={{ cursor: "pointer" }}
+                        >
+                          <Overlay
+                            title={"Your spot: \n Click to Reserve"}
+                            lat={spot.coordLat}
+                            lng={spot.coordLng}
+                          />
+                        </div>
                       )}
                     {spot.coordLat !== endLocation?.lat && (
                       <Overlay

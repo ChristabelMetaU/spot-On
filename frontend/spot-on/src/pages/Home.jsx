@@ -40,16 +40,21 @@ const Home = ({
   setActiveFilters,
   setIsRoutingToHome,
   isRoutingToHome,
+  searchKeyword,
+  setSearchKeyword,
+  showResults,
+  setShowResults,
+  searchResults,
+  setSearchResults,
+  message,
+  setMessage,
+  isVisible,
+  setIsVisible,
 }) => {
   const mode = "Home";
-  const [message, setMessage] = useState("");
-  const [isVisible, setIsVisible] = useState(false);
   const { user } = useAuth();
   const [showFilters, setShowFilters] = useState(false);
   const [userLocationError, setUserLocationError] = useState(null);
-  const [searchKeyword, setSearchKeyword] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [showResults, setShowResults] = useState(false);
   const [activeUsers, setActiveUsers] = useState([]);
   const MTSU_CENTER = {
     lat: 35.8486,

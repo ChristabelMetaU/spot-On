@@ -17,6 +17,7 @@ model Users {
   created_at DateTime @default(now())
   report reports[]
   LockedSpot LockedSpot[]
+  ReservedSpots ReservedSpots[]
 }
 
 model spots{
@@ -27,6 +28,7 @@ model spots{
     coordLng Float
   isOccupied Boolean @default(false)
   LockedSpot LockedSpot[]
+  ReservedSpots ReservedSpots[]
   report reports[]
 
 }
@@ -39,7 +41,15 @@ model LockedSpot{
   lockeAt DateTime @default(now())
   expiresAt DateTime
 }
-
+model ReservedSpots{
+  id Int @id @default(autoincrement())
+  spotId Int
+  userId Int
+  spot spots @relation(fields: [spotId], references: [id])
+  user Users @relation(fields: [userId], references: [id])
+  reservedAt DateTime @default(now())
+  expiresAt DateTime
+}
 model reports{
   id Int @id @default(autoincrement())
   description String

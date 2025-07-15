@@ -102,7 +102,6 @@ const RouteDetails = ({
       speedinMetersPerSecond * getSpeedWithMutiplier(currentHour);
     speedinMetersPerSecond = (speedinMetersPerSecond * 1000) / 3600;
     let etaSeconds = distance / speedinMetersPerSecond;
-    //round seconds
     etaSeconds = Math.round(etaSeconds);
     const eta = formatTime(etaSeconds);
     distance = Math.round(distance);

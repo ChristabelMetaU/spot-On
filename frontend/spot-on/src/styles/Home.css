@@ -274,6 +274,7 @@ body {
 .fab-route {
   position: fixed;
   right: 20px;
+  top: 14rem;
   color: #1c2e46;
   background-color: rgba(0, 0, 0, 0.1);
   border: 2px solid #dcdee5;
@@ -300,7 +301,7 @@ body {
   background-color: rgba(0, 0, 0, 0.1);
   border: 2px solid #dcdee5;
   left: 25px;
-  bottom: 30px;
+  bottom: 55px;
   width: 70px;
   height: 60px;
   border-radius: 50%;
@@ -344,4 +345,14 @@ body {
 }
 .error {
   color: red;
+}
+.reserve-btn {
+  margin: 5px;
+}
+
+.reserve-icon {
+  margin: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
