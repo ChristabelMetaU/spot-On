@@ -139,3 +139,25 @@ h2 {
 .profile-stats i:hover {
   color: #00338b;
 }
+
+.legend {
+  margin: 1rem 0;
+}
+
+.activity {
+  display: flex;
+  border-bottom: 1px solid #2e3b55;
+  padding: 0 1rem;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.activity h2 {
+  font-weight: 800;
+  color: #2e3b55;
+}
+
+.activity i {
+  color: #2e3b55;
+}

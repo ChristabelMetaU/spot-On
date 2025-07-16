@@ -23,7 +23,19 @@ const UserProfile = ({ setIsRoutingToHome }) => {
     if (!response.ok) {
       throw new Error(data.message);
     }
-    setUserReport(data);
+    const filteredReports = data.filter((report) => {
+      const reportDate = new Date(report.created_at);
+      const currentDate = new Date();
+      const diffInDays = Math.floor(
+        (currentDate - reportDate) / (1000 * 60 * 60 * 24)
+      );
+      return diffInDays <= 7;
+    });
+    filteredReports.sort((a, b) => {
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
+
+    setUserReport(filteredReports);
   };
   useEffect(() => {
     displayReport();
@@ -91,20 +103,28 @@ const UserProfile = ({ setIsRoutingToHome }) => {
         )}
       </div>
       <div className="legend">
-        <div className="activity">
+        <div
+          className="activity"
+          onClick={() => navigate("/Home/ReserveDetails")}
+        >
           <h2>Reserve a spot</h2>
+          <i className="fa-solid fa-caret-right fa-2x"></i>
         </div>
-        <div className="activity">
-          <h2>Find route to closest spot </h2>
+        <div
+          className="activity"
+          onClick={() => navigate("/Home/RouteDetails")}
+        >
+          <h2>Find your closest spot </h2>
+          <i className="fa-solid fa-caret-right fa-2x"></i>
         </div>
-        <div className="activity">
-          <h2>Find route to closest spot to your destination </h2>
-        </div>
+
         <div className="activity">
           <h2>Notifications </h2>
+          <i className="fa-solid fa-caret-right fa-2x"></i>
         </div>
         <div className="activity">
           <h2>Recent analytics </h2>
+          <i className="fa-solid fa-caret-right fa-2x"></i>
         </div>
       </div>
       <div className="log-out">
