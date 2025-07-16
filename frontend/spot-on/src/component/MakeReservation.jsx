@@ -14,6 +14,7 @@ const MakeReservation = ({
   return (
     <div className="modal-overlay">
       <div className="modal-content">
+        <p>You are less than 10 minutes from your Spot</p>
         <p>Do you Want to reserve your destination spot?</p>
         <div className="makeReservation-btns">
           <button onClick={() => handleClick(true)}>Yes</button>

@@ -1,6 +1,7 @@
 /** @format */
 
 import React from "react";
+import { useState } from "react";
 import "../styles/FilterToggles.css";
 const filters = [
   { label: "Lot Type ", color: "#", key: "lotType" },
@@ -19,35 +20,67 @@ const FilterToggles = ({ activeFilters, setActiveFilters }) => {
     const upddated = { ...activeFilters, [key]: !activeFilters[key] };
     setActiveFilters(upddated);
   };
+  const [collapsedSections, setCollapseSection] = useState({
+    lotType: false,
+    spotType: false,
+    Avail: false,
+  });
+
+  const toggleSection = (key) => {
+    setCollapseSection((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
+  const filterSections = {
+    lotType: filters.filter(
+      (f) => f.key === "red" || f.key === "green" || f.key === "white"
+    ),
+    spotType: filters.filter(
+      (f) => f.key === "handicap" || f.key === "housing"
+    ),
+    Avail: filters.filter((f) => f.key === "free" || f.key === "occupied"),
+  };
   return (
     <div className="filter-toggle-container">
-      {filters.map(({ label, color, key }) => {
-        if (
-          label === "Availability " ||
-          label === "Spot Type " ||
-          label === "Lot Type "
-        ) {
-          return <h3 key={key}>{label}</h3>;
-        }
-        return (
-          <div className="toggle-wrapper" key={key}>
-            <label className="switch">
-              <input
-                type="checkbox"
-                checked={activeFilters[key] || false}
-                onChange={() => toggleFilter(key)}
-              />
-              <span
-                className="slider"
-                style={{ backgroundColor: activeFilters[key] ? color : "#ccc" }}
-              ></span>
-            </label>
-            <span className="filter-label" style={{ color: "black" }}>
-              {label}
-            </span>
-          </div>
-        );
-      })}
+      {Object.entries(filterSections).map(([sectionKey, sectionFilters]) => (
+        <div key={sectionKey} className="filter-section">
+          <h3
+            onClick={() => toggleSection(sectionKey)}
+            style={{ cursor: "pointer" }}
+          >
+            {collapsedSections[sectionKey] ? "▼" : "▶"}
+            {sectionKey === "lotType"
+              ? "Lot Type"
+              : sectionKey === "spotType"
+              ? "Spot Type"
+              : "Availability"}
+          </h3>
+
+          {collapsedSections[sectionKey] &&
+            sectionFilters.map(({ label, key, color }) => (
+              <div className="toggle-wrapper" key={key}>
+                <label className="switch">
+                  <input
+                    type="checkbox"
+                    checked={activeFilters[key] || false}
+                    onChange={() => toggleFilter(key)}
+                  />
+                  <span
+                    className="slider"
+                    style={{
+                      backgroundColor: activeFilters[key] ? color : "#ccc",
+                    }}
+                  />
+                </label>
+                <span className="filter-label" style={{ color: "black" }}>
+                  {label}
+                </span>
+              </div>
+            ))}
+        </div>
+      ))}
     </div>
   );
 };

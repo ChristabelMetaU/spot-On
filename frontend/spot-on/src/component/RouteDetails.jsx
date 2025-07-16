@@ -10,7 +10,7 @@ import { getDistance } from "../utils/Huristic";
 import { formatTime } from "../utils/formatTime";
 import { useMap } from "./MapContext";
 import MakeReservation from "./MakeReservation";
-import { set } from "date-fns";
+import { use } from "react";
 const RouteDetails = ({
   spots,
   setSpots,
@@ -51,65 +51,13 @@ const RouteDetails = ({
   const [reserved, setReserved] = useState(false);
   const [showMakeReservation, setShowMakeReservation] = useState(false);
   const [noReservationCnt, setNoReservationCnt] = useState(0);
-  const [userBtnClickedCnt, setUserBtnClickedCnt] = useState(0);
   const [eta, setEta] = useState(0);
   const rotateMap = () => {
     const newHeading = (heading + 45) % 360;
     setHeading(newHeading);
     map.setHeading(newHeading);
   };
-  useEffect(() => {
-    const displayMakeReservationModal = () => {
-      const duration = 5000;
-      setTimeout(() => {
-        const TENMINUTES_AWAY = 600;
-        if (eta > 0 && eta <= TENMINUTES_AWAY) {
-          setShowMakeReservation(true);
-        }
-      }, duration);
-    };
-    if (noReservationCnt < 3) {
-      if (!clicked) {
-        setNoReservationCnt(noReservationCnt + 1);
-        if (noReservationCnt < 2) {
-          displayMakeReservationModal();
-        }
-      } else if (
-        clicked &&
-        destinationLocation &&
-        destinationLocation.lat &&
-        destinationLocation.lng
-      ) {
-        setNoReservationCnt(0);
-        displayMakeReservationModal();
-      }
-    }
-  }, [eta, clicked, destinationLocation, noReservationCnt]);
-  useEffect(() => {
-    if (reserved) {
-      const spot = spots.find(
-        (spot) =>
-          spot.coordLat === endLocation.lat && spot.coordLng === endLocation.lng
-      );
-      if (spot) {
-        setSelectedSpot(spot);
-        setSearchKeyword(spot.lotName);
-        navigate("/Home/ReserveDetails");
-        setTimeout(() => {
-          setIsReserveBtnClicked(true);
-        }, 2000);
-      }
-    } else {
-      setReserved(false);
-    }
-  }, [
-    reserved,
-    navigate,
-    endLocation,
-    spots,
-    setSelectedSpot,
-    setSearchKeyword,
-  ]);
+
   const getGoogleDirections = (start, end) => {
     directionsService.current.route(
       {
@@ -133,6 +81,7 @@ const RouteDetails = ({
       }
     );
   };
+
   function getSpeedWithMutiplier(hour) {
     if (hour >= 7 || hour <= 11) {
       return 0.6;
@@ -142,6 +91,7 @@ const RouteDetails = ({
     }
     return 1;
   }
+
   function computeStats(path) {
     if (!path || path.length < 2) {
       return {
@@ -181,10 +131,13 @@ const RouteDetails = ({
       accuracy: accuracy,
     };
   }
-  const computeShortestPath = (nearByFreeSpots) => {
-    const { userNode, spotNodes } = buildGraph(startLocation, nearByFreeSpots);
-    const path = customPathFinder(userNode, spotNodes);
 
+  const computeShortestPath = async (nearByFreeSpots) => {
+    const { userNode, spotNodes } = await buildGraph(
+      startLocation,
+      nearByFreeSpots
+    );
+    const path = customPathFinder(userNode, spotNodes);
     if (path.length > 0) {
       setEndLocation(path[path.length - 1]);
       getGoogleDirections(startLocation, path[path.length - 1]);
@@ -196,12 +149,21 @@ const RouteDetails = ({
       setRoutePath([]);
     }
   };
+
+  const displayMakeReservationModal = () => {
+    const duration = 10000;
+    setTimeout(() => {
+      const TENMINUTES_AWAY = 600;
+      if (eta > 0 && eta <= TENMINUTES_AWAY) {
+        setShowMakeReservation(true);
+      }
+    }, duration);
+  };
+
   useEffect(() => {
     let nearByFreeSpots = [];
     const upsateRoute = async () => {
-      if (!destinationLocation) {
-        nearByFreeSpots = spots.filter((spot) => spot.isOccupied === false);
-      } else if (destinationLocation) {
+      if (destinationLocation && clicked) {
         let tempSpots = [];
         let raduis = 200;
         while (tempSpots.length < 1) {
@@ -221,9 +183,7 @@ const RouteDetails = ({
       }
       computeShortestPath(nearByFreeSpots);
     };
-
     upsateRoute();
-    setDestinationLocation(null);
   }, [mode, destinationLocation, startLocation, isDriving, clicked]);
 
   useEffect(() => {
@@ -234,8 +194,45 @@ const RouteDetails = ({
         (spot) => spot.isOccupied === false
       );
       computeShortestPath(nearByFreeSpots);
+      setDestinationLocation(null);
     }
-  }, [clicked]);
+  }, [clicked, originlalSpots, setSpots, setDestinationLocation, mode]);
+
+  useEffect(() => {
+    if (eta > 0) {
+      if (!clicked && noReservationCnt < 3) {
+        displayMakeReservationModal();
+      } else if (clicked && destinationLocation && noReservationCnt < 3) {
+        setNoReservationCnt(0);
+        displayMakeReservationModal();
+      }
+    }
+  }, [eta, clicked, destinationLocation, noReservationCnt]);
+
+  useEffect(() => {
+    if (reserved) {
+      const spot = spots.find(
+        (spot) =>
+          spot.coordLat === endLocation.lat && spot.coordLng === endLocation.lng
+      );
+      if (spot) {
+        setSelectedSpot(spot);
+        setSearchKeyword(spot.lotName);
+        navigate("/Home/ReserveDetails");
+        setTimeout(() => {
+          setIsReserveBtnClicked(true);
+        }, 2000);
+        setReserved(false);
+      }
+    }
+  }, [
+    reserved,
+    navigate,
+    endLocation,
+    spots,
+    setSelectedSpot,
+    setSearchKeyword,
+  ]);
   return (
     <>
       <div className="route-header">

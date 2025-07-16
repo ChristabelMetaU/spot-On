@@ -5,7 +5,7 @@
   flex-direction: column;
   flex-wrap: wrap;
   gap: 1rem;
-  padding: 1rem;
+  padding: 0.5rem;
   justify-content: center;
 }
 
@@ -62,4 +62,12 @@ input:checked + .slider::before {
   color: #1c2e46;
   border-bottom: #1c2e46 solid 1px;
   text-align: justify;
+}
+
+.filter-section {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
 }
