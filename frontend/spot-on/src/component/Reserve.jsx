@@ -1,6 +1,6 @@
 /** @format */
 import { useNavigate } from "react-router-dom";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import SearchForSpot from "./SearchForSpot";
 import { useAuth } from "./AuthContext";
 import Message from "./Message";
@@ -10,7 +10,6 @@ import Timer from "./Timer";
 import { formatTime } from "../utils/formatTime";
 import { useTime } from "./ReserveContext";
 const Reserve = ({
-  setIsRoutingToHome,
   spots,
   searchKeyword,
   setSearchKeyword,
@@ -31,10 +30,16 @@ const Reserve = ({
   userLocation,
   isReserveBtnClicked,
   setIsReserveBtnClicked,
+  setIsRoutingToHome,
 }) => {
   const { user } = useAuth();
-  const { timeLeft, setTimeLeft, currentReservation, setCurrentReservation } =
-    useTime();
+  const {
+    timeLeft,
+    setTimeLeft,
+    currentReservation,
+    setCurrentReservation,
+    setHasReserve,
+  } = useTime();
   const [error, setError] = useState("");
   const [pastReservations, setPastReservations] = useState([]);
   const navigate = useNavigate();
@@ -128,6 +133,7 @@ const Reserve = ({
           handleReservation();
           setTimeLeft(600);
           setShowTimer(true);
+          setHasReserve(true);
         }
         if (data.type === "RESERVE_ERROR") {
           setMessage(data.message);
@@ -156,6 +162,7 @@ const Reserve = ({
       type: "RESERVE_SPOT",
       lotName: searchKeyword,
       userId: user.id,
+      spotId: selectedSpot.id,
     });
   };
 
@@ -167,6 +174,12 @@ const Reserve = ({
         setIsVisible(true);
         setShowTimer(false);
         setCurrentReservation([]);
+        sendWebSocket({
+          type: "UNRESERVE_SPOT",
+          spotId: currentReservation.spotId,
+          userId: user.id,
+        });
+        setTimeLeft(0);
         return;
       }
       const interval = setInterval(() => {
@@ -200,6 +213,11 @@ const Reserve = ({
       setMessage(data.message);
       setIsVisible(true);
       setShowTimer(false);
+      sendWebSocket({
+        type: "UNRESERVE_SPOT",
+        spotId: currentReservation.spotId,
+        userId: user.id,
+      });
       setTimeLeft(0);
     } else {
       setMessage("Reservation updatelation failed");

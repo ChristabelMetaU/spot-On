@@ -70,6 +70,7 @@ const SpotModal = ({
   };
   useEffect(() => {
     if (timeLeft <= 0) {
+      setShowModal(false);
       return;
     }
     const interval = setInterval(() => {
@@ -160,7 +161,7 @@ const SpotModal = ({
               className="get-direction"
               onClick={() => handleGetDirections(spot)}
             >
-              Get directions
+              Get Google directions
             </button>
             <button className="close" onClick={() => handleClose(spot)}>
               Close

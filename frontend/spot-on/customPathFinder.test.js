@@ -48,6 +48,7 @@ describe("Shortest Path Finder Tests", () => {
 
   it("should handle a graph with multiple paths and find the shortest one", () => {
     const result = customPathFinder(userNode, [goalNodes[0], goalNodes[1]]);
+    expect(Array.isArray(result)).toBe(true);
     expect(result.length).toBeGreaterThan(0);
     expect(result[0].id).toBe("user");
     expect([goalNodes[0].id, goalNodes[1].id]).toContain(

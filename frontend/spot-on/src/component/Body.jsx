@@ -7,6 +7,8 @@ import { sendWebSocket } from "../utils/websocket";
 import { useMap } from "./MapContext";
 import MapLoading from "./MapLoading";
 import Map from "./Map";
+import { useTime } from "./ReserveContext";
+import { useEffect } from "react";
 const LIBRARIES = ["geometry", "places", "routes"];
 
 const Body = ({
@@ -36,6 +38,7 @@ const Body = ({
   const { map, onLoad } = useMap();
   const { loading, user } = useAuth();
   const [len, setLen] = useState(0);
+  const { hasReserve, reservedSpotId } = useTime();
   let count = 0;
   const [zoom, setZoom] = useState(17);
   const CLUSTER_BREAKPOINT = 19;
@@ -131,6 +134,9 @@ const Body = ({
       if (endLocation && spot.coordLat === endLocation.lat) {
         return "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
       }
+    }
+    if (hasReserve && reservedSpotId === spot.id) {
+      return "http://maps.google.com/mapfiles/ms/icons/pink-dot.png";
     }
     if (lockedSpotId === spot.id && locked) {
       return "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
