@@ -85,7 +85,6 @@ wss.on("connection", (ws) => {
       });
     }
     if (data.type === "RESERVE_SPOT") {
-      console.log("rserved");
       const spot = await getSpotsByLotName(data.lotName, ws);
       if (!spot) {
         return;
@@ -118,7 +117,6 @@ wss.on("connection", (ws) => {
         sendToUserIfReserved(ws, data, reservedSpot);
         return;
       } else {
-        console.log("reserved");
         broadCastData = {
           type: "RESERVE_UPDATE",
           spotId: spot.id,
@@ -313,7 +311,6 @@ function sendToUserIfLocked(ws) {
 }
 
 function broadCastAll(data, excludeWs = null) {
-  console.log("broadcasting");
   const updatedSpot = JSON.stringify(data);
   wss.clients.forEach((client) => {
     if (client.readyState === webSocket.OPEN && client !== excludeWs) {

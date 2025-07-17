@@ -1,0 +1,714 @@
+[
+  {
+    "id": 3,
+    "lotName": "Judd Sims Spot 3",
+    "type": "red",
+    "coordLat": 35.84553327250685,
+    "coordLng": -86.36628893160479,
+    "isOccupied": false
+  },
+  {
+    "id": 4,
+    "lotName": "Judd Sims Spot 4",
+    "type": "red",
+    "coordLat": 35.84553788467105,
+    "coordLng": -86.36635330462114,
+    "isOccupied": false
+  },
+  {
+    "id": 5,
+    "lotName": "Judd Sims Spot 5",
+    "type": "red",
+    "coordLat": 35.84554557161081,
+    "coordLng": -86.36639219665186,
+    "isOccupied": false
+  },
+  {
+    "id": 6,
+    "lotName": "Judd Sims Spot 6",
+    "type": "red",
+    "coordLat": 35.84554557161081,
+    "coordLng": -86.36642907702581,
+    "isOccupied": false
+  },
+  {
+    "id": 8,
+    "lotName": "Judd Sims Spot 8",
+    "type": "red housing",
+    "coordLat": 35.84554826056418,
+    "coordLng": -86.3665141528246,
+    "isOccupied": false
+  },
+  {
+    "id": 9,
+    "lotName": "Judd Sims Spot 9",
+    "type": "red housing",
+    "coordLat": 35.84555056664586,
+    "coordLng": -86.36656042093011,
+    "isOccupied": false
+  },
+  {
+    "id": 11,
+    "lotName": "Judd Sims Spot 11",
+    "type": "red housing",
+    "coordLat": 35.84555517880907,
+    "coordLng": -86.36663284057352,
+    "isOccupied": false
+  },
+  {
+    "id": 12,
+    "lotName": "Judd Sims Spot 12",
+    "type": "red handicap",
+    "coordLat": 35.84555838413198,
+    "coordLng": -86.36667960807442,
+    "isOccupied": false
+  },
+  {
+    "id": 13,
+    "lotName": "Judd Sims Spot 13",
+    "type": "red handicap",
+    "coordLat": 35.84555069719346,
+    "coordLng": -86.36671246513485,
+    "isOccupied": false
+  },
+  {
+    "id": 14,
+    "lotName": "Judd Sims Spot 14",
+    "type": "red handicap",
+    "coordLat": 35.84554915980566,
+    "coordLng": -86.36674733385205,
+    "isOccupied": false
+  },
+  {
+    "id": 15,
+    "lotName": "Judd Sims Spot 15",
+    "type": "red handicap",
+    "coordLat": 35.84555761543815,
+    "coordLng": -86.36681505962967,
+    "isOccupied": false
+  },
+  {
+    "id": 25,
+    "lotName": "Davis Science 9",
+    "type": "white",
+    "coordLat": 35.84672441433568,
+    "coordLng": -86.36660222987028,
+    "isOccupied": true
+  },
+  {
+    "id": 52,
+    "lotName": "Davis Science 36",
+    "type": "white",
+    "coordLat": 35.8465869577069,
+    "coordLng": -86.3668367808604,
+    "isOccupied": true
+  },
+  {
+    "id": 50,
+    "lotName": "Davis Science 34",
+    "type": "white",
+    "coordLat": 35.8465892637584,
+    "coordLng": -86.36690182442901,
+    "isOccupied": true
+  },
+  {
+    "id": 40,
+    "lotName": "Davis Science 24",
+    "type": "white handicap",
+    "coordLat": 35.84677481588563,
+    "coordLng": -86.36731909779736,
+    "isOccupied": false
+  },
+  {
+    "id": 16,
+    "lotName": "Davis Science 0",
+    "type": "white",
+    "coordLat": 35.84670134504059,
+    "coordLng": -86.36621194538597,
+    "isOccupied": false
+  },
+  {
+    "id": 17,
+    "lotName": "Davis Science 1",
+    "type": "white",
+    "coordLat": 35.8467105692329,
+    "coordLng": -86.36626156625275,
+    "isOccupied": true
+  },
+  {
+    "id": 18,
+    "lotName": "Davis Science 2",
+    "type": "white",
+    "coordLat": 35.84671133791554,
+    "coordLng": -86.36630045828346,
+    "isOccupied": true
+  },
+  {
+    "id": 2,
+    "lotName": "Judd Sims Spot 2",
+    "type": "red",
+    "coordLat": 35.84552866034235,
+    "coordLng": -86.36626076841013,
+    "isOccupied": true
+  },
+  {
+    "id": 30,
+    "lotName": "Davis Science 14",
+    "type": "white",
+    "coordLat": 35.84674593744314,
+    "coordLng": -86.3668047366509,
+    "isOccupied": true
+  },
+  {
+    "id": 39,
+    "lotName": "Davis Science 23",
+    "type": "white handicap",
+    "coordLat": 35.84678865216089,
+    "coordLng": -86.36731909779736,
+    "isOccupied": true
+  },
+  {
+    "id": 34,
+    "lotName": "Davis Science 18",
+    "type": "white",
+    "coordLat": 35.84675475713038,
+    "coordLng": -86.36699251941839,
+    "isOccupied": false
+  },
+  {
+    "id": 19,
+    "lotName": "Davis Science 3",
+    "type": "white",
+    "coordLat": 35.84672286815431,
+    "coordLng": -86.36634069141869,
+    "isOccupied": true
+  },
+  {
+    "id": 45,
+    "lotName": "Davis Science 29",
+    "type": "white",
+    "coordLat": 35.8465892637584,
+    "coordLng": -86.36710634286639,
+    "isOccupied": true
+  },
+  {
+    "id": 47,
+    "lotName": "Davis Science 31",
+    "type": "white",
+    "coordLat": 35.8465869577069,
+    "coordLng": -86.36703124101398,
+    "isOccupied": true
+  },
+  {
+    "id": 20,
+    "lotName": "Davis Science 4",
+    "type": "white",
+    "coordLat": 35.84671210659818,
+    "coordLng": -86.36639768836025,
+    "isOccupied": true
+  },
+  {
+    "id": 58,
+    "lotName": "Jones Lot spot 3",
+    "type": "white",
+    "coordLat": 35.84908514533901,
+    "coordLng": -86.3670556762703,
+    "isOccupied": false
+  },
+  {
+    "id": 10,
+    "lotName": "Judd Sims Spot 10",
+    "type": "red housing",
+    "coordLat": 35.84555517880907,
+    "coordLng": -86.36658791357252,
+    "isOccupied": false
+  },
+  {
+    "id": 59,
+    "lotName": "Jones Lot spot 4",
+    "type": "white",
+    "coordLat": 35.84903525721956,
+    "coordLng": -86.36706736440601,
+    "isOccupied": false
+  },
+  {
+    "id": 49,
+    "lotName": "Davis Science 33",
+    "type": "white",
+    "coordLat": 35.8465854203392,
+    "coordLng": -86.3669454103255,
+    "isOccupied": true
+  },
+  {
+    "id": 38,
+    "lotName": "Davis Science 22",
+    "type": "white",
+    "coordLat": 35.84675245108368,
+    "coordLng": -86.3671661924521,
+    "isOccupied": true
+  },
+  {
+    "id": 42,
+    "lotName": "Davis Science 26",
+    "type": "white handicap",
+    "coordLat": 35.84671639603028,
+    "coordLng": -86.36733049718568,
+    "isOccupied": true
+  },
+  {
+    "id": 37,
+    "lotName": "Davis Science 21",
+    "type": "white",
+    "coordLat": 35.84676013790572,
+    "coordLng": -86.36711925379434,
+    "isOccupied": true
+  },
+  {
+    "id": 23,
+    "lotName": "Davis Science 7",
+    "type": "white",
+    "coordLat": 35.84672901761429,
+    "coordLng": -86.36651972887043,
+    "isOccupied": true
+  },
+  {
+    "id": 36,
+    "lotName": "Davis Science 20",
+    "type": "white",
+    "coordLat": 35.84675398844815,
+    "coordLng": -86.36708103231588,
+    "isOccupied": true
+  },
+  {
+    "id": 41,
+    "lotName": "Davis Science 25",
+    "type": "white handicap",
+    "coordLat": 35.84675406146826,
+    "coordLng": -86.36732379166314,
+    "isOccupied": true
+  },
+  {
+    "id": 43,
+    "lotName": "Davis Science 27",
+    "type": "white handicap",
+    "coordLat": 35.84667104374446,
+    "coordLng": -86.36733519105145,
+    "isOccupied": false
+  },
+  {
+    "id": 46,
+    "lotName": "Davis Science 30",
+    "type": "white",
+    "coordLat": 35.84659233849363,
+    "coordLng": -86.36706946249244,
+    "isOccupied": true
+  },
+  {
+    "id": 53,
+    "lotName": "East of Gree spot 0",
+    "type": "white handicap",
+    "coordLat": 35.84673712847925,
+    "coordLng": -86.36656443183172,
+    "isOccupied": true
+  },
+  {
+    "id": 22,
+    "lotName": "Davis Science 6",
+    "type": "white",
+    "coordLat": 35.84671671869384,
+    "coordLng": -86.36648620125774,
+    "isOccupied": true
+  },
+  {
+    "id": 21,
+    "lotName": "Davis Science 5",
+    "type": "white",
+    "coordLat": 35.84671441264602,
+    "coordLng": -86.36643389818195,
+    "isOccupied": true
+  },
+  {
+    "id": 44,
+    "lotName": "Davis Science 28",
+    "type": "white handicap",
+    "coordLat": 35.84659391260953,
+    "coordLng": -86.36715198586455,
+    "isOccupied": true
+  },
+  {
+    "id": 28,
+    "lotName": "Davis Science 12",
+    "type": "white",
+    "coordLat": 35.84672825774815,
+    "coordLng": -86.366730975903,
+    "isOccupied": true
+  },
+  {
+    "id": 24,
+    "lotName": "Davis Science 8",
+    "type": "white",
+    "coordLat": 35.84672441433568,
+    "coordLng": -86.36655864397379,
+    "isOccupied": true
+  },
+  {
+    "id": 48,
+    "lotName": "Davis Science 32",
+    "type": "white",
+    "coordLat": 35.84659003244223,
+    "coordLng": -86.366991678431,
+    "isOccupied": true
+  },
+  {
+    "id": 32,
+    "lotName": "Davis Science 16",
+    "type": "white",
+    "coordLat": 35.84674783899009,
+    "coordLng": -86.36690870038667,
+    "isOccupied": true
+  },
+  {
+    "id": 29,
+    "lotName": "Davis Science 13",
+    "type": "white",
+    "coordLat": 35.84673748193732,
+    "coordLng": -86.36678126732203,
+    "isOccupied": true
+  },
+  {
+    "id": 51,
+    "lotName": "Davis Science 35",
+    "type": "white",
+    "coordLat": 35.84658388297145,
+    "coordLng": -86.36686695571181,
+    "isOccupied": true
+  },
+  {
+    "id": 71,
+    "lotName": "Jones Lot spot 16",
+    "type": "white",
+    "coordLat": 35.84871975017769,
+    "coordLng": -86.36709576825338,
+    "isOccupied": true
+  },
+  {
+    "id": 61,
+    "lotName": "Jones Lot spot 6",
+    "type": "white",
+    "coordLat": 35.8489596494888,
+    "coordLng": -86.36707231780476,
+    "isOccupied": true
+  },
+  {
+    "id": 69,
+    "lotName": "Jones Lot spot 14",
+    "type": "white",
+    "coordLat": 35.84877247957499,
+    "coordLng": -86.3670997545015,
+    "isOccupied": true
+  },
+  {
+    "id": 64,
+    "lotName": "Jones Lot spot 9",
+    "type": "white",
+    "coordLat": 35.84889775576569,
+    "coordLng": -86.36708518362789,
+    "isOccupied": true
+  },
+  {
+    "id": 27,
+    "lotName": "Davis Science 11",
+    "type": "white",
+    "coordLat": 35.84673133247799,
+    "coordLng": -86.36669275442453,
+    "isOccupied": true
+  },
+  {
+    "id": 7,
+    "lotName": "Judd Sims Spot 7",
+    "type": "red",
+    "coordLat": 35.84554864638651,
+    "coordLng": -86.36646662795202,
+    "isOccupied": false
+  },
+  {
+    "id": 31,
+    "lotName": "Davis Science 15",
+    "type": "white",
+    "coordLat": 35.84674937635466,
+    "coordLng": -86.36684566847482,
+    "isOccupied": true
+  },
+  {
+    "id": 33,
+    "lotName": "Davis Science 17",
+    "type": "white",
+    "coordLat": 35.84675014503691,
+    "coordLng": -86.36694625131288,
+    "isOccupied": true
+  },
+  {
+    "id": 26,
+    "lotName": "Davis Science 10",
+    "type": "white",
+    "coordLat": 35.84672287697065,
+    "coordLng": -86.3666585562596,
+    "isOccupied": true
+  },
+  {
+    "id": 68,
+    "lotName": "Jones Lot spot 13",
+    "type": "white",
+    "coordLat": 35.84878839268558,
+    "coordLng": -86.36708991853648,
+    "isOccupied": true
+  },
+  {
+    "id": 70,
+    "lotName": "Jones Lot spot 15",
+    "type": "white",
+    "coordLat": 35.84874584285949,
+    "coordLng": -86.36709782266391,
+    "isOccupied": true
+  },
+  {
+    "id": 72,
+    "lotName": "Jones Lot spot 17",
+    "type": "white",
+    "coordLat": 35.84868736752883,
+    "coordLng": -86.36702092775296,
+    "isOccupied": true
+  },
+  {
+    "id": 73,
+    "lotName": "Jones Lot spot 18",
+    "type": "white",
+    "coordLat": 35.84872089579159,
+    "coordLng": -86.36703447148474,
+    "isOccupied": true
+  },
+  {
+    "id": 82,
+    "lotName": "Mary hall spot 2",
+    "type": "red",
+    "coordLat": 35.84730650881668,
+    "coordLng": -86.37097349907495,
+    "isOccupied": false
+  },
+  {
+    "id": 84,
+    "lotName": "Mary hall spot 4",
+    "type": "red",
+    "coordLat": 35.84725065160769,
+    "coordLng": -86.37097165505625,
+    "isOccupied": false
+  },
+  {
+    "id": 85,
+    "lotName": "Mary hall spot 5",
+    "type": "red",
+    "coordLat": 35.84723066598881,
+    "coordLng": -86.37097358289398,
+    "isOccupied": false
+  },
+  {
+    "id": 65,
+    "lotName": "Jones Lot spot 10",
+    "type": "white",
+    "coordLat": 35.8488686149415,
+    "coordLng": -86.36708725488951,
+    "isOccupied": true
+  },
+  {
+    "id": 67,
+    "lotName": "Jones Lot spot 12",
+    "type": "white",
+    "coordLat": 35.8488103874662,
+    "coordLng": -86.36708976207412,
+    "isOccupied": true
+  },
+  {
+    "id": 66,
+    "lotName": "Jones Lot spot 11",
+    "type": "white",
+    "coordLat": 35.84883815874069,
+    "coordLng": -86.36708492728542,
+    "isOccupied": true
+  },
+  {
+    "id": 62,
+    "lotName": "Jones Lot spot 7",
+    "type": "white",
+    "coordLat": 35.84893874190049,
+    "coordLng": -86.36707978328685,
+    "isOccupied": true
+  },
+  {
+    "id": 56,
+    "lotName": "Jones Lot spot 1",
+    "type": "white",
+    "coordLat": 35.84912803653205,
+    "coordLng": -86.36705185411938,
+    "isOccupied": true
+  },
+  {
+    "id": 57,
+    "lotName": "Jones Lot spot 2",
+    "type": "white",
+    "coordLat": 35.84910559168216,
+    "coordLng": -86.36704903780196,
+    "isOccupied": true
+  },
+  {
+    "id": 60,
+    "lotName": "Jones Lot spot 5",
+    "type": "white",
+    "coordLat": 35.84900226404174,
+    "coordLng": -86.36707462450411,
+    "isOccupied": true
+  },
+  {
+    "id": 55,
+    "lotName": "Jones Lot spot 0",
+    "type": "white",
+    "coordLat": 35.84859202795508,
+    "coordLng": -86.36723513571224,
+    "isOccupied": true
+  },
+  {
+    "id": 35,
+    "lotName": "Davis Science 19",
+    "type": "white",
+    "coordLat": 35.84675014503691,
+    "coordLng": -86.36703208200136,
+    "isOccupied": false
+  },
+  {
+    "id": 87,
+    "lotName": "Mary hall spot 7",
+    "type": "red",
+    "coordLat": 35.84689804924375,
+    "coordLng": -86.37101395964964,
+    "isOccupied": false
+  },
+  {
+    "id": 83,
+    "lotName": "Mary hall spot 3",
+    "type": "red",
+    "coordLat": 35.84727883644345,
+    "coordLng": -86.37097266088463,
+    "isOccupied": true
+  },
+  {
+    "id": 88,
+    "lotName": "Mary hall spot 8",
+    "type": "red",
+    "coordLat": 35.84686745935989,
+    "coordLng": -86.37100998470527,
+    "isOccupied": false
+  },
+  {
+    "id": 81,
+    "lotName": "Mary hall spot 1",
+    "type": "red",
+    "coordLat": 35.84733264382599,
+    "coordLng": -86.3709778576646,
+    "isOccupied": true
+  },
+  {
+    "id": 91,
+    "lotName": "Mary hall spot 11",
+    "type": "red",
+    "coordLat": 35.84679054685031,
+    "coordLng": -86.37101196098163,
+    "isOccupied": true
+  },
+  {
+    "id": 90,
+    "lotName": "Mary hall spot 10",
+    "type": "red",
+    "coordLat": 35.84681436198949,
+    "coordLng": -86.37102494203783,
+    "isOccupied": false
+  },
+  {
+    "id": 89,
+    "lotName": "Mary hall spot 9",
+    "type": "red",
+    "coordLat": 35.84684149654607,
+    "coordLng": -86.37101629917049,
+    "isOccupied": false
+  },
+  {
+    "id": 1,
+    "lotName": "Judd Sims Spot 1",
+    "type": "red",
+    "coordLat": 35.84554249683499,
+    "coordLng": -86.36622187637941,
+    "isOccupied": true
+  },
+  {
+    "id": 86,
+    "lotName": "Mary hall spot 6",
+    "type": "red",
+    "coordLat": 35.84720991168693,
+    "coordLng": -86.37097351583876,
+    "isOccupied": true
+  },
+  {
+    "id": 63,
+    "lotName": "Jones Lot spot 8",
+    "type": "white",
+    "coordLat": 35.8489186249305,
+    "coordLng": -86.36708167999211,
+    "isOccupied": true
+  },
+  {
+    "id": 94,
+    "lotName": "Mary hall spot 14",
+    "type": "red",
+    "coordLat": 35.84669640797089,
+    "coordLng": -86.37102673118747,
+    "isOccupied": true
+  },
+  {
+    "id": 93,
+    "lotName": "Mary hall spot 13",
+    "type": "red",
+    "coordLat": 35.84672611711389,
+    "coordLng": -86.37101824224054,
+    "isOccupied": true
+  },
+  {
+    "id": 92,
+    "lotName": "Mary hall spot 12",
+    "type": "red",
+    "coordLat": 35.84676799446983,
+    "coordLng": -86.37102059239984,
+    "isOccupied": true
+  },
+  {
+    "id": 97,
+    "lotName": "Mary hall spot 17",
+    "type": "red",
+    "coordLat": 35.84661763472726,
+    "coordLng": -86.37103866106311,
+    "isOccupied": false
+  },
+  {
+    "id": 96,
+    "lotName": "Mary hall spot 16",
+    "type": "red",
+    "coordLat": 35.84664298652981,
+    "coordLng": -86.37103086389914,
+    "isOccupied": false
+  },
+  {
+    "id": 95,
+    "lotName": "Mary hall spot 15",
+    "type": "red",
+    "coordLat": 35.84667338145528,
+    "coordLng": -86.37103058739402,
+    "isOccupied": false
+  }
+]
