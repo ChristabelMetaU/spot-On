@@ -171,6 +171,7 @@ function AppRoutes() {
                 userLocation={userLocation}
                 isReserveBtnClicked={isReserveBtnClicked}
                 setIsReserveBtnClicked={setIsReserveBtnClicked}
+                isRoutingToHome={isRoutingToHome}
               />
             }
           />

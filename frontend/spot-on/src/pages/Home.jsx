@@ -16,6 +16,7 @@ import SearchForSpot from "../component/SearchForSpot";
 import { getDistance } from "../utils/Huristic";
 import "../styles/Home.css";
 import { connectWebSocket, sendWebSocket } from "../utils/websocket";
+import { useTime } from "../component/ReserveContext";
 const Home = ({
   spots,
   setSpots,
@@ -54,6 +55,7 @@ const Home = ({
   const [showFilters, setShowFilters] = useState(false);
   const [userLocationError, setUserLocationError] = useState(null);
   const [activeUsers, setActiveUsers] = useState([]);
+  const { setHasReserve, setReservedSpotId } = useTime();
   const MTSU_CENTER = {
     lat: 35.8486,
     lng: -86.3669,
@@ -146,6 +148,14 @@ const Home = ({
         setShowModal(false);
         setIsVisible(true);
         setMessage(data.message);
+      }
+      if (data.type === "RESERVE_UPDATE") {
+        setHasReserve(true);
+        setReservedSpotId(data.spotId);
+      }
+      if (data.type === "SPOT_UNRESERVED") {
+        setHasReserve(false);
+        setReservedSpotId(null);
       }
     });
   }, [user, userLocation, selectedSpot, locked, lockedSpotId, mode]);

@@ -116,13 +116,27 @@ wss.on("connection", (ws) => {
       if (reservedSpot) {
         sendToUserIfReserved(ws, data, reservedSpot);
         return;
-      }
-      ws.send(
-        JSON.stringify({
-          type: "RESERVE_SUCCESS",
+      } else {
+        broadCastData = {
+          type: "RESERVE_UPDATE",
           spotId: spot.id,
-        })
-      );
+          userId: data.userId,
+        };
+        ws.send(
+          JSON.stringify({
+            type: "RESERVE_SUCCESS",
+            spotId: spot.id,
+          })
+        );
+        //unreserve the spot after 10 minutes
+      }
+    }
+    if (data.type === "UNRESERVE_SPOT") {
+      broadCastData = {
+        type: "SPOT_UNRESERVED",
+        spotId: data.spotId,
+        userId: data.userId,
+      };
     }
 
     if (data.type === "UPDATE_SPOT_BY_REPORT") {
@@ -298,7 +312,6 @@ function sendToUserIfLocked(ws) {
 
 function broadCastAll(data, excludeWs = null) {
   const updatedSpot = JSON.stringify(data);
-
   wss.clients.forEach((client) => {
     if (client.readyState === webSocket.OPEN && client !== excludeWs) {
       client.send(updatedSpot);
