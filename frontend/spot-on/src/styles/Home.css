@@ -292,44 +292,30 @@ body {
 .fab-timer h2 {
   color: #dcdee5;
 }
-.fab-route {
-  position: fixed;
-  right: 20px;
-  top: 14rem;
-  color: #1c2e46;
-  background-color: rgba(0, 0, 0, 0.1);
-  border: 2px solid #dcdee5;
-  width: 70px;
-  height: 60px;
-  border-radius: 50%;
-  font-size: 14px;
+
+.route-filter {
   display: flex;
   flex-direction: column;
+  background-color: #1c2e46;
+  border-radius: 8px;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+  padding: 1rem;
+}
+
+.filter-button {
+  display: flex;
+}
+.rank-options {
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+.rank-options-sort {
+  cursor: pointer;
+}
+.fab-route {
 }
 
 .walk {
-  position: fixed;
-  right: 20px;
-  top: 14rem;
-  color: #ccc;
-  background-color: #1c2e46;
-  border: 2px solid #dcdee5;
-  width: 70px;
-  height: 60px;
-  border-radius: 50%;
-  font-size: 14px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 .fab-route:hover {
   transform: rotate(360deg);

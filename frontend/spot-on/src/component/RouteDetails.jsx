@@ -27,7 +27,6 @@ const RouteDetails = ({
   destinationLocation,
   setDestinationLocation,
   setIsRoutingToHome,
-  searchKeyword,
   setSearchKeyword,
   isReserveBtnClicked,
   setIsReserveBtnClicked,
@@ -51,11 +50,18 @@ const RouteDetails = ({
   const [showMakeReservation, setShowMakeReservation] = useState(false);
   const [noReservationCnt, setNoReservationCnt] = useState(0);
   const [activePath, setActivePath] = useState(null);
+  const [rankPathChoosen, setRankPathChoosen] = useState([]);
   const [rankedPaths, setRankedPaths] = useState([]);
   const [selectedRankType, setSelectedRankType] = useState("");
   const [eta, setEta] = useState(0);
   const [paths, setPaths] = useState([]);
   const [freeSpots, setFreeSpots] = useState([]);
+  const [rankBy, setRankBy] = useState(false);
+  const [sortBy, setSortBy] = useState(null);
+  const [rankValue, setRankValue] = useState("");
+  const [sortByValue, setSortByValue] = useState("");
+  const [error, setError] = useState("");
+  const [showRouteList, setShowRouteList] = useState(false);
 
   const fetchSpotsCloseToDestination = async () => {
     let tempSpots = [];
@@ -86,32 +92,48 @@ const RouteDetails = ({
     setPaths(allPaths);
     const ranked = rankPaths(allPaths, userLocation, destinationLocation);
     setRankedPaths(ranked);
-
-    const bestPath = ranked[value]?.[0];
-    if (bestPath) {
-      setActivePath(bestPath);
-      getGoogleDirections(
-        userLocation,
-        bestPath.path[bestPath.path.length - 1],
-        isDriving
-      );
-      setEndLocation(bestPath[bestPath.length - 1]);
-      setLoaded(true);
+    let bestPath = ranked[value];
+    let sortedRanked;
+    if (value === "cheapest") {
+      if (sortByValue === "DistanceToUser") {
+        sortedRanked = bestPath.sort(
+          (a, b) =>
+            a.goal.drivingMinutesFromUser - b.goal.drivingMinutesFromUser
+        );
+      } else if (sortByValue === "DistanceToDest") {
+        sortedRanked = bestPath.sort(
+          (a, b) =>
+            a.goal.drivingMinutesFromDestination -
+            b.goal.drivingMinutesFromDestination
+        );
+      } else {
+        sortedRanked = bestPath;
+      }
+    } else {
+      if (sortByValue === "price") {
+        sortedRanked = bestPath.sort((a, b) => a.totalPrice - b.totalPrice);
+      } else {
+        sortedRanked = bestPath;
+      }
     }
+    setRankPathChoosen(sortedRanked);
+    setShowRouteList(true);
   };
-
   const handleRankTypeChange = async (e) => {
-    setLoaded(false);
-    const value = e.target.value;
-    setSelectedRankType(value);
+    if (sortByValue === "" || rankValue === "" || !destinationLocation) {
+      setError("Please select a rank option first");
+      return;
+    }
+    setError("");
+    setSelectedRankType(rankValue);
     let nearByFreeSpots = [];
-    if (value.includes("Destination")) {
+    if (rankValue.includes("Destination")) {
       nearByFreeSpots = await fetchSpotsCloseToDestination();
     } else {
       nearByFreeSpots = spots.filter((spot) => !spot.isOccupied);
       setFreeSpots(nearByFreeSpots);
     }
-    loadPaths(nearByFreeSpots, value);
+    loadPaths(nearByFreeSpots, rankValue);
   };
   useEffect(() => {
     if (eta > 0 && eta <= 600 && noReservationCnt < 3) {
@@ -149,7 +171,7 @@ const RouteDetails = ({
       );
     }
     distance = distance * 1000;
-    let speed = isDriving ? 10 : 1.4;
+    let speed = isDriving ? 25 : 5;
     const currentHour = new Date().getHours();
     speed *= getSpeedWithMutiplier(currentHour);
     speed = (speed * 1000) / 3600;
@@ -192,111 +214,187 @@ const RouteDetails = ({
       }
     );
   };
-  useEffect(() => {
-    if (!isDriving) {
-      if (userLocation && endLocation) {
-        getGoogleDirections(userLocation, endLocation, isDriving);
-      }
-    }
-  }, [userLocation, endLocation, isDriving]);
+
   const handleToggle = () => {
     setIsDriving(!isDriving);
+    getGoogleDirections(userLocation, endLocation, isDriving);
   };
   return (
     <>
       <div className="route-header">
-        <div className="header-icon">
-          <i
-            className="fa fa-arrow-left fa-2x go-back"
-            aria-hidden="true"
-            onClick={() => {
-              setIsRoutingToHome(true);
-              navigate("/");
-            }}
-          ></i>
+        <div
+          className="header-icon"
+          onClick={() => {
+            setIsRoutingToHome(true);
+            navigate("/");
+          }}
+        >
+          <i className="fa fa-arrow-left fa-2x go-back" aria-hidden="true"></i>
         </div>
         <div className="header-text">
           <p>Find best route to your spot</p>
           <p>Your spot, yur way</p>
         </div>
       </div>
-      {<DestSearch onSelect={(loc) => setDestinationLocation(loc)} />}
-      <button className="fab-rotate">Rotate Map</button>
-      <button
-        className={!isDriving ? "walk" : "fab-route"}
-        onClick={handleToggle}
-      >
-        {isDriving ? (
-          <i className="fas fa-car"></i>
-        ) : (
-          <i className="fas fa-walking"></i>
-        )}
-        <p>{isDriving ? "Driving" : "Walking"}</p>
-      </button>
 
-      <div className="site-container">
-        <div className="site-select">
-          <h2 className="">Select Route to display for you</h2>
-          <select
-            value={selectedRankType}
-            onChange={handleRankTypeChange}
-            className="site-select-dropdown"
-          >
-            <option value="">Rank routes by: </option>
-            <option value="closestToUser">Closest to Me</option>
-            <option value="secondClosestToUser">2nd Closest to Me</option>
-            <option value="closestToDestination">Closest to Destination</option>
-            <option value="secondClosestToDestination">
-              2nd Closest to Destination
-            </option>
-            <option value="cheapest">Cheapest Option</option>
-          </select>
-
-          {activePath && (
-            <div className="active">
-              <h3 className="font-medium">Selected Route Summary:</h3>
-              <p>
-                <strong>Goal Spot:</strong> {activePath.goal.id}
+      <div className="site-main">
+        <div className="route-filter">
+          {<DestSearch onSelect={(loc) => setDestinationLocation(loc)} />}
+          <div className="filter-button">
+            <button className="fab-rotate">Rotate Map</button>
+            <button className="walk" onClick={handleToggle}>
+              <i className="fas fa-car"></i>
+              <p>Driiving</p>
+            </button>
+            <button className="walk" onClick={handleToggle}>
+              <i className="fas fa-walking"></i>
+              <p>walking</p>
+            </button>
+            <button>Hide seen spots</button>
+            <div className="site-select">
+              <div
+                onClick={() => {
+                  setRankBy(!rankBy);
+                  setSortBy(null);
+                }}
+              >
+                <p>Rank spots by:{rankBy ? "▼" : "▶"}</p>
+              </div>
+            </div>
+          </div>
+          {rankBy && (
+            <div className="rank-options">
+              <p
+                onClick={() => {
+                  setSortBy("distance");
+                  setRankValue("closestToUser");
+                }}
+              >
+                closest to you
               </p>
-              <p>
-                <strong>Total Cost:</strong> {activePath.totalCost.toFixed(2)}
+              <p
+                value="closestToDestination"
+                onClick={() => {
+                  setSortBy("distance");
+                  setRankValue("closestToDestination");
+                }}
+              >
+                Closest to destination
               </p>
-              <p>
-                <strong>Spots in Path:</strong>{" "}
-                {activePath.path.map((p) => p.id).join(" → ")}
+              <p
+                value="cheapest"
+                onClick={() => {
+                  setSortBy("price");
+                  setRankValue("cheapest");
+                }}
+              >
+                All Cheapest
               </p>
             </div>
           )}
-        </div>
-        <div className="site-main">
-          {loaded ? (
-            <Body
-              mode="route"
-              routeMode={mode}
-              name={"Your Smart Router"}
-              spots={spots}
-              setSpots={setSpots}
-              setSelectedSpot={setSelectedSpot}
-              setShowModal={setShowModal}
-              setActive={setActive}
-              activeFilters={activeFilters}
-              userLocation={userLocation}
-              locked={locked}
-              setLocked={setLocked}
-              lockedSpotId={lockedSpotId}
-              setLockedSpotId={setLockedSpotId}
-              setFreeCount={setFreeCount}
-              routePath={routePath}
-              destinationLocation={destinationLocation}
-              endLocation={endLocation}
-              heading={heading}
-              setSearchKeyword={setSearchKeyword}
-              setIsReserveBtnClicked={setIsReserveBtnClicked}
-            />
-          ) : (
-            <MapLoading />
+          {sortBy && sortBy === "distance" && (
+            <div className="rank-options-sort">
+              <p>Sort By: </p>
+              <p
+                onClick={() => {
+                  setSortByValue("price");
+                }}
+              >
+                Price
+              </p>
+              <p
+                onClick={() => {
+                  setSortByValue("None");
+                }}
+              >
+                None
+              </p>
+            </div>
           )}
+          {sortBy && sortBy === "price" && (
+            <div>
+              <p
+                onClick={() => {
+                  setSortByValue("DistanceToUser");
+                }}
+              >
+                closest to you
+              </p>
+
+              <p
+                onClick={() => {
+                  setSortByValue("DistanceToDest");
+                }}
+              >
+                closest to your destination
+              </p>
+              <p
+                onClick={() => {
+                  setSortByValue("None");
+                }}
+              >
+                None
+              </p>
+            </div>
+          )}
+          <button onClick={handleRankTypeChange}>
+            <p>Rank</p>
+          </button>
+          <p>{error}</p>
         </div>
+
+        {showRouteList &&
+          rankPathChoosen?.slice(0, 5).map((path, index) => (
+            <div
+              key={index}
+              className="ranked-spot-item"
+              onClick={() => {
+                setActivePath(path);
+                getGoogleDirections(
+                  userLocation,
+                  path.path[path.path.length - 1],
+                  isDriving
+                );
+                setEndLocation(path.path[path.path.length - 1]);
+                setShowRouteList(false);
+              }}
+            >
+              <p>
+                Lot: {spots.find((spot) => spot.id === path.goal.id)?.lotName}
+              </p>
+              <p>Distance: {Math.round(path.totalDistance)}m</p>
+              <p>ETA: {Math.round(path.goal.drivingMinutesFromUser)} min</p>
+              <p>Price: ${path.totalPrice}</p>
+            </div>
+          ))}
+
+        {loaded ? (
+          <Body
+            mode="route"
+            routeMode={mode}
+            name={"Your Smart Router"}
+            spots={spots}
+            setSpots={setSpots}
+            setSelectedSpot={setSelectedSpot}
+            setShowModal={setShowModal}
+            setActive={setActive}
+            activeFilters={activeFilters}
+            userLocation={userLocation}
+            locked={locked}
+            setLocked={setLocked}
+            lockedSpotId={lockedSpotId}
+            setLockedSpotId={setLockedSpotId}
+            setFreeCount={setFreeCount}
+            routePath={routePath}
+            destinationLocation={destinationLocation}
+            endLocation={endLocation}
+            heading={heading}
+            setSearchKeyword={setSearchKeyword}
+            setIsReserveBtnClicked={setIsReserveBtnClicked}
+          />
+        ) : (
+          <MapLoading />
+        )}
       </div>
       <div className="route-summary">
         <div className="route-summary-header">

@@ -13,20 +13,7 @@ export function rankPaths(paths, serLocation, destinationLocation) {
       const bTime = b.goal.drivingMinutesFromDestination;
       return aTime - bTime;
     }),
-
-    cheapest: [...paths].sort(
-      (a, b) => a.totalPrice || infinity - (b.totalPrice || infinity)
-    ),
-
-    secondClosestToUser: [],
-    secondClosestToDestination: [],
+    cheapest: [...paths].sort((a, b) => a.totalPrice - b.totalPrice),
   };
-
-  ranked.secondClosestToUser = ranked.closestToUser[1]
-    ? [ranked.closestToUser[1]]
-    : [];
-  ranked.secondClosestToDestination = ranked.closestToDestination[1]
-    ? [ranked.closestToDestination[1]]
-    : [];
   return ranked;
 }

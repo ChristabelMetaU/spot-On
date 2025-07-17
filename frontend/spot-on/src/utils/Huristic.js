@@ -90,7 +90,7 @@ export async function buildGraph(
   if (!userLocation || !nearbySpots || !destinationLocation) {
     return null;
   }
-  const userNode = new Node("user", userLocation.lat, userLocation.lng);
+  const userNode = new Node("user", userLocation.lat, userLocation.lng, 0);
   const nodes = [userNode];
   const spotNodes = [];
   const hour = new Date().getHours();
@@ -159,7 +159,7 @@ export function dynamicPathFinder(startNode, goalNodes, options = {}) {
         path,
         goal: current,
         totalCost,
-        totalPrice: path.reduce((sum, n) => sum + n.Price || 0, 0),
+        totalPrice: path.reduce((sum, n) => sum + n.Price, 0),
       });
       continue; // Continue exploring other paths
     }
@@ -183,6 +183,5 @@ export function dynamicPathFinder(startNode, goalNodes, options = {}) {
       }
     }
   }
-
   return foundPaths;
 }
