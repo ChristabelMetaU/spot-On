@@ -67,10 +67,7 @@ const Map = ({
   }, [hasPanned, map, clustered, isRoutingToHome, selectedSpot]);
   useEffect(() => {
     if (isHome || !map || routePath.length < 2 || !window.google) return;
-    if (
-      polyLine.current ||
-      (polyLine.current && routeMode === "user-to-spot")
-    ) {
+    if (polyLine.current) {
       polyLine.current.setMap(null);
     }
     const glowline = new window.google.maps.Polyline({
