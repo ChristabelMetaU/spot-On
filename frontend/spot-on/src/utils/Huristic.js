@@ -1,10 +1,11 @@
 /** @format */
 
 class Node {
-  constructor(id, lat, lng, edges = []) {
+  constructor(id, lat, lng, Price, edges = []) {
     this.id = id;
     this.lat = lat;
     this.lng = lng;
+    this.Price = Price;
     this.edges = edges;
   }
 }
@@ -95,7 +96,7 @@ export async function buildGraph(
   const hour = new Date().getHours();
 
   for (const spot of nearbySpots) {
-    const node = new Node(spot.id, spot.coordLat, spot.coordLng);
+    const node = new Node(spot.id, spot.coordLat, spot.coordLng, spot.Price);
     const unreliable = await getSpotUnreliabilityScore(spot);
     node.unreliability = unreliable;
     //defining  a threshold of 1.5 if spot is too unreliable, skip
@@ -154,7 +155,12 @@ export function dynamicPathFinder(startNode, goalNodes, options = {}) {
       while (cameFrom[path[0].id]) {
         path.unshift(cameFrom[path[0].id]);
       }
-      foundPaths.push({ path, goal: current, totalCost });
+      foundPaths.push({
+        path,
+        goal: current,
+        totalCost,
+        totalPrice: path.reduce((sum, n) => sum + n.Price || 0, 0),
+      });
       continue; // Continue exploring other paths
     }
 

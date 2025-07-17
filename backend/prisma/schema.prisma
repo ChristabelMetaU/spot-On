@@ -26,6 +26,7 @@ model spots{
   type String
     coordLat Float
     coordLng Float
+    Price Float @default(0.00)
   isOccupied Boolean @default(false)
   LockedSpot LockedSpot[]
   ReservedSpots ReservedSpots[]

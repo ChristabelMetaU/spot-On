@@ -2,7 +2,7 @@
 import "../styles/Home.css";
 import { useNavigate } from "react-router-dom";
 import Body from "./Body";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, use } from "react";
 import { buildGraph } from "../utils/Huristic";
 import DestSearch from "./DestSearch";
 import { dynamicPathFinder } from "../utils/Huristic";
@@ -12,7 +12,6 @@ import { formatTime } from "../utils/formatTime";
 import { useMap } from "./MapContext";
 import MakeReservation from "./MakeReservation";
 import MapLoading from "./MapLoading";
-import { use } from "react";
 const RouteDetails = ({
   spots,
   setSpots,
@@ -41,8 +40,7 @@ const RouteDetails = ({
   }).current;
   const { map } = useMap();
   const directionsService = useRef(new window.google.maps.DirectionsService());
-  const [originlalSpots, setOriginalSpots] = useState(spots);
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(true);
   const [mode, setMode] = useState("user-to-spot");
   const [routePath, setRoutePath] = useState([]);
   const [endLocation, setEndLocation] = useState(null);
@@ -94,7 +92,8 @@ const RouteDetails = ({
       setActivePath(bestPath);
       getGoogleDirections(
         userLocation,
-        bestPath.path[bestPath.path.length - 1]
+        bestPath.path[bestPath.path.length - 1],
+        isDriving
       );
       setEndLocation(bestPath[bestPath.length - 1]);
       setLoaded(true);
@@ -102,6 +101,7 @@ const RouteDetails = ({
   };
 
   const handleRankTypeChange = async (e) => {
+    setLoaded(false);
     const value = e.target.value;
     setSelectedRankType(value);
     let nearByFreeSpots = [];
@@ -113,7 +113,6 @@ const RouteDetails = ({
     }
     loadPaths(nearByFreeSpots, value);
   };
-
   useEffect(() => {
     if (eta > 0 && eta <= 600 && noReservationCnt < 3) {
       setShowMakeReservation(true);
@@ -169,7 +168,7 @@ const RouteDetails = ({
     return 1;
   };
 
-  const getGoogleDirections = (start, end) => {
+  const getGoogleDirections = (start, end, isDriving) => {
     directionsService.current.route(
       {
         origin: start,
@@ -186,15 +185,23 @@ const RouteDetails = ({
           }));
 
           setRoutePath([...route, end]);
-          const pathStats = computeStats(bestPath.path);
-          setStats(pathStats);
+          return setStats(computeStats(route));
         } else {
           throw new Error("Directions request failed due to " + status);
         }
       }
     );
   };
-
+  useEffect(() => {
+    if (!isDriving) {
+      if (userLocation && endLocation) {
+        getGoogleDirections(userLocation, endLocation, isDriving);
+      }
+    }
+  }, [userLocation, endLocation, isDriving]);
+  const handleToggle = () => {
+    setIsDriving(!isDriving);
+  };
   return (
     <>
       <div className="route-header">
@@ -215,7 +222,10 @@ const RouteDetails = ({
       </div>
       {<DestSearch onSelect={(loc) => setDestinationLocation(loc)} />}
       <button className="fab-rotate">Rotate Map</button>
-      <button className="fab-route" onClick={() => setIsDriving(!isDriving)}>
+      <button
+        className={!isDriving ? "walk" : "fab-route"}
+        onClick={handleToggle}
+      >
         {isDriving ? (
           <i className="fas fa-car"></i>
         ) : (
@@ -259,29 +269,33 @@ const RouteDetails = ({
           )}
         </div>
         <div className="site-main">
-          <Body
-            mode="route"
-            routeMode={mode}
-            name={"Your Smart Router"}
-            spots={spots}
-            setSpots={setSpots}
-            setSelectedSpot={setSelectedSpot}
-            setShowModal={setShowModal}
-            setActive={setActive}
-            activeFilters={activeFilters}
-            userLocation={userLocation}
-            locked={locked}
-            setLocked={setLocked}
-            lockedSpotId={lockedSpotId}
-            setLockedSpotId={setLockedSpotId}
-            setFreeCount={setFreeCount}
-            routePath={routePath}
-            destinationLocation={destinationLocation}
-            endLocation={endLocation}
-            heading={heading}
-            setSearchKeyword={setSearchKeyword}
-            setIsReserveBtnClicked={setIsReserveBtnClicked}
-          />
+          {loaded ? (
+            <Body
+              mode="route"
+              routeMode={mode}
+              name={"Your Smart Router"}
+              spots={spots}
+              setSpots={setSpots}
+              setSelectedSpot={setSelectedSpot}
+              setShowModal={setShowModal}
+              setActive={setActive}
+              activeFilters={activeFilters}
+              userLocation={userLocation}
+              locked={locked}
+              setLocked={setLocked}
+              lockedSpotId={lockedSpotId}
+              setLockedSpotId={setLockedSpotId}
+              setFreeCount={setFreeCount}
+              routePath={routePath}
+              destinationLocation={destinationLocation}
+              endLocation={endLocation}
+              heading={heading}
+              setSearchKeyword={setSearchKeyword}
+              setIsReserveBtnClicked={setIsReserveBtnClicked}
+            />
+          ) : (
+            <MapLoading />
+          )}
         </div>
       </div>
       <div className="route-summary">

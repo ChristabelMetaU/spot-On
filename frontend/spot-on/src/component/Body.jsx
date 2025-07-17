@@ -69,6 +69,7 @@ const Body = ({
       const newSpot = {
         lotName: `Mary hall spot ${len}`,
         type: "red",
+        Price: 2.0,
         coordLat: e.latLng.lat(),
         coordLng: e.latLng.lng(),
         isOccupied: false,

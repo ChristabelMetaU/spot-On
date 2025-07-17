@@ -14,7 +14,9 @@ export function rankPaths(paths, serLocation, destinationLocation) {
       return aTime - bTime;
     }),
 
-    cheapest: [...paths].sort((a, b) => a.totalCost - b.totalCost),
+    cheapest: [...paths].sort(
+      (a, b) => a.totalPrice || infinity - (b.totalPrice || infinity)
+    ),
 
     secondClosestToUser: [],
     secondClosestToDestination: [],
