@@ -29,8 +29,6 @@ const Body = ({
   routePath,
   destinationLocation,
   endLocation,
-  Heading,
-  routeMode,
   isRoutingToHome,
   setSearchKeyword,
   setIsReserveBtnClicked,
@@ -175,8 +173,6 @@ const Body = ({
         isHome={isHome}
         destinationLocation={destinationLocation}
         endLocation={endLocation}
-        Heading={Heading}
-        routeMode={routeMode}
         isRoutingToHome={isRoutingToHome}
         selectedSpot={selectedSpot}
         setSelectedSpot={setSelectedSpot}

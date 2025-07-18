@@ -16,9 +16,9 @@ const Welcome = () => {
         </p>
 
         <ul className="features">
-          <li>🔍 Search for nearby parking in real-time</li>
-          <li>📍 Navigate directly to available spots</li>
-          <li>🛡️ Reserve with confidence — no guesswork</li>
+          <li> Search for nearby parking in real-time</li>
+          <li> Navigate directly to available spots</li>
+          <li> Reserve with confidence — no guesswork</li>
         </ul>
 
         <div className="button-group">

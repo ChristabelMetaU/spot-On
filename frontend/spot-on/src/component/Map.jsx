@@ -27,8 +27,6 @@ const Map = ({
   endLocation,
   isHome,
   map,
-  Heading,
-  routeMode,
   isRoutingToHome,
   selectedSpot,
   setSearchKeyword,
@@ -106,7 +104,7 @@ const Map = ({
       glowline.setMap(null);
       newPolyLine.setMap(null);
     };
-  }, [routePath, map, routeMode]);
+  }, [routePath, map]);
   return (
     <>
       {loading ? (
@@ -117,19 +115,6 @@ const Map = ({
           onLoad={onLoad}
           zoom={zoom}
           center={userLocation}
-          options={
-            !isHome
-              ? {
-                  mapId: "f4f5f6b0d0b3b3b3",
-                  heading: Heading,
-                  tilt: 45,
-                  mapTypeId: "roadmap",
-                  disableDefaultUI: false,
-                  streetViewControl: false,
-                  zoomControl: true,
-                }
-              : null
-          }
           onDblClick={handleMapClick}
         >
           {clustered.map((cluster, idx) => {

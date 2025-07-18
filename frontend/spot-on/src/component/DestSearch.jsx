@@ -32,17 +32,11 @@ const DestSearch = ({ onSelect }) => {
         fields: ["address_components", "geometry", "name"],
       }}
     >
-      <div className="search-bar">
+      <div className="dest-search">
         <input
           ref={inputRef}
           placeholder="Enter your Destination"
           type="text"
-          style={{
-            flex: 1,
-            padding: "10px",
-            marginLeft: "2rem",
-            marginRight: "2rem",
-          }}
         />
       </div>
     </Autocomplete>

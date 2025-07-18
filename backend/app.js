@@ -17,7 +17,10 @@ const app = express();
 
 const RedisStore = connectRedis.RedisStore;
 const redisClient = redis.createClient({ url: process.env.REDIS_URL });
-redisClient.connect();
+async function startRedis() {
+  await redisClient.connect();
+}
+startRedis();
 const store = new RedisStore({
   client: redisClient,
   prefix: "spotonspoton",
@@ -50,5 +53,10 @@ app.use("/spots", spots);
 app.use("/report", reportRouter);
 app.use("/user", profileRouter);
 app.use("/spots", reserveRouter);
-
-module.exports = app;
+redisClient.on("error", (err) => {
+  console.log("Error " + err);
+});
+module.exports = {
+  app,
+  redisClient,
+};

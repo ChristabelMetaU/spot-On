@@ -3,7 +3,8 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const webSocket = require("ws");
 const http = require("http");
-const app = require("./app");
+const { app, redisClient } = require("./app");
+console.log("redisClient", redisClient);
 const e = require("express");
 const server = http.createServer(app);
 const wss = new webSocket.Server({ server });
@@ -192,6 +193,26 @@ wss.on("connection", (ws) => {
     }
     if (data.type == "LOCK_SPOT") {
       const now = Date.now();
+      const lockedKey = `spot-lock:${data.spotId}`;
+      console.log("lockedKey", lockedKey);
+      const lockTTL = 60 * 1000;
+      const userId = data.userId;
+      const lockAcquired = redisClient.set(
+        lockedKey,
+        userId,
+        "NX",
+        "PX",
+        lockTTL
+      );
+      if (!lockAcquired) {
+        ws.send(
+          JSON.stringify({
+            type: "ERROR",
+            message: "This spot is being updated by another user",
+          })
+        );
+        return;
+      }
       const expires = new Date(now + 60_000);
       const activeLock = await isSpotLocked(data.spotId, now);
       if (activeLock) {
@@ -215,6 +236,10 @@ wss.on("connection", (ws) => {
         userId: data.userId,
       };
       setTimeout(async () => {
+        const currentLock = await redisClient.get(lockedKey);
+        if (currentLock === userId) {
+          await redisClient.sendCommand(["DEL", lockedKey]);
+        }
         if (
           lockedSpots[data.spotId] &&
           lockedSpots[data.spotId].expiresAt <= Date.now()
@@ -237,6 +262,20 @@ wss.on("connection", (ws) => {
       }, 60000);
     }
     if (data.type === "UNLOCK_SPOT") {
+      const lockedKey = `spot-lock:${data.spotId}`;
+      const userId = data.userId;
+      const luaScript = `
+        if redis.call("GET", KEYS[1]) == ARGV[1] then
+          return redis.call("DEL", KEYS[1])
+        else
+          return 0
+        end
+      `;
+      await redisClient.eval(luaScript, {
+        keys: [lockedKey],
+        arguments: [String(userId)],
+      });
+
       if (lockedSpots[data.spotId]?.userId === data.userId) {
         await prisma.lockedSpot.delete({
           where: {
