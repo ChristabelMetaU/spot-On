@@ -1,10 +1,11 @@
 /** @format */
 
 class Node {
-  constructor(id, lat, lng, edges = []) {
+  constructor(id, lat, lng, Price, edges = []) {
     this.id = id;
     this.lat = lat;
     this.lng = lng;
+    this.Price = Price;
     this.edges = edges;
   }
 }
@@ -81,14 +82,21 @@ export async function getDrivingData(lat1, lng1, lat2, lng2) {
   };
 }
 
-export async function buildGraph(userLocation, nearbySpots) {
-  const userNode = new Node("user", userLocation.lat, userLocation.lng);
+export async function buildGraph(
+  userLocation,
+  nearbySpots,
+  destinationLocation
+) {
+  if (!userLocation || !nearbySpots || !destinationLocation) {
+    return null;
+  }
+  const userNode = new Node("user", userLocation.lat, userLocation.lng, 0);
   const nodes = [userNode];
   const spotNodes = [];
   const hour = new Date().getHours();
 
   for (const spot of nearbySpots) {
-    const node = new Node(spot.id, spot.coordLat, spot.coordLng);
+    const node = new Node(spot.id, spot.coordLat, spot.coordLng, spot.Price);
     const unreliable = await getSpotUnreliabilityScore(spot);
     node.unreliability = unreliable;
     //defining  a threshold of 1.5 if spot is too unreliable, skip
@@ -97,12 +105,21 @@ export async function buildGraph(userLocation, nearbySpots) {
     }
     nodes.push(node);
     spotNodes.push(node);
+
     const drivingData = await getDrivingData(
       userLocation.lat,
       userLocation.lng,
       spot.coordLat,
       spot.coordLng
     );
+    const destinationData = await getDrivingData(
+      spot.coordLat,
+      spot.coordLng,
+      destinationLocation.lat,
+      destinationLocation.lng
+    );
+    node.drivingMinutesFromUser = drivingData.durationInTrafficMin;
+    node.drivingMinutesFromDestination = destinationData.durationInTrafficMin;
     const unreliability = await getSpotUnreliabilityScore(spot);
     const timePenalty = getTimePenalty(hour);
     const weight =
@@ -112,17 +129,16 @@ export async function buildGraph(userLocation, nearbySpots) {
   return { userNode, spotNodes, allNodes: nodes };
 }
 
-export function customPathFinder(startNode, goalNodes) {
+export function dynamicPathFinder(startNode, goalNodes, options = {}) {
+  const queue = [];
+  queue.push({ node: startNode, cost: 0 });
   const visited = new Set();
   const cameFrom = {};
   const costSoFar = {};
-  const queue = [];
-  const hour = new Date().getHours();
-  if (!startNode?.id || goalNodes.length == 0) {
-    return [];
-  }
   costSoFar[startNode.id] = 0;
-  queue.push({ node: startNode, cost: 0 });
+  const hour = new Date().getHours();
+  const foundPaths = [];
+
   while (queue.length > 0) {
     queue.sort((a, b) => a.cost - b.cost);
     const { node: current } = queue.shift();
@@ -132,23 +148,29 @@ export function customPathFinder(startNode, goalNodes) {
     }
     visited.add(current.id);
 
-    if (goalNodes.some((goal) => goal.id === current.id)) {
+    const matchingGoal = goalNodes.find((goal) => goal.id === current.id);
+    if (matchingGoal) {
       let path = [current];
+      let totalCost = costSoFar[current.id];
       while (cameFrom[path[0].id]) {
         path.unshift(cameFrom[path[0].id]);
       }
-      return path;
+      foundPaths.push({
+        path,
+        goal: current,
+        totalCost,
+        totalPrice: path.reduce((sum, n) => sum + n.Price, 0),
+      });
+      continue; // Continue exploring other paths
     }
 
     for (const edge of current.edges) {
       const neighbor = edge.node;
       const newCost = costSoFar[current.id] + edge.weight;
-
       const unreliability = neighbor.unreliability || 0;
-
       const heuristic = smartHeuristic(
         neighbor,
-        goalNodes[0],
+        goalNodes[0], // heuristic is relative; all goals assumed close
         unreliability,
         getTimePenalty(hour)
       );
@@ -161,5 +183,5 @@ export function customPathFinder(startNode, goalNodes) {
       }
     }
   }
-  return [];
+  return foundPaths;
 }

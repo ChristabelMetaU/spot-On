@@ -128,7 +128,6 @@ wss.on("connection", (ws) => {
             spotId: spot.id,
           })
         );
-        //unreserve the spot after 10 minutes
       }
     }
     if (data.type === "UNRESERVE_SPOT") {

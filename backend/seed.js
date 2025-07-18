@@ -14,16 +14,14 @@ async function seed() {
     );
 
     // Optional: clear existing spots (depends on your app logic)
-    await prisma.spot.deleteMany();
+    await prisma.spots.deleteMany();
 
     // Insert spots from JSON
     for (const spot of spotsData) {
-      await prisma.spot.create({
+      await prisma.spots.create({
         data: spot,
       });
     }
-
-    console.log(`Seeded ${spotsData.length} spots into the database.`);
   } catch (error) {
     console.error("Error seeding data:", error);
   } finally {

@@ -13,10 +13,8 @@ async function exportSpots() {
 
     // Write spots data to a JSON file
     fs.writeFileSync("./data/spots-seed.json", JSON.stringify(spots, null, 2));
-
-    console.log("Exported spots to ./data/spots-seed.json");
   } catch (error) {
-    console.error("Error exporting spots:", error);
+    throw error;
   } finally {
     await prisma.$disconnect();
   }
