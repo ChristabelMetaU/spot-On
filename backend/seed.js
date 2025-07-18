@@ -23,7 +23,7 @@ async function seed() {
       });
     }
   } catch (error) {
-    console.error("Error seeding data:", error);
+    throw error;
   } finally {
     await prisma.$disconnect();
   }

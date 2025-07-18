@@ -11,7 +11,6 @@ import { getDistance } from "../utils/Huristic";
 import { formatTime } from "../utils/formatTime";
 import { useMap } from "./MapContext";
 import MakeReservation from "./MakeReservation";
-import MapLoading from "./MapLoading";
 const RouteDetails = ({
   spots,
   setSpots,
@@ -40,12 +39,10 @@ const RouteDetails = ({
   const { map } = useMap();
   const directionsService = useRef(new window.google.maps.DirectionsService());
   const [loaded, setLoaded] = useState(true);
-  const [mode, setMode] = useState("user-to-spot");
   const [routePath, setRoutePath] = useState([]);
   const [endLocation, setEndLocation] = useState(null);
   const [stats, setStats] = useState({});
   const [isDriving, setIsDriving] = useState(true);
-  const [heading, setHeading] = useState(0);
   const [reserved, setReserved] = useState(false);
   const [showMakeReservation, setShowMakeReservation] = useState(false);
   const [noReservationCnt, setNoReservationCnt] = useState(0);
@@ -62,6 +59,8 @@ const RouteDetails = ({
   const [sortByValue, setSortByValue] = useState("");
   const [error, setError] = useState("");
   const [showRouteList, setShowRouteList] = useState(false);
+  const [hideViewed, setHideViewed] = useState(false);
+  const [viewedSpots, setViewedSpots] = useState([]);
 
   const fetchSpotsCloseToDestination = async () => {
     let tempSpots = [];
@@ -116,7 +115,11 @@ const RouteDetails = ({
         sortedRanked = bestPath;
       }
     }
+    sortedRanked = hideViewed
+      ? sortedRanked.filter((path) => !viewedSpots.includes(path.goal.id))
+      : sortedRanked;
     setRankPathChoosen(sortedRanked);
+    setLoaded(true);
     setShowRouteList(true);
   };
   const handleRankTypeChange = async (e) => {
@@ -125,6 +128,7 @@ const RouteDetails = ({
       return;
     }
     setError("");
+    setLoaded(false);
     setSelectedRankType(rankValue);
     let nearByFreeSpots = [];
     if (rankValue.includes("Destination")) {
@@ -216,8 +220,21 @@ const RouteDetails = ({
   };
 
   const handleToggle = () => {
+    getGoogleDirections(userLocation, endLocation, !isDriving);
     setIsDriving(!isDriving);
-    getGoogleDirections(userLocation, endLocation, isDriving);
+  };
+  const showRoute = (path) => {
+    setActivePath(path);
+    if (!viewedSpots.includes(path.goal.id)) {
+      setViewedSpots([...viewedSpots, path.goal.id]);
+    }
+    getGoogleDirections(
+      userLocation,
+      path.path[path.path.length - 1],
+      isDriving
+    );
+    setEndLocation(path.path[path.path.length - 1]);
+    setShowRouteList(false);
   };
   return (
     <>
@@ -241,16 +258,32 @@ const RouteDetails = ({
         <div className="route-filter">
           {<DestSearch onSelect={(loc) => setDestinationLocation(loc)} />}
           <div className="filter-button">
-            <button className="fab-rotate">Rotate Map</button>
-            <button className="walk" onClick={handleToggle}>
+            <button
+              className={`walk ${isDriving ? "active-toggle" : ""}`}
+              onClick={handleToggle}
+            >
               <i className="fas fa-car"></i>
-              <p>Driiving</p>
+              <p>Driving</p>
             </button>
-            <button className="walk" onClick={handleToggle}>
+
+            <button
+              className={`walk ${!isDriving ? "active-toggle" : ""}`}
+              onClick={handleToggle}
+            >
               <i className="fas fa-walking"></i>
-              <p>walking</p>
+              <p>Walking</p>
             </button>
-            <button>Hide seen spots</button>
+            <label>
+              <input
+                type="checkbox"
+                checked={hideViewed}
+                className="ranked-spot-checkbox"
+                onChange={(e) => {
+                  setHideViewed(!hideViewed);
+                }}
+              />
+              Hide previously shown spots
+            </label>
             <div className="site-select">
               <div
                 onClick={() => {
@@ -269,6 +302,9 @@ const RouteDetails = ({
                   setSortBy("distance");
                   setRankValue("closestToUser");
                 }}
+                className={
+                  rankValue === "closestToUser" ? "rank-options-active" : ""
+                }
               >
                 closest to you
               </p>
@@ -278,6 +314,11 @@ const RouteDetails = ({
                   setSortBy("distance");
                   setRankValue("closestToDestination");
                 }}
+                className={
+                  rankValue === "closestToDestination"
+                    ? "rank-options-active"
+                    : ""
+                }
               >
                 Closest to destination
               </p>
@@ -287,6 +328,9 @@ const RouteDetails = ({
                   setSortBy("price");
                   setRankValue("cheapest");
                 }}
+                className={
+                  rankValue === "cheapest" ? "rank-options-active" : ""
+                }
               >
                 All Cheapest
               </p>
@@ -299,6 +343,7 @@ const RouteDetails = ({
                 onClick={() => {
                   setSortByValue("price");
                 }}
+                className={sortByValue === "price" ? "rank-options-active" : ""}
               >
                 Price
               </p>
@@ -306,17 +351,22 @@ const RouteDetails = ({
                 onClick={() => {
                   setSortByValue("None");
                 }}
+                className={sortByValue === "None" ? "rank-options-active" : ""}
               >
                 None
               </p>
             </div>
           )}
+
           {sortBy && sortBy === "price" && (
-            <div>
+            <div className="rank-options-sort">
               <p
                 onClick={() => {
                   setSortByValue("DistanceToUser");
                 }}
+                className={
+                  sortByValue === "DistanceToUser" ? "rank-options-active" : ""
+                }
               >
                 closest to you
               </p>
@@ -325,6 +375,9 @@ const RouteDetails = ({
                 onClick={() => {
                   setSortByValue("DistanceToDest");
                 }}
+                className={
+                  sortByValue === "DistanceToDest" ? "rank-options-active" : ""
+                }
               >
                 closest to your destination
               </p>
@@ -332,6 +385,7 @@ const RouteDetails = ({
                 onClick={() => {
                   setSortByValue("None");
                 }}
+                className={sortByValue === "None" ? "rank-options-active" : ""}
               >
                 None
               </p>
@@ -340,61 +394,52 @@ const RouteDetails = ({
           <button onClick={handleRankTypeChange}>
             <p>Rank</p>
           </button>
-          <p>{error}</p>
+          <p className="error-message">{error}</p>
         </div>
-
+        {!loaded && (
+          <div className="skeleton-wrapper">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div key={index} className="skeleton-spot-card" />
+            ))}
+          </div>
+        )}
         {showRouteList &&
+          loaded &&
           rankPathChoosen?.slice(0, 5).map((path, index) => (
             <div
               key={index}
               className="ranked-spot-item"
-              onClick={() => {
-                setActivePath(path);
-                getGoogleDirections(
-                  userLocation,
-                  path.path[path.path.length - 1],
-                  isDriving
-                );
-                setEndLocation(path.path[path.path.length - 1]);
-                setShowRouteList(false);
-              }}
+              onClick={() => showRoute(path)}
             >
               <p>
                 Lot: {spots.find((spot) => spot.id === path.goal.id)?.lotName}
               </p>
-              <p>Distance: {Math.round(path.totalDistance)}m</p>
+              <p>Distance: {Math.round(path.totalcost)}m</p>
               <p>ETA: {Math.round(path.goal.drivingMinutesFromUser)} min</p>
               <p>Price: ${path.totalPrice}</p>
             </div>
           ))}
-
-        {loaded ? (
-          <Body
-            mode="route"
-            routeMode={mode}
-            name={"Your Smart Router"}
-            spots={spots}
-            setSpots={setSpots}
-            setSelectedSpot={setSelectedSpot}
-            setShowModal={setShowModal}
-            setActive={setActive}
-            activeFilters={activeFilters}
-            userLocation={userLocation}
-            locked={locked}
-            setLocked={setLocked}
-            lockedSpotId={lockedSpotId}
-            setLockedSpotId={setLockedSpotId}
-            setFreeCount={setFreeCount}
-            routePath={routePath}
-            destinationLocation={destinationLocation}
-            endLocation={endLocation}
-            heading={heading}
-            setSearchKeyword={setSearchKeyword}
-            setIsReserveBtnClicked={setIsReserveBtnClicked}
-          />
-        ) : (
-          <MapLoading />
-        )}
+        <Body
+          mode="route"
+          name={"Your Smart Router"}
+          spots={spots}
+          setSpots={setSpots}
+          setSelectedSpot={setSelectedSpot}
+          setShowModal={setShowModal}
+          setActive={setActive}
+          activeFilters={activeFilters}
+          userLocation={userLocation}
+          locked={locked}
+          setLocked={setLocked}
+          lockedSpotId={lockedSpotId}
+          setLockedSpotId={setLockedSpotId}
+          setFreeCount={setFreeCount}
+          routePath={routePath}
+          destinationLocation={destinationLocation}
+          endLocation={endLocation}
+          setSearchKeyword={setSearchKeyword}
+          setIsReserveBtnClicked={setIsReserveBtnClicked}
+        />
       </div>
       <div className="route-summary">
         <div className="route-summary-header">
@@ -413,7 +458,7 @@ const RouteDetails = ({
 
           <div className="route-summary-item">
             <p>Accuracy</p>
-            <h2>99%</h2>
+            <h2>{stats.accuracy}</h2>
           </div>
         </div>
         {showMakeReservation && (
