@@ -1,9 +1,17 @@
 /** @format */
+import React from "react";
+import "../styles/mapLoading.css";
 
 const MapLoading = () => {
   return (
-    <div className="w-full p-4 space-y-4 animate-pulse">
-      <div className="w-full h-44 bg-gray-300 rounded-lg" />
+    <div className="map-skeleton-container">
+      <div className="map-skeleton-pulse" />
+      <div className="map-skeleton-pin" />
+      <div className="map-skeleton-controls">
+        <div className="map-skeleton-control" />
+        <div className="map-skeleton-control" />
+        <div className="map-skeleton-control short" />
+      </div>
     </div>
   );
 };
