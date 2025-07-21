@@ -9,7 +9,7 @@ dotenv.config();
 const GOOGLE_API_KEY = process.env.GOOGLE_MAPS_KEY;
 reportRouter.post("/create", async (req, res) => {
   try {
-    const { description, type, user_id, spot_name } = req.body;
+    const { description, type, user_id, spot_name, isOccupied } = req.body;
     if (!user_id || !spot_name) {
       return res.status(400).json({ message: "Missing required fields" });
     }
@@ -19,6 +19,7 @@ reportRouter.post("/create", async (req, res) => {
         type,
         user_id: parseInt(user_id),
         spot_name,
+        isOccupied,
       },
     });
     if (!newReport) {

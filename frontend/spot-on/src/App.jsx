@@ -179,7 +179,14 @@ function AppRoutes() {
 
           <Route
             path="/Home/Predictions"
-            element={<Predictions setIsRoutingToHome={setIsRoutingToHome} />}
+            element={
+              <Predictions
+                setIsRoutingToHome={setIsRoutingToHome}
+                spots={spots}
+                selectedSpot={selectedSpot}
+                setSelectedSpot={setSelectedSpot}
+              />
+            }
           />
         </Route>
       </Routes>

@@ -34,6 +34,7 @@ const Report = ({
       description: description,
       type: spotType,
       user_id: user.id,
+      isOccupied: occupied,
     };
     const requiredData = {
       spot_name: formData.spot_name,

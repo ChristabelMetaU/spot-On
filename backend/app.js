@@ -54,7 +54,7 @@ app.use("/map", map);
 app.use("/spots", spots);
 app.use("/report", reportRouter);
 app.use("/user", profileRouter);
-app.use("/prediction", predictionRouter);
+app.use("/predictions", predictionRouter);
 app.use("/spots", reserveRouter);
 
 module.exports = {
