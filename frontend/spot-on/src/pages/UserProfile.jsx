@@ -121,7 +121,7 @@ const UserProfile = ({ setIsRoutingToHome }) => {
           <h2>Notifications </h2>
           <i className="fa-solid fa-caret-right fa-2x"></i>
         </div>
-        <div className="activity">
+        <div className="activity" onClick={() => navigate("/Home/Predictions")}>
           <h2>Recent analytics </h2>
           <i className="fa-solid fa-caret-right fa-2x"></i>
         </div>

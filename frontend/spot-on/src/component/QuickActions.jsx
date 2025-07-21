@@ -24,7 +24,10 @@ const QuickActions = () => {
           <p>cancel reservation anytime</p>
         </div>
 
-        <div className="actions-div">
+        <div
+          className="actions-div"
+          onClick={() => navigate("/Home/Predictions")}
+        >
           <h3>Analytic DashBoard</h3>
           <p>Your parking pattern and more</p>
           <p>Your predictions</p>

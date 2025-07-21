@@ -11,6 +11,8 @@ const map = require("./routes/Map");
 const spots = require("./routes/Spots");
 const reportRouter = require("./routes/Report");
 const profileRouter = require("./routes/Profile");
+const predictionRouter = require("./routes/Predictions");
+
 const e = require("express");
 dotenv.config();
 const app = express();
@@ -52,7 +54,9 @@ app.use("/map", map);
 app.use("/spots", spots);
 app.use("/report", reportRouter);
 app.use("/user", profileRouter);
+app.use("/predictions", predictionRouter);
 app.use("/spots", reserveRouter);
+
 module.exports = {
   app,
   redisClient,

@@ -55,6 +55,7 @@ const SpotModal = ({
       description: "Auto non description",
       type: spot.type,
       user_id: id,
+      isOccupied,
     };
     handleReportSubmit(formData, isOccupied);
   };
@@ -132,6 +133,14 @@ const SpotModal = ({
               }}
             >
               Reserve Spot
+            </button>
+            <button
+              onClick={() => {
+                setSelectedSpot(spot);
+                navigate("/Home/Predictions");
+              }}
+            >
+              Get Spot Availabiltiy Prediction
             </button>
           </div>
           <label>Spot's recent Activity </label>
