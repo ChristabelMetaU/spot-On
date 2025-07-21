@@ -1,4 +1,5 @@
 /** @format */
+
 import { useAuth } from "../component/AuthContext";
 import Header from "../component/Header";
 import Nav from "../component/Nav";
@@ -17,6 +18,8 @@ import { getDistance } from "../utils/Huristic";
 import "../styles/Home.css";
 import { connectWebSocket, sendWebSocket } from "../utils/websocket";
 import { useTime } from "../component/ReserveContext";
+import { getDeviceId } from "../utils/getDeviceId";
+
 const Home = ({
   spots,
   setSpots,
@@ -51,7 +54,7 @@ const Home = ({
   setIsReserveBtnClicked,
 }) => {
   const mode = "Home";
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [showFilters, setShowFilters] = useState(false);
   const [userLocationError, setUserLocationError] = useState(null);
   const [activeUsers, setActiveUsers] = useState([]);
@@ -89,6 +92,20 @@ const Home = ({
     }
   }, [user, userLocation]);
   useEffect(() => {
+    if (!user) {
+      return;
+    }
+    sendWebSocket({
+      type: "SESSION_STATE_UPDATE",
+      userId: user.id,
+      deviceId: getDeviceId(),
+      state: {
+        locked,
+        lockedSpotId,
+      },
+    });
+  }, [searchKeyword, selectedSpot, locked, lockedSpotId]);
+  useEffect(() => {
     const fetchSpots = async () => {
       if (!userLocation) {
         return;
@@ -119,10 +136,20 @@ const Home = ({
         }
       }
     };
-    // connectWebSocket
     fetchSpots();
 
-    connectWebSocket((data) => {
+    connectWebSocket(user, (data) => {
+      if (
+        data.type === "SESSION_STATE_SYNC" &&
+        data.fromDevice !== getDeviceId
+      ) {
+        if (data.state.locked) {
+          setLocked(data.state.locked);
+        }
+        if (data.state.lockedSpotId) {
+          setLockedSpotId(data.state.lockedSpotId);
+        }
+      }
       if (data.type === "PRESENCE_UPDATE") {
         if (data.userId !== user.id) {
           setActiveUsers(data.users);
