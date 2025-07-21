@@ -18,6 +18,7 @@ import { useAuth } from "./component/AuthContext";
 import { MapProvider } from "./component/MapContext";
 import Reserve from "./component/Reserve";
 import { ReserveProvider } from "./component/ReserveContext";
+import Predictions from "./component/Predictions";
 function ProtectedRoute() {
   const { user } = useAuth();
   return user ? <Outlet /> : <Navigate to="/Welcome" />;
@@ -174,6 +175,11 @@ function AppRoutes() {
                 isRoutingToHome={isRoutingToHome}
               />
             }
+          />
+
+          <Route
+            path="/Home/Predictions"
+            element={<Predictions setIsRoutingToHome={setIsRoutingToHome} />}
           />
         </Route>
       </Routes>
