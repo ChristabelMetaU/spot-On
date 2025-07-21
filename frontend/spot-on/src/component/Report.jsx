@@ -55,7 +55,7 @@ const Report = ({
   };
   useEffect(() => {
     if (showReportForm) {
-      connectWebSocket((data) => {
+      connectWebSocket(user, (data) => {
         if (data.type === "REPORT_ERROR" && data.spotName === searchKeyword) {
           setShowReportForm(false);
           setIsVisible(true);
@@ -146,9 +146,7 @@ Example: Spot is close To the Gym"
               cols={50}
             />
             <p className="error">{error}</p>
-            <button className="close" onClick={handleSubmit}>
-              Submit Report
-            </button>
+            <button className="close">Submit Report</button>
             <button
               className="close"
               onClick={() => {

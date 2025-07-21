@@ -127,7 +127,7 @@ const Reserve = ({
   };
   useEffect(() => {
     if (isReserveBtnClicked) {
-      connectWebSocket((data) => {
+      connectWebSocket(user, (data) => {
         if (data.type === "RESERVE_SUCCESS") {
           setIsReserved(true);
           handleReservation();

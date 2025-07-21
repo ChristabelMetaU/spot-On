@@ -1,14 +1,17 @@
 /** @format */
+
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const webSocket = require("ws");
 const http = require("http");
 const { app, redisClient } = require("./app");
-console.log("redisClient", redisClient);
 const e = require("express");
 const server = http.createServer(app);
 const wss = new webSocket.Server({ server });
 let lockedSpots = {};
+const sessioonDeviceKey = (userId) => `session:${userId}:devices`;
+const sessionStateKey = (userId) => `session:${userId}:state`;
+const sessionStateMap = new Map();
 const presenceMap = new Map();
 const checkForReservedSpots = async (spotId, now) => {
   const reservedSpot = await prisma.reservedSpots.findFirst({
@@ -62,8 +65,8 @@ const getSpotsByLotName = async (lotName, ws) => {
     ws.send(
       JSON.stringify({
         type: "REPORT_ERROR",
-        spotName: data.spotName,
-        message: "This spot does not exist",
+        spotName: lotName,
+        message: "Fill in the Required feilds.",
       })
     );
   }
@@ -73,6 +76,39 @@ wss.on("connection", (ws) => {
   ws.on("message", async (message) => {
     const data = JSON.parse(message);
     let broadCastData = null;
+    if (data.type === "SESSION_JOIN") {
+      ws.userId = data.userId;
+      ws.deviceId = data.deviceId;
+      await redisClient.sAdd(sessioonDeviceKey(data.userId), data.deviceId);
+      await redisClient.expire(sessioonDeviceKey(data.userId), 3600);
+      const key = sessionStateKey(data.userId);
+      const current = await redisClient.get(key);
+      if (current) {
+        ws.send(
+          JSON.stringify({
+            type: "SESSION_STATE_SYNC",
+            state: JSON.parse(current),
+          })
+        );
+      }
+    }
+    if (data.type === "SESSION_STATE_UPDATE") {
+      const key = sessionStateKey(data.userId);
+      let current = await redisClient.get(key);
+      let parsed = current
+        ? JSON.parse(current)
+        : { deviceStates: {}, lastState: {} };
+      parsed.deviceStates[data.deviceId] = data.state;
+      parsed.lastState = data.state;
+      await redisClient.set(key, JSON.stringify(parsed), { EX: 3600 });
+      broadCastData = {
+        type: "SESSION_STATE_SYNC",
+        userId: data.userId,
+        fromDevice: data.deviceId,
+        state: data.state,
+      };
+    }
+
     if (data.type === "USER_ENTERED_MAP") {
       currentUserId = data.userId;
       presenceMap.set(data.userId, {
@@ -194,7 +230,6 @@ wss.on("connection", (ws) => {
     if (data.type == "LOCK_SPOT") {
       const now = Date.now();
       const lockedKey = `spot-lock:${data.spotId}`;
-      console.log("lockedKey", lockedKey);
       const lockTTL = 60 * 1000;
       const userId = data.userId;
       const lockAcquired = redisClient.set(
@@ -265,12 +300,12 @@ wss.on("connection", (ws) => {
       const lockedKey = `spot-lock:${data.spotId}`;
       const userId = data.userId;
       const luaScript = `
-        if redis.call("GET", KEYS[1]) == ARGV[1] then
-          return redis.call("DEL", KEYS[1])
-        else
-          return 0
-        end
-      `;
+       if redis.call("GET", KEYS[1]) == ARGV[1] then
+         return redis.call("DEL", KEYS[1])
+       else
+         return 0
+       end
+     `;
       await redisClient.eval(luaScript, {
         keys: [lockedKey],
         arguments: [String(userId)],
@@ -315,7 +350,6 @@ wss.on("connection", (ws) => {
         );
       }
     }
-
     if (broadCastData) {
       broadCastAll(broadCastData, ws);
     }

@@ -70,12 +70,12 @@ const RouteDetails = ({
         `http://localhost:3000/map/spots?lat=${destinationLocation.lat}&lng=${destinationLocation.lng}&radius=${radius}`
       );
       const data = await response.json();
-      if (!data || data.length < 1) {
+      const nearByFreeSpots = data.filter((spot) => !spot.isOccupied);
+      if (!data || data.length < 1 || nearByFreeSpots.length === 0) {
         radius += 200;
         continue;
       }
       tempSpots = data;
-      const nearByFreeSpots = data.filter((spot) => !spot.isOccupied);
       setFreeSpots(nearByFreeSpots);
       return nearByFreeSpots;
     }
