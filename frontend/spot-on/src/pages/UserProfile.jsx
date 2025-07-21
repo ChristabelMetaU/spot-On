@@ -78,7 +78,6 @@ const UserProfile = ({ setIsRoutingToHome }) => {
           <div>
             {displayedReports.map((report) => (
               <div className="profile-report" key={report.id}>
-                <i className="fas fa-edit edit-icon"></i>
                 <h2>{report.spot_name}</h2>
                 <p>{report.lottype}</p>
                 <p>

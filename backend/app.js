@@ -53,9 +53,6 @@ app.use("/spots", spots);
 app.use("/report", reportRouter);
 app.use("/user", profileRouter);
 app.use("/spots", reserveRouter);
-redisClient.on("error", (err) => {
-  console.log("Error " + err);
-});
 module.exports = {
   app,
   redisClient,

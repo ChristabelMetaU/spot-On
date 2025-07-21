@@ -18,7 +18,7 @@ import { useAuth } from "./component/AuthContext";
 import { MapProvider } from "./component/MapContext";
 import Reserve from "./component/Reserve";
 import { ReserveProvider } from "./component/ReserveContext";
-function ProtectedRoute({ children }) {
+function ProtectedRoute() {
   const { user } = useAuth();
   return user ? <Outlet /> : <Navigate to="/Welcome" />;
 }
