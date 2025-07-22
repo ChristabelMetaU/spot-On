@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import FilterLoading from "./FilterLoading";
 import { useAuth } from "./AuthContext";
 import FilterToggles from "./FilterToggles";
+import TooltipWrapper from "./ToolTipWrapper";
 const Nav = ({
   showFilters,
   setShowFilters,
@@ -14,26 +15,32 @@ const Nav = ({
   return (
     <nav className="site-nav">
       <Link to="/">
+        <TooltipWrapper text="Current page">
+          <button
+            className={!showFilters ? "default" : "btn-nav"}
+            onClick={() => {
+              setShowFilters(false);
+            }}
+          >
+            Map
+          </button>
+        </TooltipWrapper>
+      </Link>
+      <TooltipWrapper text="Filter out spots">
         <button
-          className={!showFilters ? "default" : "btn-nav"}
+          className={showFilters ? "default" : "btn-nav"}
           onClick={() => {
-            setShowFilters(false);
+            setShowFilters((f) => !f);
           }}
         >
-          Map
+          Filters
         </button>
-      </Link>
-      <button
-        className={showFilters ? "default" : "btn-nav"}
-        onClick={() => {
-          setShowFilters((f) => !f);
-        }}
-      >
-        Filters
-      </button>
-      <Link to="/Profile">
-        <button className="btn-nav">Profile</button>
-      </Link>
+      </TooltipWrapper>
+      <TooltipWrapper text="View your Profile">
+        <Link to="/Profile">
+          <button className="btn-nav">Profile</button>
+        </Link>
+      </TooltipWrapper>
 
       {showFilters &&
         (loading ? (

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { sendWebSocket } from "../utils/websocket";
 import { connectWebSocket } from "../utils/websocket";
 import SearchForSpot from "./SearchForSpot";
+import TooltipWrapper from "./ToolTipWrapper";
 const Report = ({
   spots,
   handleReportSubmit,
@@ -83,9 +84,13 @@ const Report = ({
 
   return (
     <div className="report-container">
-      <button className="report-btn" onClick={handleShowReportForm}>
-        Report free spot
-      </button>
+      <TooltipWrapper
+        text={`Can't Find a spot?\nSearch up and make update the spot.`}
+      >
+        <button className="report-btn" onClick={handleShowReportForm}>
+          Report free spot
+        </button>
+      </TooltipWrapper>
       {showReportForm && (
         <div className="modal-overlay">
           <form className="modal-content" onSubmit={handleSubmit}>
