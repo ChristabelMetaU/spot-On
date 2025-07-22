@@ -134,14 +134,6 @@ const SpotModal = ({
             >
               Reserve Spot
             </button>
-            <button
-              onClick={() => {
-                setSelectedSpot(spot);
-                navigate("/Home/Predictions");
-              }}
-            >
-              Get Spot Availabiltiy Prediction
-            </button>
           </div>
           <label>Spot's recent Activity </label>
           <textarea
