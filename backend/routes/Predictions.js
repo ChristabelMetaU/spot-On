@@ -5,18 +5,14 @@ const { PrismaClient } = require("@prisma/client");
 let generateForecast = require("../utils/generateForeCast");
 const prisma = new PrismaClient();
 
-predictionRouter.get("/:spotId", async (req, res) => {
+predictionRouter.get("/:lotName", async (req, res) => {
+  const lotName = req.params.lotName;
+  if (!lotName) {
+    res.status(400).json({ error: "Missing lot name" });
+  }
   try {
-    const { spotId } = req.params;
-    const spot = await prisma.spots.findFirst({
-      where: { id: parseInt(spotId) },
-    });
-    if (!spot) {
-      return res.status(404).json({ error: "Spot not found" });
-    }
-
     const reports = await prisma.reports.findMany({
-      where: { spot_name: spot.lotName },
+      where: { spot_name: lotName },
       orderBy: { created_at: "asc" },
     });
 

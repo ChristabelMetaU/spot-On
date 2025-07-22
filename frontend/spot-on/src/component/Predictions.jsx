@@ -1,6 +1,7 @@
 /** @format */
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import SearchForSpot from "./SearchForSpot";
 import {
   LineChart,
   Line,
@@ -16,18 +17,29 @@ const Predictions = ({
   spots,
   selectedSpot,
   setSelectedSpot,
+  mode,
+  searchKeyword,
+  setSearchKeyword,
+  showResults,
+  setShowResults,
+  searchResults,
+  setSearchResults,
 }) => {
   const navigate = useNavigate();
   const [forecastData, setForecastData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedSpotID, setSelectedSpotID] = useState(1);
 
-  const fetchForecast = async (selectedSpotID) => {
+  const fetchForecast = async () => {
+    if (searchKeyword.length == 0) {
+      console.log("No spot selected");
+      return;
+    }
     setLoading(true);
+    console.log("Fetching forecast for spot: ", selectedSpot.lotName);
     try {
-      const res = await fetch(
-        `http://localhost:3000/predictions/${selectedSpotID}`
-      );
+      const lotName = selectedSpot.lotName;
+      const res = await fetch(`http://localhost:3000/predictions/${lotName}`);
       const data = await res.json();
       if (data.error) {
         throw new Error(data.error);
@@ -50,19 +62,11 @@ const Predictions = ({
   };
 
   useEffect(() => {
-    if (selectedSpot.id == null || selectedSpot.length === 0) {
-      const randomNum = Math.random();
-      const randomIndex = Math.floor(randomNum * spots.length);
-      const randomSpot = spots[randomIndex];
-      setSelectedSpot(randomSpot);
-      setSelectedSpotID(randomSpot.id);
-      fetchForecast(randomSpot.id);
-    } else {
-      const selectedSpotID = selectedSpot.id;
-      setSelectedSpotID(selectedSpotID);
-      fetchForecast(selectedSpotID);
+    if (selectedSpot.length != 0) {
+      setSelectedSpotID(selectedSpot.id);
+      fetchForecast();
     }
-  }, []);
+  }, [searchKeyword, selectedSpot]);
   return (
     <div>
       <div className="route-header">
@@ -88,14 +92,19 @@ const Predictions = ({
 
         <div className="mb-4">
           <label className="mr-2">Spot ID:</label>
-          <input
-            type="number"
-            value={selectedSpotID}
-            onChange={(e) => setSelectedSpotID(Number(e.target.value))}
-            className="border p-1 rounded"
+          <SearchForSpot
+            mode="prediction"
+            spots={spots}
+            searchKeyword={searchKeyword}
+            setSearchKeyword={setSearchKeyword}
+            showResults={showResults}
+            setShowResults={setShowResults}
+            searchResults={searchResults}
+            setSearchResults={setSearchResults}
+            setSelectedSpot={setSelectedSpot}
           />
           <button
-            onClick={() => fetchForecast(selectedSpotID)}
+            onClick={() => fetchForecast()}
             className="ml-3 px-3 py-1 bg-blue-500 text-white rounded"
           >
             Refresh
