@@ -11,7 +11,7 @@ const Legend = () => {
         <span className="legend-circle available" /> Available Spot
       </div>
       <div className="legend-item">
-        <span className="legend-circle occupied" /> Occupied Spot
+        <span className="legend-circle occupied-legend" /> Occupied Spot
       </div>
       <div className="legend-item">
         <span className="legend-circle reserved" /> Reserved Spot

@@ -1,7 +1,7 @@
 /** @format */
 
 const predictionRouter = require("express").Router();
-const ARIMA = require("arima").default;
+const ARIMA = require("arima");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 let clusters;
@@ -25,11 +25,11 @@ async function predictAvailabilityForCluster(spotIds) {
     select: { id: true, lotName: true },
   });
 
-  const oneHourAgo = new Date(Date.now() - 1000 * 60 * 60);
+  const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   const reports = await prisma.reports.findMany({
     where: {
       spot_name: { in: spots.map((s) => s.lotName) },
-      created_at: { gte: oneHourAgo },
+      created_at: { gte: oneWeekAgo },
     },
     orderBy: { created_at: "asc" },
   });
@@ -39,15 +39,22 @@ async function predictAvailabilityForCluster(spotIds) {
     const m = new Date(rpt.created_at);
     m.setSeconds(0, 0);
     const key = m.getTime();
-    const prev = buckets.get(key) || 0;
-    buckets.set(key, rpt.isOccupied ? prev : prev + 1);
+    let prev = buckets.get(key);
+    if (!prev || typeof prev.total !== "number" || prev.free !== "Number") {
+      prev = { total: 0, free: 0 };
+    }
+    buckets.set(key, {
+      total: prev.total + 1,
+      free: prev.free + (rpt.isOccupied ? 0 : 1),
+    });
   }
-
-  const history = [];
+  let history = [];
   for (let i = 60; i >= 1; i--) {
-    const t = new Date(Date.now() - i * 60000);
+    const t = new Date(Date.now() - i * 6000000);
     t.setSeconds(0, 0, 0);
-    history.push(buckets.get(t.getTime()) || 0);
+    const key = t.getTime();
+    const entry = buckets.get(key);
+    history.push(entry ? entry.free : 0);
   }
 
   if (history.length < 10 || new Set(history).size === 1) {
@@ -71,7 +78,7 @@ async function predictAvailabilityForCluster(spotIds) {
   const [predictions] = arima.predict(horizon);
   const forecastAt = (n) => {
     const v = predictions[n - 1];
-    return Math.max(0, Math.round(v));
+    return Math.min(spotIds.length, Math.max(0, Math.round(v)));
   };
 
   return {

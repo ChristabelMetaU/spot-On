@@ -1,7 +1,6 @@
 /** @format */
 
 import { Link } from "react-router-dom";
-import FilterLoading from "./FilterLoading";
 import { useAuth } from "./AuthContext";
 import FilterToggles from "./FilterToggles";
 import TooltipWrapper from "./ToolTipWrapper";
@@ -42,17 +41,14 @@ const Nav = ({
         </Link>
       </TooltipWrapper>
 
-      {showFilters &&
-        (loading ? (
-          <FilterLoading />
-        ) : (
-          <div className="nav-filters-container">
-            <FilterToggles
-              activeFilters={activeFilters}
-              setActiveFilters={setActiveFilters}
-            />
-          </div>
-        ))}
+      {showFilters && (
+        <div className="nav-filters-container">
+          <FilterToggles
+            activeFilters={activeFilters}
+            setActiveFilters={setActiveFilters}
+          />
+        </div>
+      )}
     </nav>
   );
 };
