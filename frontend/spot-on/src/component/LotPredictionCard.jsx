@@ -45,3 +45,5 @@ const LotPredictionCard = ({
     </div>
   );
 };
+
+export default LotPredictionCard;

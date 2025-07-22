@@ -1,35 +1,122 @@
 /** @format */
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import SearchForSpot from "./SearchForSpot";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-} from "recharts";
-
-const Predictions = ({
-  setIsRoutingToHome,
-  spots,
-  selectedSpot,
-  setSelectedSpot,
-  mode,
-  searchKeyword,
-  setSearchKeyword,
-  showResults,
-  setShowResults,
-  searchResults,
-  setSearchResults,
-}) => {
-  const navigate = useNavigate();
-  const [forecastData, setForecastData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [selectedSpotID, setSelectedSpotID] = useState(1);
-
+import PredictionToggle from "./PredictionToggle";
+import BestAvailabilityCard from "./BestAvailabilityCard";
+import LotPredictionCard from "./LotPredictionCard";
+import MapLegend from "./MapLegend";
+const dummyLots = [
+  {
+    id: "lot1",
+    name: "Lot A",
+    predictions: {
+      now: {
+        availability: 85,
+        waitTime: "2 mins",
+        peak: "4:30 PM",
+        freeCount: 17,
+        totalSpots: 20,
+      },
+      15: {
+        availability: 78,
+        waitTime: "3 mins",
+        peak: "4:45 PM",
+        freeCount: 15,
+        totalSpots: 20,
+      },
+      30: {
+        availability: 60,
+        waitTime: "5 mins",
+        peak: "5:00 PM",
+        freeCount: 12,
+        totalSpots: 20,
+      },
+      50: {
+        availability: 35,
+        waitTime: "7 mins",
+        peak: "5:30 PM",
+        freeCount: 7,
+        totalSpots: 20,
+      },
+    },
+    lastReported: "2 mins ago",
+    walkTime: "3 mins",
+  },
+  {
+    id: "lot2",
+    name: "Lot B",
+    predictions: {
+      now: {
+        availability: 20,
+        waitTime: "7 mins",
+        peak: "5:15 PM",
+        freeCount: 4,
+        totalSpots: 20,
+      },
+      15: {
+        availability: 25,
+        waitTime: "6 mins",
+        peak: "5:30 PM",
+        freeCount: 5,
+        totalSpots: 20,
+      },
+      30: {
+        availability: 40,
+        waitTime: "5 mins",
+        peak: "5:45 PM",
+        freeCount: 8,
+        totalSpots: 20,
+      },
+      50: {
+        availability: 60,
+        waitTime: "4 mins",
+        peak: "6:00 PM",
+        freeCount: 12,
+        totalSpots: 20,
+      },
+    },
+    lastReported: "5 mins ago",
+    walkTime: "5 mins",
+  },
+  {
+    id: "lot3",
+    name: "Lot C",
+    predictions: {
+      now: {
+        availability: 55,
+        waitTime: "4 mins",
+        peak: "4:45 PM",
+        freeCount: 11,
+        totalSpots: 20,
+      },
+      15: {
+        availability: 45,
+        waitTime: "5 mins",
+        peak: "5:00 PM",
+        freeCount: 9,
+        totalSpots: 20,
+      },
+      30: {
+        availability: 30,
+        waitTime: "6 mins",
+        peak: "5:15 PM",
+        freeCount: 6,
+        totalSpots: 20,
+      },
+      50: {
+        availability: 20,
+        waitTime: "7 mins",
+        peak: "5:30 PM",
+        freeCount: 4,
+        totalSpots: 20,
+      },
+    },
+    lastReported: "1 min ago",
+    walkTime: "2 mins",
+  },
+];
+const Predictions = ({ setIsRoutingToHome, selectedSpot, searchKeyword }) => {
+  const [selectedTime, setSelectedTime] = useState("now");
+  const [lots, setLots] = useState([]);
   const fetchForecast = async () => {
     if (searchKeyword.length == 0) {
       console.log("No spot selected");
@@ -60,13 +147,21 @@ const Predictions = ({
       throw error;
     }
   };
-
   useEffect(() => {
-    if (selectedSpot.length != 0) {
-      setSelectedSpotID(selectedSpot.id);
-      fetchForecast();
-    }
-  }, [searchKeyword, selectedSpot]);
+    // In real app, this is where we fetch prediction results based on time window
+    setLots(dummyLots); // Simulating load
+  }, []);
+
+  const currentPredictions = dummyLots.map((lot) => ({
+    ...lot,
+    current: lot.predictions[selectedTime],
+  }));
+
+  const sortedLots = [...currentPredictions].sort(
+    (a, b) => b.current.availability - a.current.availability
+  );
+  const bestLot = sortedLots[0];
+  const otherLots = sortedLots.slice(1);
   return (
     <div>
       <div className="route-header">
@@ -86,55 +181,38 @@ const Predictions = ({
           <p>Your spot, yur way</p>
         </div>
       </div>
+      <div className="prediction-dashboard">
+        <h2 className="page-title">Prediction Dashboard</h2>
 
-      <div className="p-6">
-        <h2 className="text-xl font-bold mb-4">Availability Forecast</h2>
+        <PredictionToggle onSelect={setSelectedTime} />
 
-        <div className="mb-4">
-          <label className="mr-2">Spot ID:</label>
-          <SearchForSpot
-            mode="prediction"
-            spots={spots}
-            searchKeyword={searchKeyword}
-            setSearchKeyword={setSearchKeyword}
-            showResults={showResults}
-            setShowResults={setShowResults}
-            searchResults={searchResults}
-            setSearchResults={setSearchResults}
-            setSelectedSpot={setSelectedSpot}
-          />
-          <button
-            onClick={() => fetchForecast()}
-            className="ml-3 px-3 py-1 bg-blue-500 text-white rounded"
-          >
-            Refresh
-          </button>
+        <BestAvailabilityCard
+          lotName={bestLot.name}
+          availability={bestLot.current.availability}
+          waitTime={bestLot.current.waitTime}
+          peakTime={bestLot.current.peak}
+        />
+
+        <div className="cards-section">
+          {otherLots.map((lot) => (
+            <LotPredictionCard
+              key={lot.id}
+              lotName={lot.name}
+              availability={lot.current.availability}
+              waitTime={lot.current.waitTime}
+              peakTime={lot.current.peak}
+              totalSpots={lot.current.totalSpots}
+              freeSpots={lot.current.freeCount}
+              walkTime={lot.walkTime}
+              lastReported={lot.lastReported}
+            />
+          ))}
         </div>
 
-        {loading ? (
-          <p>Loading forecast...</p>
-        ) : (
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={forecastData}>
-              <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
-              <XAxis dataKey="time" />
-              <YAxis domain={[0, 100]} tickFormatter={(val) => `${val}%`} />
-              <Tooltip formatter={(val) => `${val}%`} />
-              <Line
-                type="monotone"
-                dataKey="availability"
-                stroke="#8884d8"
-                strokeWidth={2}
-                dot={{ r: 4 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        )}
+        <MapLegend />
       </div>
     </div>
   );
 };
 
 export default Predictions;
-
-/** @format */

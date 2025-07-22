@@ -25,3 +25,5 @@ const BestAvailabilityCard = ({
     </div>
   );
 };
+
+export default BestAvailabilityCard;

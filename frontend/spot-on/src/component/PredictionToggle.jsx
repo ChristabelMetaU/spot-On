@@ -1,7 +1,6 @@
 /** @format */
 
 import React, { useState } from "react";
-import "./PredictionToggle.css";
 
 const PredictionToggle = ({ onSelect }) => {
   const [selected, setSelected] = useState("now");

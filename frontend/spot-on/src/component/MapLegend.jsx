@@ -1,8 +1,5 @@
 /** @format */
 
-import React from "react";
-import "./MapLegend.css";
-
 const MapLegend = () => {
   return (
     <div className="map-legend-container">
