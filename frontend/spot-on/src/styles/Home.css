@@ -1,5 +1,4 @@
 /** @format */
-@import "tailwindcss";
 body {
   margin: 0;
   padding: 0;
@@ -185,6 +184,7 @@ body {
   margin-top: 1.5rem;
   min-height: calc(100vh - 200px);
   flex-direction: column;
+  max-width: 2000px;
 }
 .map-title {
   background-color: #1c2e46;

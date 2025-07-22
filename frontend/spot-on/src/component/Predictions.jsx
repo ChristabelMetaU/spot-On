@@ -10,7 +10,6 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import { set } from "date-fns";
 
 const Predictions = ({
   setIsRoutingToHome,
