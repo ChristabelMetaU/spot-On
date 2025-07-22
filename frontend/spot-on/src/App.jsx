@@ -185,6 +185,13 @@ function AppRoutes() {
                 spots={spots}
                 selectedSpot={selectedSpot}
                 setSelectedSpot={setSelectedSpot}
+                mode="prediction"
+                searchKeyword={searchKeyword}
+                setSearchKeyword={setSearchKeyword}
+                showResults={showResults}
+                setShowResults={setShowResults}
+                searchResults={searchResults}
+                setSearchResults={setSearchResults}
               />
             }
           />

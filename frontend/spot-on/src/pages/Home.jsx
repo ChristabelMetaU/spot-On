@@ -19,7 +19,7 @@ import "../styles/Home.css";
 import { connectWebSocket, sendWebSocket } from "../utils/websocket";
 import { useTime } from "../component/ReserveContext";
 import { getDeviceId } from "../utils/getDeviceId";
-
+import Legend from "../component/Legend";
 const Home = ({
   spots,
   setSpots,
@@ -294,7 +294,7 @@ const Home = ({
             count={freeCount}
           />
           <QuickActions />
-
+          <Legend />
           <Fab />
         </main>
       )}

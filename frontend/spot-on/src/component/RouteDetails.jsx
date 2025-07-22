@@ -414,7 +414,6 @@ const RouteDetails = ({
               <p>
                 Lot: {spots.find((spot) => spot.id === path.goal.id)?.lotName}
               </p>
-              <p>Distance: {Math.round(path.totalcost)}m</p>
               <p>ETA: {Math.round(path.goal.drivingMinutesFromUser)} min</p>
               <p>Price: ${path.totalPrice}</p>
             </div>

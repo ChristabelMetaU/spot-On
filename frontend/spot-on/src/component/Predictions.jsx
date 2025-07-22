@@ -1,69 +1,67 @@
 /** @format */
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid,
-} from "recharts";
-import { set } from "date-fns";
+import PredictionToggle from "./PredictionToggle";
+import BestAvailabilityCard from "./BestAvailabilityCard";
+import LotPredictionCard from "./LotPredictionCard";
+import MapLegend from "./MapLegend";
+import { clusterSpots } from "../utils/clusterSpots";
+import { use } from "react";
 
-const Predictions = ({
-  setIsRoutingToHome,
-  spots,
-  selectedSpot,
-  setSelectedSpot,
-}) => {
-  const navigate = useNavigate();
-  const [forecastData, setForecastData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [selectedSpotID, setSelectedSpotID] = useState(1);
+const Predictions = ({ setIsRoutingToHome, spots }) => {
+  const [selectedTime, setSelectedTime] = useState("now");
+  const [lots, setLots] = useState([]);
+  const [bestLot, setBestLot] = useState(null);
+  const [otherLots, setOtherLots] = useState([]);
 
-  const fetchForecast = async (selectedSpotID) => {
-    setLoading(true);
+  const fetchPredictions = async () => {
     try {
-      const res = await fetch(
-        `http://localhost:3000/predictions/${selectedSpotID}`
-      );
+      const res = await fetch("http://localhost:3000/predictions");
       const data = await res.json();
-      if (data.error) {
-        throw new Error(data.error);
-      }
-      setForecastData(
-        data.map((entry) => ({
-          time: new Date(entry.time).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-          availability: parseFloat(
-            (entry.predictedAvailability * 100).toFixed(1)
-          ),
-        }))
+      setLots(data);
+
+      const currentPredictions = data.map((lot) => ({
+        ...lot,
+        current: lot.predictions[selectedTime],
+      }));
+      const sortedLots = [...currentPredictions].sort(
+        (a, b) => b.current.availability - a.current.availability
       );
-      setLoading(false);
-    } catch (error) {
-      throw error;
+
+      setBestLot(sortedLots[0]);
+      setOtherLots(sortedLots.slice(1));
+    } catch (err) {
+      throw new Error(err);
     }
   };
-
   useEffect(() => {
-    if (selectedSpot.id == null || selectedSpot.length === 0) {
-      const randomNum = Math.random();
-      const randomIndex = Math.floor(randomNum * spots.length);
-      const randomSpot = spots[randomIndex];
-      setSelectedSpot(randomSpot);
-      setSelectedSpotID(randomSpot.id);
-      fetchForecast(randomSpot.id);
-    } else {
-      const selectedSpotID = selectedSpot.id;
-      setSelectedSpotID(selectedSpotID);
-      fetchForecast(selectedSpotID);
+    try {
+      const clusteredLots = clusterSpots(spots);
+      const sendClusteredLots = async () => {
+        const response = await fetch(
+          "http://localhost:3000/predictions/clusters",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(clusteredLots),
+          }
+        );
+        const data = await response.json();
+        if (data.success) {
+          fetchPredictions();
+        } else {
+          throw new Error(data.error);
+        }
+      };
+      sendClusteredLots();
+    } catch (err) {
+      throw new Error(err);
     }
   }, []);
+  useEffect(() => {
+    fetchPredictions();
+  }, [selectedTime]);
   return (
     <div>
       <div className="route-header">
@@ -77,56 +75,44 @@ const Predictions = ({
             }}
           ></i>
         </div>
-        <h2>SpotOn</h2>
         <div className="header-text">
           <p>Availabiloty Predictions for You</p>
           <p>Your spot, yur way</p>
         </div>
       </div>
+      <div className="prediction-dashboard">
+        <h2 className="page-title">Prediction Dashboard</h2>
 
-      <div className="p-6">
-        <h2 className="text-xl font-bold mb-4">Availability Forecast</h2>
-
-        <div className="mb-4">
-          <label className="mr-2">Spot ID:</label>
-          <input
-            type="number"
-            value={selectedSpotID}
-            onChange={(e) => setSelectedSpotID(Number(e.target.value))}
-            className="border p-1 rounded"
+        <PredictionToggle onSelect={setSelectedTime} />
+        {bestLot && (
+          <BestAvailabilityCard
+            lotName={bestLot.name}
+            availability={bestLot.current.availability}
+            waitTime={bestLot.current.waitTime}
+            peakTime={bestLot.current.peak}
           />
-          <button
-            onClick={() => fetchForecast(selectedSpotID)}
-            className="ml-3 px-3 py-1 bg-blue-500 text-white rounded"
-          >
-            Refresh
-          </button>
+        )}
+
+        <div className="cards-section">
+          {otherLots.map((lot) => (
+            <LotPredictionCard
+              key={lot.id}
+              lotName={lot.name}
+              availability={lot.current.availability}
+              waitTime={lot.current.waitTime}
+              peakTime={lot.current.peak}
+              totalSpots={lot.current.totalSpots}
+              freeSpots={lot.current.freeCount}
+              walkTime={lot.walkTime}
+              lastReported={lot.lastReported}
+            />
+          ))}
         </div>
 
-        {loading ? (
-          <p>Loading forecast...</p>
-        ) : (
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={forecastData}>
-              <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
-              <XAxis dataKey="time" />
-              <YAxis domain={[0, 100]} tickFormatter={(val) => `${val}%`} />
-              <Tooltip formatter={(val) => `${val}%`} />
-              <Line
-                type="monotone"
-                dataKey="availability"
-                stroke="#8884d8"
-                strokeWidth={2}
-                dot={{ r: 4 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        )}
+        <MapLegend />
       </div>
     </div>
   );
 };
 
 export default Predictions;
-
-/** @format */
