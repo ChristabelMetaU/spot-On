@@ -19,6 +19,8 @@ import { MapProvider } from "./component/MapContext";
 import Reserve from "./component/Reserve";
 import { ReserveProvider } from "./component/ReserveContext";
 import Predictions from "./component/Predictions";
+import { ToastContainer } from "react-toastify";
+import Notifications from "./component/Notifications";
 function ProtectedRoute() {
   const { user } = useAuth();
   return user ? <Outlet /> : <Navigate to="/Welcome" />;
@@ -54,6 +56,7 @@ function AppRoutes() {
   const { user } = useAuth();
   return (
     <>
+      <ToastContainer position="top-right" autoClose={5000} />
       <Routes>
         <Route
           path="/Welcome"
@@ -192,6 +195,16 @@ function AppRoutes() {
                 setShowResults={setShowResults}
                 searchResults={searchResults}
                 setSearchResults={setSearchResults}
+              />
+            }
+          />
+
+          <Route
+            path="/Home/Notifications"
+            element={
+              <Notifications
+                setIsRoutingToHome={setIsRoutingToHome}
+                spots={spots}
               />
             }
           />

@@ -1,7 +1,6 @@
 /** @format */
 
 const predictionRouter = require("express").Router();
-const ARIMA = require("arima");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 let clusters;
