@@ -22,6 +22,28 @@ const Notifications = ({ setIsRoutingToHome }) => {
     };
     fetchNotifications();
   }, []);
+  const handleNotificationUpdate = async (notification) => {
+    const response = await fetch(`http://localhost:3000/notifications/update`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        isRead: true,
+        id: notification.id,
+        userId: user.id,
+      }),
+    });
+    const data = await response.json();
+    if (data) {
+      const dataIds = data.map((item) => item.id);
+      const newNotifications = notifications.filter(
+        (notification) => !dataIds.includes(notification.id)
+      );
+    } else {
+      throw new Error("Failed to update notification");
+    }
+  };
   return (
     <>
       <div className="route-header">
@@ -44,7 +66,9 @@ const Notifications = ({ setIsRoutingToHome }) => {
         <h2 className="page-title">Notifications</h2>
         <div className="notification-list">
           {notifications.length === 0 ? (
-            <p className="empty-messgae">No notifications</p>
+            <p className="empty-messgae">
+              You have no recent notificaationsszzzz
+            </p>
           ) : (
             notifications.map((notification) => (
               <div className="notification-card" key={notification.id}>
@@ -58,7 +82,9 @@ const Notifications = ({ setIsRoutingToHome }) => {
                   </span>
                 </div>
                 <p>{notification.message}</p>
-                <button>Close</button>
+                <button onClick={() => handleNotificationUpdate(notification)}>
+                  Close
+                </button>
               </div>
             ))
           )}
