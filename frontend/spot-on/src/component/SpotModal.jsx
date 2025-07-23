@@ -129,7 +129,8 @@ const SpotModal = ({
                 navigate("/Home/ReserveDetails");
                 setTimeout(() => {
                   setIsReserveBtnClicked(true);
-                }, 2000);
+                  handleClose(spot);
+                }, 1000);
               }}
             >
               Reserve Spot

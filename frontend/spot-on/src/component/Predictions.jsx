@@ -95,17 +95,21 @@ const Predictions = ({ setIsRoutingToHome, spots }) => {
 
         <div className="cards-section">
           {otherLots.map((lot) => (
-            <LotPredictionCard
-              key={lot.id}
-              lotName={lot.name}
-              availability={lot.current.availability}
-              waitTime={lot.current.waitTime}
-              peakTime={lot.current.peak}
-              totalSpots={lot.current.totalSpots}
-              freeSpots={lot.current.freeCount}
-              walkTime={lot.walkTime}
-              lastReported={lot.lastReported}
-            />
+            <div>
+              {console.log(lot.current)}
+              <LotPredictionCard
+                key={lot.id}
+                lotName={lot.name}
+                availabilityLevel="Medium"
+                availability={lot.current.availability}
+                peakTime={lot.current.peak}
+                totalSpots={lot.current.totalSpots}
+                currentSpots={lot.current.freeCount}
+                projectedFree={lot.predictions[selectedTime].freeCount}
+                walkTime={lot.walkTime}
+                lastReport={lot.lastReported}
+              />
+            </div>
           ))}
         </div>
 

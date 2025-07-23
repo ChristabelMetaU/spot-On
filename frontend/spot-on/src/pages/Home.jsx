@@ -260,6 +260,7 @@ const Home = ({
             setSearchResults={setSearchResults}
             setSelectedSpot={setSelectedSpot}
           />
+          <Legend />
           <Body
             mode={mode}
             name={"Your campus Parking Assistant"}
@@ -294,7 +295,6 @@ const Home = ({
             count={freeCount}
           />
           <QuickActions />
-          <Legend />
           <Fab />
         </main>
       )}

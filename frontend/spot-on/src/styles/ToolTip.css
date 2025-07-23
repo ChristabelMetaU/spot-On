@@ -27,7 +27,6 @@
   transform: translateX(-50%) translateY(-4px);
 }
 
-/* Triangle pointer */
 .tooltip-box::after {
   content: "";
   position: absolute;

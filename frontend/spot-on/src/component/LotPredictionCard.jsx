@@ -2,7 +2,7 @@
 
 const LotPredictionCard = ({
   lotName,
-  availabilityLevel, // "High", "Medium", "Low"
+  availabilityLevel,
   currentSpots,
   totalSpots,
   projectedFree,

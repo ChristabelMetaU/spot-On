@@ -391,7 +391,7 @@ const RouteDetails = ({
               </p>
             </div>
           )}
-          <button onClick={handleRankTypeChange}>
+          <button onClick={handleRankTypeChange} className="rank-button">
             <p>Rank</p>
           </button>
           <p className="error-message">{error}</p>
