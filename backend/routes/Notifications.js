@@ -8,7 +8,7 @@ notifyRouter.get("/:userId", async (req, res) => {
   const userId = req.params.userId;
   const notifications = await prisma.notifications.findMany({
     where: {
-      userId,
+      userId: Number(userId),
     },
     orderBy: {
       createdAt: "desc",

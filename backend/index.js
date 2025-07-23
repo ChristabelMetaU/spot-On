@@ -4,7 +4,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const webSocket = require("ws");
 const http = require("http");
-const { app, redisClient, sessionConfig } = require("./app");
+const { app, redisClient } = require("./app");
 const e = require("express");
 const dotenv = require("dotenv");
 const cookie = require("cookie");
@@ -15,7 +15,8 @@ const wss = new webSocket.Server({ server });
 let lockedSpots = {};
 const sessioonDeviceKey = (userId) => `session:${userId}:devices`;
 const sessionStateKey = (userId) => `session:${userId}:state`;
-const sessionStateMap = new Map();
+const sendReminder = require("./routes/staleNotifier");
+sendReminder(wss);
 const presenceMap = new Map();
 const checkForReservedSpots = async (spotId, now) => {
   const reservedSpot = await prisma.reservedSpots.findFirst({
@@ -424,6 +425,5 @@ wss.on("close", () => {
     }
   }, 3000);
 });
-
 const PORT = process.env.PORT || 9000;
 server.listen(PORT, () => {});

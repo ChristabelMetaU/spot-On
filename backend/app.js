@@ -59,5 +59,4 @@ app.use("/notifications", notifyRouter);
 module.exports = {
   app,
   redisClient,
-  sessionConfig,
 };
