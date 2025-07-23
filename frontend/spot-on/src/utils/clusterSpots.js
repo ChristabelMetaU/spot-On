@@ -16,8 +16,8 @@ const haversine = (lat1, lng1, lat2, lng2) => {
 export const clusterSpots = (spots, clusterRadius = 100) => {
   const clusters = [];
   spots.forEach((spot) => {
-    const lat = Number(spot.coordLat);
-    const lng = Number(spot.coordLng);
+    const lat = Number(spot.coordLat) || Number(spot.lat);
+    const lng = Number(spot.coordLng) || Number(spot.lng);
     let added = false;
     for (const cluster of clusters) {
       const dist = haversine(lat, lng, cluster.centerLat, cluster.centerLng);

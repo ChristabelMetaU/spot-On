@@ -96,7 +96,6 @@ const Predictions = ({ setIsRoutingToHome, spots }) => {
         <div className="cards-section">
           {otherLots.map((lot) => (
             <div>
-              {console.log(lot.current)}
               <LotPredictionCard
                 key={lot.id}
                 lotName={lot.name}
