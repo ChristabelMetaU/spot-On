@@ -592,6 +592,44 @@ body {
   width: 100%;
 }
 
+.cluster-group {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  margin: 20px 0;
+  background: #f1f5f9;
+  padding: 10px;
+}
+
+.cluster-header {
+  background: #1c2e46;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-bottom: 10px;
+  transition: background 0.3s ease;
+}
+
+.cluster-header:hover {
+  background: #365074;
+}
+
+.cluster-spots-dropdown {
+  padding: 10px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 .error-message {
   color: #ff0000;
   font-size: 0.855rem;

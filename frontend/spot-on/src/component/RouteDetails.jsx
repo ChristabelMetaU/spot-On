@@ -11,6 +11,7 @@ import { getDistance } from "../utils/Huristic";
 import { formatTime } from "../utils/formatTime";
 import { useMap } from "./MapContext";
 import MakeReservation from "./MakeReservation";
+import { clusterSpots } from "../utils/clusterSpots";
 const RouteDetails = ({
   spots,
   setSpots,
@@ -47,7 +48,6 @@ const RouteDetails = ({
   const [showMakeReservation, setShowMakeReservation] = useState(false);
   const [noReservationCnt, setNoReservationCnt] = useState(0);
   const [activePath, setActivePath] = useState(null);
-  const [rankPathChoosen, setRankPathChoosen] = useState([]);
   const [rankedPaths, setRankedPaths] = useState([]);
   const [selectedRankType, setSelectedRankType] = useState("");
   const [eta, setEta] = useState(0);
@@ -61,6 +61,8 @@ const RouteDetails = ({
   const [showRouteList, setShowRouteList] = useState(false);
   const [hideViewed, setHideViewed] = useState(false);
   const [viewedSpots, setViewedSpots] = useState([]);
+  const [clusteredLots, setClusteredLots] = useState([]);
+  const [openClusterIndex, setOpenClusterIndex] = useState(null);
 
   const fetchSpotsCloseToDestination = async () => {
     let tempSpots = [];
@@ -118,7 +120,22 @@ const RouteDetails = ({
     sortedRanked = hideViewed
       ? sortedRanked.filter((path) => !viewedSpots.includes(path.goal.id))
       : sortedRanked;
-    setRankPathChoosen(sortedRanked);
+    const spotLikeGaols = sortedRanked.map((path) => ({
+      id: path.goal.id,
+      coordLat: path.goal.lat,
+      coordLng: path.goal.lng,
+    }));
+    const clustered = clusterSpots(spotLikeGaols);
+    const clusteredWithPath = clustered.map((cluster) => {
+      const matchPath = sortedRanked.filter((path) =>
+        cluster.spots.some((s) => s.id === path.goal.id)
+      );
+      return {
+        ...cluster,
+        clusterSpots: matchPath,
+      };
+    });
+    setClusteredLots(clusteredWithPath);
     setLoaded(true);
     setShowRouteList(true);
   };
@@ -398,26 +415,59 @@ const RouteDetails = ({
         </div>
         {!loaded && (
           <div className="skeleton-wrapper">
-            {Array.from({ length: 5 }).map((_, index) => (
+            {Array.from({ length: 3 }).map((_, index) => (
               <div key={index} className="skeleton-spot-card" />
             ))}
           </div>
         )}
+
         {showRouteList &&
           loaded &&
-          rankPathChoosen?.slice(0, 5).map((path, index) => (
-            <div
-              key={index}
-              className="ranked-spot-item"
-              onClick={() => showRoute(path)}
-            >
-              <p>
-                Lot: {spots.find((spot) => spot.id === path.goal.id)?.lotName}
-              </p>
-              <p>ETA: {Math.round(path.goal.drivingMinutesFromUser)} min</p>
-              <p>Price: ${path.totalPrice}</p>
+          clusteredLots.map((cluster, index) => (
+            <div key={index} className="cluster-group">
+              <div
+                className="cluster-header"
+                onClick={() =>
+                  setOpenClusterIndex(openClusterIndex === index ? null : index)
+                }
+              >
+                <p>
+                  Lot:
+                  {" " +
+                    spots
+                      .find((s) => s.id === cluster.clusterSpots[0].goal.id)
+                      ?.lotName?.split(" ")[0] +
+                    " " +
+                    spots
+                      .find((s) => s.id === cluster.clusterSpots[0].goal.id)
+                      ?.lotName?.split(" ")[1]}
+                </p>
+                <p>{cluster.clusterSpots.length} free spots</p>
+                <small>Tap to view spots</small>
+              </div>
+
+              {openClusterIndex === index && (
+                <div className="cluster-spots-dropdown">
+                  {cluster.clusterSpots.slice(0, 5).map((path, idx) => (
+                    <div
+                      key={idx}
+                      className="ranked-spot-item"
+                      onClick={() => showRoute(path)}
+                    >
+                      <p>
+                        Lot: {spots.find((s) => s.id === path.goal.id)?.lotName}
+                      </p>
+                      <p>
+                        ETA: {Math.round(path.goal.drivingMinutesFromUser)} min
+                      </p>
+                      <p>Price: ${path.totalPrice}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
+
         <Body
           mode="route"
           name={"Your Smart Router"}
