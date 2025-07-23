@@ -12,7 +12,7 @@ const spots = require("./routes/Spots");
 const reportRouter = require("./routes/Report");
 const profileRouter = require("./routes/Profile");
 const predictionRouter = require("./routes/Predictions");
-
+const notifyRouter = require("./routes/Notifications");
 const e = require("express");
 dotenv.config();
 const app = express();
@@ -55,7 +55,7 @@ app.use("/report", reportRouter);
 app.use("/user", profileRouter);
 app.use("/predictions", predictionRouter);
 app.use("/spots", reserveRouter);
-
+app.use("/notifications", notifyRouter);
 module.exports = {
   app,
   redisClient,

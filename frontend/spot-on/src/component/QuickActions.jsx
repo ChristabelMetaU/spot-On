@@ -40,7 +40,10 @@ const QuickActions = () => {
           </div>
         </TooltipWrapper>
 
-        <div className="actions-div">
+        <div
+          className="actions-div"
+          onClick={() => navigate("/Home/Notifications")}
+        >
           <h3>Notifications</h3>
           <p>Personalozed notifications</p>
           <p>check if you have not unlocked a spot.</p>

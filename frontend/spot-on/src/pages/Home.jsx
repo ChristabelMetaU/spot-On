@@ -16,7 +16,7 @@ import MapLoading from "../component/MapLoading";
 import SearchForSpot from "../component/SearchForSpot";
 import { getDistance } from "../utils/Huristic";
 import "../styles/Home.css";
-import { connectWebSocket, sendWebSocket } from "../utils/websocket";
+import { connectWebSocket, sendWebSocket } from "../utils/WebSocket";
 import { useTime } from "../component/ReserveContext";
 import { getDeviceId } from "../utils/getDeviceId";
 import Legend from "../component/Legend";
@@ -183,6 +183,9 @@ const Home = ({
       if (data.type === "SPOT_UNRESERVED") {
         setHasReserve(false);
         setReservedSpotId(null);
+      }
+      if (data.type === "REMINDER") {
+        toast.info(data.message);
       }
     });
   }, [user, userLocation, selectedSpot, locked, lockedSpotId, mode]);

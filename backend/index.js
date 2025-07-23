@@ -6,6 +6,10 @@ const webSocket = require("ws");
 const http = require("http");
 const { app, redisClient, sessionConfig } = require("./app");
 const e = require("express");
+const dotenv = require("dotenv");
+const cookie = require("cookie");
+const signature = require("cookie-signature");
+dotenv.config();
 const server = http.createServer(app);
 const wss = new webSocket.Server({ server });
 let lockedSpots = {};
@@ -72,7 +76,25 @@ const getSpotsByLotName = async (lotName, ws) => {
   }
   return spot;
 };
-wss.on("connection", (ws) => {
+wss.on("connection", async (ws, req) => {
+  const cookies = cookie.parse(req.headers.cookie || "");
+  const raw = cookies["connect.sid"];
+  if (!raw) {
+    return;
+  }
+  const sid = signature.unsign(raw.slice(2), process.env.SESSION_SECRET);
+  if (!sid) {
+    return;
+  }
+  const redisKey = `spotonspoton${sid}`;
+  const sessionData = await redisClient.get(redisKey);
+  if (!sessionData) {
+    return;
+  } else {
+    const parseSession = JSON.parse(sessionData);
+    ws.userId = parseSession.userId;
+  }
+
   ws.on("message", async (message) => {
     const data = JSON.parse(message);
     let broadCastData = null;
