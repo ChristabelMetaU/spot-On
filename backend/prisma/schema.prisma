@@ -18,6 +18,7 @@ model Users {
   report reports[]
   LockedSpot LockedSpot[]
   ReservedSpots ReservedSpots[]
+  notifications notifications[]
 }
 
 model spots{
@@ -31,6 +32,7 @@ model spots{
   LockedSpot LockedSpot[]
   ReservedSpots ReservedSpots[]
   report reports[]
+  notifications notifications[]
 
 }
 model LockedSpot{
@@ -63,4 +65,15 @@ model reports{
   updated_at DateTime @default(now())
    created_at DateTime @default(now())
 
+}
+
+model notifications{
+  id Int @id @default(autoincrement())
+  userId Int
+  message String
+  spotId Int
+  read Boolean @default(false)
+  createdAt DateTime @default(now())
+  user Users @relation(fields: [userId], references: [id])
+  spot spots @relation(fields: [spotId], references: [id])
 }

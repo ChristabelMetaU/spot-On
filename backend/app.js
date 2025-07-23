@@ -34,20 +34,19 @@ app.use(
     credentials: true,
   })
 );
-app.use(
-  session({
-    store,
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60000 * 60 * 60 * 24,
-    },
-  })
-);
+const sessionConfig = session({
+  store,
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 60000 * 60 * 60 * 24,
+  },
+});
+app.use(sessionConfig);
 app.use(express.json());
 app.use("/auth", auth);
 app.use("/map", map);
@@ -60,4 +59,5 @@ app.use("/spots", reserveRouter);
 module.exports = {
   app,
   redisClient,
+  sessionConfig,
 };
