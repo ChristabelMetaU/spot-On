@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 const cron = require("node-cron");
 let staleSpots = [];
 module.exports = function sendReminder(wss) {
-  cron.schedule("0 * * * *", async () => {
+  cron.schedule("* * * * *", async () => {
     staleSpots = await prisma.reports.findMany({
       where: {
         isOccupied: true,
@@ -13,7 +13,6 @@ module.exports = function sendReminder(wss) {
         },
       },
     });
-
     for (const staleSpot of staleSpots) {
       const userId = staleSpot.user_id;
       const message = `You have had ${staleSpot.spot_name} reserved for more than 24 hours. Please release the spot. `;
