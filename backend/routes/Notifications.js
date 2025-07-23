@@ -16,25 +16,31 @@ notifyRouter.get("/:userId", async (req, res) => {
     },
   });
   if (notifications) {
-    res.status(200).json(notifications);
+    //remove repeated notifications if they have the same spotId
+    const uniqueNotifications = notifications.filter(
+      (notification, index, self) =>
+        index ===
+        self.findIndex(
+          (t) => t.spotId === notification.spotId && t.id === notification.id
+        )
+    );
+    res.status(200).json(uniqueNotifications);
   } else {
     res.status(404).json({ message: "No notifications found for user" });
   }
 });
 
-//update notification to read
+//update notification to read true
 notifyRouter.put("/update", async (req, res) => {
-  const { isRead, userId, id } = req.body;
-  const notification = await prisma.notifications.updateMany({
+  const { isRead, id } = req.body;
+  const notification = await prisma.notifications.update({
     where: {
-      userId: Number(userId),
       id: Number(id),
     },
     data: {
       read: isRead,
     },
   });
-  console.log(notification);
   if (notification) {
     res.status(200).json(notification);
   } else {
