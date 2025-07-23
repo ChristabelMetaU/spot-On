@@ -5,13 +5,14 @@ import BestAvailabilityCard from "./BestAvailabilityCard";
 import LotPredictionCard from "./LotPredictionCard";
 import MapLegend from "./MapLegend";
 import { clusterSpots } from "../utils/clusterSpots";
-import { use } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Predictions = ({ setIsRoutingToHome, spots }) => {
   const [selectedTime, setSelectedTime] = useState("now");
   const [lots, setLots] = useState([]);
   const [bestLot, setBestLot] = useState(null);
   const [otherLots, setOtherLots] = useState([]);
+  const navigate = useNavigate();
 
   const fetchPredictions = async () => {
     try {

@@ -20,6 +20,7 @@ import { connectWebSocket, sendWebSocket } from "../utils/WebSocket";
 import { useTime } from "../component/ReserveContext";
 import { getDeviceId } from "../utils/getDeviceId";
 import Legend from "../component/Legend";
+import { toast } from "react-toastify";
 const Home = ({
   spots,
   setSpots,
