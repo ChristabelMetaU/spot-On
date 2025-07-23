@@ -1,23 +1,32 @@
 /** @format */
 
-import React from "react";
-import "../styles/Legend.css";
+import { useEffect, useState } from "react";
+import "../styles/legend.css";
 
 const Legend = () => {
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setVisible(false), 15000); //15 seconds
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!visible) return null;
+
   return (
-    <div className="legend-container">
-      <h4 className="legend-title">Spot Legend</h4>
-      <div className="legend-item">
-        <span className="legend-circle available" /> Available Spot
+    <div className="map-legend">
+      <div>
+        <span className="dot green" /> Available
       </div>
-      <div className="legend-item">
-        <span className="legend-circle occupied-legend" /> Occupied Spot
+      <div>
+        <span className="dot red" /> Occupied
       </div>
-      <div className="legend-item">
-        <span className="legend-circle reserved" /> Reserved Spot
+      <div>
+        <span className="dot pink" /> Reserved
       </div>
-      <div className="legend-item">
-        <span className="legend-circle unreliable" /> Updating Spot
+      <div>
+        <span className="dot yellow" />
+        updating
       </div>
     </div>
   );
