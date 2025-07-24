@@ -1,5 +1,5 @@
 /** @format */
-/** @format */
+
 import { useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
 import "../styles/Notifications.css";
@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 const Notifications = ({ setIsRoutingToHome }) => {
   const { user } = useAuth();
   const [notifications, setNotifications] = useState([]);
+  const navigate = useNavigate();
   useEffect(() => {
     //fetch notifications
     const fetchNotifications = async () => {
@@ -31,15 +32,14 @@ const Notifications = ({ setIsRoutingToHome }) => {
       body: JSON.stringify({
         isRead: true,
         id: notification.id,
-        userId: user.id,
       }),
     });
     const data = await response.json();
     if (data) {
-      const dataIds = data.map((item) => item.id);
       const newNotifications = notifications.filter(
-        (notification) => !dataIds.includes(notification.id)
+        (notification) => notification.id !== data.id
       );
+      setNotifications(newNotifications);
     } else {
       throw new Error("Failed to update notification");
     }
@@ -66,9 +66,7 @@ const Notifications = ({ setIsRoutingToHome }) => {
         <h2 className="page-title">Notifications</h2>
         <div className="notification-list">
           {notifications.length === 0 ? (
-            <p className="empty-messgae">
-              You have no recent notificaationsszzzz
-            </p>
+            <p className="empty-messgae">You have no recent notificaations</p>
           ) : (
             notifications.map((notification) => (
               <div className="notification-card" key={notification.id}>

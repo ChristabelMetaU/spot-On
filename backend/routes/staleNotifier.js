@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 const cron = require("node-cron");
 let staleSpots = [];
 module.exports = function sendReminder(wss) {
-  cron.schedule("* * * * *", async () => {
+  cron.schedule("0 * * * *", async () => {
     staleSpots = await prisma.reports.findMany({
       where: {
         isOccupied: true,

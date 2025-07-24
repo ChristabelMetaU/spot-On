@@ -1,5 +1,5 @@
 /** @format */
-
+import "../styles/Prediction.css";
 const BestAvailabilityCard = ({
   lotName,
   availability,

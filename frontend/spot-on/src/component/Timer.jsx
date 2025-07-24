@@ -1,5 +1,6 @@
 /** @format */
 import { formatTime } from "../utils/formatTime";
+import "../styles/Fab.css";
 const Timer = ({ timeLeft }) => {
   return (
     <div className="fab-timer">

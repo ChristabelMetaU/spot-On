@@ -12,6 +12,7 @@ import { formatTime } from "../utils/formatTime";
 import { useMap } from "./MapContext";
 import MakeReservation from "./MakeReservation";
 import { clusterSpots } from "../utils/clusterSpots";
+import "../styles/RouteDetails.css";
 const RouteDetails = ({
   spots,
   setSpots,

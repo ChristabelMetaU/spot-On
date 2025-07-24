@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import SearchForSpot from "./SearchForSpot";
 import { useAuth } from "./AuthContext";
 import Message from "./Message";
-import { sendWebSocket, connectWebSocket } from "../utils/websocket";
+import { sendWebSocket, connectWebSocket } from "../utils/WebSocket";
 import { getFormattedDate } from "../utils/getFormattedDate";
 import Timer from "./Timer";
 import { formatTime } from "../utils/formatTime";
 import { useTime } from "./ReserveContext";
+import "../styles/Reserve.css";
 const Reserve = ({
   spots,
   searchKeyword,
