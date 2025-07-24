@@ -1,5 +1,5 @@
 /** @format */
-
+import "../styles/Prediction.css";
 const LotPredictionCard = ({
   lotName,
   availabilityLevel,

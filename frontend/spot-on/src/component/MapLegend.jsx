@@ -1,5 +1,5 @@
 /** @format */
-
+import "../styles/MapLegend.css";
 const MapLegend = () => {
   return (
     <div className="map-legend-container">
