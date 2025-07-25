@@ -37,7 +37,7 @@ async function predictAvailabilityForCluster(spotIds) {
 
   let baseProbability;
   if (reports.length === 0) {
-    baseProbability = 0.5; // fallback default
+    baseProbability = 0.5;
   } else {
     const freeReports = reports.filter((r) => r.isOccupied === false).length;
     baseProbability = freeReports / reports.length;
@@ -55,8 +55,7 @@ async function predictAvailabilityForCluster(spotIds) {
     );
 
     const availability = Math.round((adjusted / totalSpots) * 100);
-    //Check availiabilty level if higher aavailability/total spots is than 50& and less than 70& meduim level if less than 50 low level if more than 70 high level
-    let availabilityLevel = "Low";
+
     if (availability > 70) {
       availabilityLevel = "High";
     } else if (availability > 50) {
@@ -124,7 +123,6 @@ predictionRouter.get("/", async (req, res) => {
             .slice(0, 2)
             .join(" "),
           predictions: prediction,
-          //last report should be in format 2 days ago or 2 hours ago or a week ago or about 2 minutes ago or jus not
           lastReported: lastReported
             ? new Date(lastReported).toLocaleString("en-US", {
                 month: "short",

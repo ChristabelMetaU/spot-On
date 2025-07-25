@@ -48,6 +48,9 @@ async function fetchReports(lat, lng) {
 async function getSpotUnreliabilityScore(spot) {
   const TEN_MINUTES_DECAY = 600000;
   const reports = await fetchReports(spot.coordLat, spot.coordLng);
+  if (!reports) {
+    return 0;
+  }
   const now = Date.now();
   return reports.reduce((penalty, r) => {
     const age = now - new Date(r.created_at).getTime();
@@ -161,7 +164,7 @@ export function dynamicPathFinder(startNode, goalNodes, options = {}) {
         totalCost,
         totalPrice: path.reduce((sum, n) => sum + n.Price, 0),
       });
-      continue; // Continue exploring other paths
+      continue;
     }
 
     for (const edge of current.edges) {
@@ -170,7 +173,7 @@ export function dynamicPathFinder(startNode, goalNodes, options = {}) {
       const unreliability = neighbor.unreliability || 0;
       const heuristic = smartHeuristic(
         neighbor,
-        goalNodes[0], // heuristic is relative; all goals assumed close
+        goalNodes[0],
         unreliability,
         getTimePenalty(hour)
       );
