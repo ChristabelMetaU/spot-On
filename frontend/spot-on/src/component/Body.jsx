@@ -1,14 +1,13 @@
 /** @format */
-import { LoadScript, useJsApiLoader } from "@react-google-maps/api";
+import { useJsApiLoader } from "@react-google-maps/api";
 import { useAuth } from "./AuthContext";
 import { useState, useMemo, useCallback } from "react";
 import { clusterSpots } from "../utils/clusterSpots";
-import { sendWebSocket } from "../utils/websocket";
+import { sendWebSocket } from "../utils/WebSocket";
 import { useMap } from "./MapContext";
 import MapLoading from "./MapLoading";
 import Map from "./Map";
 import { useTime } from "./ReserveContext";
-import { useEffect } from "react";
 const LIBRARIES = ["geometry", "places", "routes"];
 
 const Body = ({

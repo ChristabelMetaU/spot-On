@@ -61,7 +61,7 @@ model reports{
   spot_name String
   isOccupied Boolean @default(false)
   notified Boolean @default(false)
-   user Users @relation(fields: [user_id], references: [id])
+  user Users @relation(fields: [user_id], references: [id])
   spot spots @relation(fields: [spot_name], references: [lotName])
   updated_at DateTime @default(now())
    created_at DateTime @default(now())
