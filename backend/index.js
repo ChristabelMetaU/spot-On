@@ -319,7 +319,10 @@ wss.on("connection", async (ws, req) => {
         }
       }, 60000);
     }
-    if (data.type === "UNLOCK_SPOT") {
+    if (
+      data.type === "UNLOCK_SPOT" &&
+      lockedSpots[data.spotId]?.userId === data.userId
+    ) {
       const lockedKey = `spot-lock:${data.spotId}`;
       const userId = data.userId;
       const luaScript = `
@@ -333,22 +336,19 @@ wss.on("connection", async (ws, req) => {
         keys: [lockedKey],
         arguments: [String(userId)],
       });
-
-      if (lockedSpots[data.spotId]?.userId === data.userId) {
-        await prisma.lockedSpot.delete({
-          where: {
-            id: lockedSpots[data.spotId].id,
-          },
-        });
-        delete lockedSpots[data.spotId];
-        broadCastData = {
-          type: "SPOT_UNLOCKED",
-          isOccupied: data.isOccupied,
-          locked: false,
-          spotId: data.spotId,
-          userId: data.userId,
-        };
-      }
+      await prisma.lockedSpot.delete({
+        where: {
+          id: lockedSpots[data.spotId].id,
+        },
+      });
+      delete lockedSpots[data.spotId];
+      broadCastData = {
+        type: "SPOT_UNLOCKED",
+        isOccupied: data.isOccupied,
+        locked: false,
+        spotId: data.spotId,
+        userId: data.userId,
+      };
     }
     if (data.type === "UPDATE_SPOT") {
       if (lockedSpots[data.spotId]) {
