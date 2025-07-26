@@ -96,9 +96,8 @@ const Predictions = ({ setIsRoutingToHome, spots }) => {
 
         <div className="cards-section">
           {otherLots.map((lot) => (
-            <div>
+            <div key={lot.name}>
               <LotPredictionCard
-                key={lot.id}
                 lotName={lot.name}
                 availabilityLevel="Medium"
                 availability={lot.current.availability}
