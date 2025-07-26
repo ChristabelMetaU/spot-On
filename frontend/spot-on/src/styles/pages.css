@@ -11,17 +11,6 @@
   background: linear-gradient(45deg, #1c2e46 0%, #7c94b4 100%);
 }
 
-.welcome-page {
-  text-align: center;
-  max-width: 600px;
-  margin: 2rem auto;
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 3rem 2rem;
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-  animation: drop 0.6s ease-out forwards;
-}
-
 @keyframes drop {
   0% {
     opacity: 0;
@@ -31,12 +20,6 @@
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.logo-title {
-  font-size: 3.5rem;
-  color: #1c2e46;
-  margin-bottom: 0.5rem;
 }
 
 .tagline {
@@ -67,30 +50,150 @@
   gap: 1rem;
   flex-wrap: wrap;
 }
-
-.btn-start {
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 600;
+.welcome-container {
+  font-family: "Segoe UI", sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: linear-gradient(120deg, #1c2e46 0%, #7c94b4 100%);
   color: #fff;
-  background: linear-gradient(45deg, #1c2e46 0%, #7c94b4 100%);
-  border: none;
+  padding: 0 2rem;
+}
+
+.welcome-navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #ddd;
+  background: transparent;
+}
+
+.logo-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #bec4cd;
+  animation: drop 0.5s ease;
+}
+
+.nav-buttons .nav-btn {
+  margin-left: 1rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.nav-btn.filled {
+  background-color: #1c2e46;
+  color: white;
+}
+
+.nav-btn.filled:hover {
+  background-color: #1c2e46;
+}
+
+.nav-btn.outlined {
+  border: 2px solid #1c2e46;
+  color: #1c2e46;
+}
+
+.nav-btn.outlined:hover {
+  background-color: #bec4cd;
+}
+
+.hero-section {
+  text-align: center;
+  padding: 4rem 0;
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #cfd5dd;
+}
+
+.hero-title .highlight {
+  color: #1c2e46;
+}
+
+.hero-subtitle {
+  max-width: 600px;
+  margin: 0 auto;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.hero-buttons {
+  margin-top: 2rem;
+}
+
+.hero-btn {
+  margin: 0 1rem;
+  padding: 0.8rem 1.6rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.hero-btn.primary {
+  background-color: #1c2e46;
+  color: white;
+}
+
+.hero-btn.primary:hover {
+  background-color: #0e1c2f;
+}
+
+.hero-btn.secondary {
+  background-color: transparent;
+  border: 2px solid #1c2e46;
+  color: #1c2e46;
+}
+
+.hero-btn.secondary:hover {
+  background-color: #cfd5dd;
+}
+
+.features-section {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 4rem;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.feature-card {
+  flex: 1;
+  min-width: 250px;
+  background: white;
+  padding: 1.5rem;
   border-radius: 10px;
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  transition: transform 0.3s ease;
 }
 
-.btn-start:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+.feature-card:hover {
+  transform: translateY(-5px);
 }
 
-.btn-start.secondary {
-  background: #555;
+.feature-card h3 {
+  color: #1c2e46;
+  margin-bottom: 0.5rem;
 }
-
-.btn-start.secondary:hover {
-  background: #333;
+.feature-card p {
+  color: #666;
+}
+.welcome-footer {
+  text-align: center;
+  margin-top: auto;
+  padding: 2rem 0;
+  font-size: 0.9rem;
+  color: #fff;
 }
 
 .auth-container {
