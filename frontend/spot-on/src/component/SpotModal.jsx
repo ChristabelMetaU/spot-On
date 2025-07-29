@@ -4,7 +4,7 @@ import "../styles/Modal.css";
 import { getFormattedDate } from "../utils/getFormattedDate";
 import { useAuth } from "./AuthContext";
 import { formatTime } from "../utils/formatTime";
-import { sendWebSocket } from "../utils/websocket";
+import { sendWebSocket } from "../utils/WebSocket";
 import { useNavigate } from "react-router-dom";
 const SpotModal = ({
   spot,
