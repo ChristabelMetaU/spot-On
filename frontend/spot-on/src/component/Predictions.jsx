@@ -8,6 +8,7 @@ import { clusterSpots } from "../utils/clusterSpots";
 import { useNavigate } from "react-router-dom";
 
 const Predictions = ({ setIsRoutingToHome, spots }) => {
+  const base_URL = import.meta.env.VITE_BACKEND_URL;
   const [selectedTime, setSelectedTime] = useState("now");
   const [lots, setLots] = useState([]);
   const [bestLot, setBestLot] = useState(null);
@@ -16,7 +17,7 @@ const Predictions = ({ setIsRoutingToHome, spots }) => {
 
   const fetchPredictions = async () => {
     try {
-      const res = await fetch("http://localhost:3000/predictions");
+      const res = await fetch(`${base_URL}/predictions`);
       const data = await res.json();
       setLots(data);
 
@@ -38,16 +39,13 @@ const Predictions = ({ setIsRoutingToHome, spots }) => {
     try {
       const clusteredLots = clusterSpots(spots);
       const sendClusteredLots = async () => {
-        const response = await fetch(
-          "http://localhost:3000/predictions/clusters",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(clusteredLots),
-          }
-        );
+        const response = await fetch(`${base_URL}/predictions/clusters`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(clusteredLots),
+        });
         const data = await response.json();
         if (data.success) {
           fetchPredictions();

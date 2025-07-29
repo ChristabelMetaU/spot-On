@@ -39,6 +39,7 @@ const RouteDetails = ({
     lng: -86.3789569,
   }).current;
   const { map } = useMap();
+  const base_URL = import.meta.env.VITE_BACKEND_URL;
   const directionsService = useRef(new window.google.maps.DirectionsService());
   const [loaded, setLoaded] = useState(true);
   const [routePath, setRoutePath] = useState([]);
@@ -70,7 +71,7 @@ const RouteDetails = ({
     let radius = 200;
     while (tempSpots.length < 1) {
       const response = await fetch(
-        `http://localhost:3000/map/spots?lat=${destinationLocation.lat}&lng=${destinationLocation.lng}&radius=${radius}`
+        `${base_URL}/map/spots?lat=${destinationLocation.lat}&lng=${destinationLocation.lng}&radius=${radius}`
       );
       const data = await response.json();
       const nearByFreeSpots = data.filter((spot) => !spot.isOccupied);

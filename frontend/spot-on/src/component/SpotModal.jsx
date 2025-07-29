@@ -18,6 +18,7 @@ const SpotModal = ({
   setIsReserveBtnClicked,
 }) => {
   const { user } = useAuth();
+  const base_URL = import.meta.env.VITE_BACKEND_URL;
   const navigate = useNavigate();
   const [spotReport, setSpotReport] = useState([]);
   const [timeLeft, setTimeLeft] = useState(60);
@@ -40,9 +41,7 @@ const SpotModal = ({
 
   useEffect(() => {
     const fetchSpotReports = async () => {
-      const response = await fetch(
-        `http://localhost:3000/report/spot/${spot.lotName}`
-      );
+      const response = await fetch(`${base_URL}/report/spot/${spot.lotName}`);
       const data = await response.json();
       setSpotReport(data);
     };

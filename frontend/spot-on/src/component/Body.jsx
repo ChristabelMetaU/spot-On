@@ -32,6 +32,7 @@ const Body = ({
   setSearchKeyword,
   setIsReserveBtnClicked,
 }) => {
+  const base_URL = import.meta.env.VITE_BACKEND_URL;
   const { map, onLoad } = useMap();
   const { loading, user } = useAuth();
   const [len, setLen] = useState(0);
@@ -72,7 +73,7 @@ const Body = ({
         isOccupied: false,
       };
       try {
-        const response = await fetch("http://localhost:3000/spots/", {
+        const response = await fetch(`${base_URL}/spots/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

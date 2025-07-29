@@ -4,12 +4,13 @@ import { createContext, useContext, useState, useEffect } from "react";
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
+  const base_URL = import.meta.env.VITE_BACKEND_URL;
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     try {
-      fetch("http://localhost:3000/auth/me", {
+      fetch(`${base_URL}/auth/me`, {
         credentials: "include",
       })
         .then((res) => res.json())
@@ -24,7 +25,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    const res = await fetch("http://localhost:3000/auth/Login", {
+    const res = await fetch(`${base_URL}/auth/Login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -39,7 +40,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const signUp = async (username, email, password, role) => {
-    const res = await fetch("http://localhost:3000/auth/signup", {
+    const res = await fetch(`${base_URL}/auth/signup`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -53,7 +54,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    await fetch("http://localhost:3000/auth/logout", {
+    await fetch(`${base_URL}/auth/logout`, {
       credentials: "include",
     });
     setUser(null);

@@ -34,6 +34,7 @@ const Reserve = ({
   setIsRoutingToHome,
 }) => {
   const { user } = useAuth();
+  const base_URL = import.meta.env.VITE_BACKEND_URL;
   const {
     timeLeft,
     setTimeLeft,
@@ -51,7 +52,7 @@ const Reserve = ({
     : pastReservations.slice(0, limit);
   useEffect(() => {
     const fetchReservations = async () => {
-      const response = await fetch("http://localhost:3000/spots/get/reserve");
+      const response = await fetch(`${base_URL}/spots/get/reserve`);
       const data = await response.json();
       if (data) {
         setPastReservations(
@@ -73,7 +74,7 @@ const Reserve = ({
   useEffect(() => {
     const fetchCurrentReservation = async () => {
       const response = await fetch(
-        `http://localhost:3000/spots/current/reserve/${user.id}`
+        `${base_URL}/spots/current/reserve/${user.id}`
       );
       const data = await response.json();
       if (data) {
@@ -105,7 +106,7 @@ const Reserve = ({
       lotName: searchKeyword,
       userId: user.id,
     };
-    const response = await fetch("http://localhost:3000/spots/reserve", {
+    const response = await fetch(`${base_URL}/spots/reserve`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -191,7 +192,7 @@ const Reserve = ({
   }, [timeLeft]);
 
   const updateReservation = async (formData) => {
-    const response = await fetch("http://localhost:3000/spots/cancel", {
+    const response = await fetch(`${base_URL}/spots/cancel`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
