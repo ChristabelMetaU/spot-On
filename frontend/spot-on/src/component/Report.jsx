@@ -1,7 +1,7 @@
 /** @format */
 import { useState, useEffect } from "react";
-import { sendWebSocket } from "../utils/websocket";
-import { connectWebSocket } from "../utils/websocket";
+import { sendWebSocket } from "../utils/WebSocket";
+import { connectWebSocket } from "../utils/WebSocket";
 import SearchForSpot from "./SearchForSpot";
 import TooltipWrapper from "./ToolTipWrapper";
 const Report = ({
