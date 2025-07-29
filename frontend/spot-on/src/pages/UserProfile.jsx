@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import "../styles/Profile.css";
 import ProfileImg from "../assets/profileImg.jpg";
-import ProfileLoading from "../component/profileLoading";
 import { useAuth } from "../component/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { getFormattedDate } from "../utils/getFormattedDate";
@@ -56,14 +55,11 @@ const UserProfile = ({ setIsRoutingToHome }) => {
           }}
         ></i>
         <div className="profile-user">
-          {loading ? (
-            <ProfileLoading />
-          ) : (
-            <div className="profie-picture">
-              <img src={ProfileImg} alt="profile-img" />
-            </div>
-          )}
-
+          (
+          <div className="profie-picture">
+            <img src={ProfileImg} alt="profile-img" />
+          </div>
+          )
           <div className="user-info">
             <h1>{user.username}</h1>
             <p>{user.email}</p>
