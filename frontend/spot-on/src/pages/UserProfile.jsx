@@ -1,7 +1,7 @@
 /** @format */
 import { useState, useEffect } from "react";
 import "../styles/Profile.css";
-import ProfileImg from "../assets/profileImg.jpg";
+import Profile from "../assets/Profile.jpg";
 import { useAuth } from "../component/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { getFormattedDate } from "../utils/getFormattedDate";
@@ -57,7 +57,7 @@ const UserProfile = ({ setIsRoutingToHome }) => {
         <div className="profile-user">
           (
           <div className="profie-picture">
-            <img src={ProfileImg} alt="profile-img" />
+            <img src={Profile} alt="profile-img" />
           </div>
           )
           <div className="user-info">
