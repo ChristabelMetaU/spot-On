@@ -1,7 +1,7 @@
 /** @format */
 
 import { useEffect, useState } from "react";
-import "../styles/legend.css";
+import "../styles/Legend.css";
 
 const Legend = () => {
   const [visible, setVisible] = useState(true);
