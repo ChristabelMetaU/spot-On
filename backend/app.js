@@ -29,7 +29,7 @@ const store = new RedisStore({
 });
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: [process.env.FRONTEND_URL, " https://spoton-f7sp.onrender.com"],
     optionsSuccessStatus: 200,
     credentials: true,
   })
