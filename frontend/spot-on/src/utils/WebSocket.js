@@ -4,7 +4,8 @@ let socket = null;
 import { getDeviceId } from "./getDeviceId";
 
 export function connectWebSocket(user, onMessage) {
-  socket = new WebSocket("ws://localhost:3000");
+  const WS_URL = import.meta.env.VITE_WS_URL || "ws://localhost:3000";
+  socket = new WebSocket(WS_URL);
   socket.onopen = () => {
     const joinMsg = {
       type: "SESSION_JOIN",

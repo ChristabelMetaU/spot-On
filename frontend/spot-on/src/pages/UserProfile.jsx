@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { getFormattedDate } from "../utils/getFormattedDate";
 const UserProfile = ({ setIsRoutingToHome }) => {
   const navigate = useNavigate();
+  const base_URL = import.meta.env.VITE_BACKEND_URL;
   const { logout, user, loading } = useAuth();
   const [userReport, setUserReport] = useState([]);
   const [showFullText, setShowFullText] = useState(false);
@@ -15,9 +16,7 @@ const UserProfile = ({ setIsRoutingToHome }) => {
     ? userReport
     : userReport.slice(0, limit);
   const displayReport = async () => {
-    const response = await fetch(
-      `http://localhost:3000/user/profile/${user.id}`
-    );
+    const response = await fetch(`${base_URL}/user/profile/${user.id}`);
     const data = await response.json();
     if (!response.ok) {
       throw new Error(data.message);

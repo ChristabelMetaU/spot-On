@@ -19,6 +19,9 @@ const app = express();
 
 const RedisStore = connectRedis.RedisStore;
 const redisClient = redis.createClient({ url: process.env.REDIS_URL });
+redisClient.on("error", (err) => {
+  console.error("Redis Client Error", err);
+});
 async function startRedis() {
   await redisClient.connect();
 }
@@ -29,7 +32,7 @@ const store = new RedisStore({
 });
 app.use(
   cors({
-    origin: [process.env.FRONTEND_URL, " https://spoton-f7sp.onrender.com"],
+    origin: process.env.FRONTEND_URL,
     optionsSuccessStatus: 200,
     credentials: true,
   })

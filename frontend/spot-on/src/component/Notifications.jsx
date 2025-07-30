@@ -5,15 +5,14 @@ import { useAuth } from "./AuthContext";
 import "../styles/Notifications.css";
 import { useNavigate } from "react-router-dom";
 const Notifications = ({ setIsRoutingToHome }) => {
+  const base_URL = import.meta.env.VITE_BACKEND_URL;
   const { user } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
     //fetch notifications
     const fetchNotifications = async () => {
-      const response = await fetch(
-        `http://localhost:3000/notifications/${user.id}`
-      );
+      const response = await fetch(`${base_URL}/notifications/${user.id}`);
       const data = await response.json();
       if (data) {
         setNotifications(data);
@@ -24,7 +23,7 @@ const Notifications = ({ setIsRoutingToHome }) => {
     fetchNotifications();
   }, []);
   const handleNotificationUpdate = async (notification) => {
-    const response = await fetch(`http://localhost:3000/notifications/update`, {
+    const response = await fetch(`${base_URL}/notifications/update`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

@@ -55,6 +55,7 @@ const Home = ({
   setIsReserveBtnClicked,
 }) => {
   const mode = "Home";
+  const base_URL = import.meta.env.VITE_BACKEND_URL;
   const { user, logout } = useAuth();
   const [showFilters, setShowFilters] = useState(false);
   const [userLocationError, setUserLocationError] = useState(null);
@@ -119,7 +120,7 @@ const Home = ({
       let raduis = 200;
       while (tempSPots.length < 1) {
         const response = await fetch(
-          `http://localhost:3000/map/spots?lat=${lat}&lng=${lng}&radius=${raduis}`
+          `${base_URL}/map/spots?lat=${lat}&lng=${lng}&radius=${raduis}`
         );
         const data = await response.json();
         if (!data || data.length < 1) {
@@ -193,7 +194,7 @@ const Home = ({
 
   const updateIsOccupied = async (Occupied) => {
     const id = Number(selectedSpot.id);
-    const response = await fetch(`http://localhost:3000/map/spots/${id}`, {
+    const response = await fetch(`${base_URL}/map/spots/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -224,7 +225,7 @@ const Home = ({
     setLocked(false);
   };
   const handleReportSubmit = async (formData, occupied) => {
-    const response = await fetch("http://localhost:3000/report/create", {
+    const response = await fetch(`${base_URL}/report/create`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

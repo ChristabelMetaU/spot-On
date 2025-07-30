@@ -35,9 +35,8 @@ function getTimePenalty(hour) {
 }
 
 async function fetchReports(lat, lng) {
-  const res = await fetch(
-    `http://localhost:3000/report/spot/latlng/${lat}/${lng}`
-  );
+  const base_URL = import.meta.env.VITE_BACKEND_URL;
+  const res = await fetch(`${base_URL}/report/spot/latlng/${lat}/${lng}`);
   if (!res.ok) {
     throw new Error("Failed to fetch reports");
   } else {
@@ -68,8 +67,9 @@ function calculatePriority(cost, heuristic, urgencyFactor = 1) {
 }
 
 export async function getDrivingData(lat1, lng1, lat2, lng2) {
+  const base_URL = import.meta.env.VITE_BACKEND_URL;
   const res = await fetch(
-    `http://localhost:3000/report/spot/direction/${lat1}/${lat2}/${lng1}/${lng2}`
+    `${base_URL}/report/spot/direction/${lat1}/${lat2}/${lng1}/${lng2}`
   );
   const data = await res.json();
   if (!data) {
