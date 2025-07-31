@@ -79,6 +79,10 @@ const RouteDetails = ({
         radius += 200;
         continue;
       }
+      if (radius > 4655000) {
+        setError("No spots found near destination");
+        return;
+      }
       tempSpots = data;
       setFreeSpots(nearByFreeSpots);
       return nearByFreeSpots;

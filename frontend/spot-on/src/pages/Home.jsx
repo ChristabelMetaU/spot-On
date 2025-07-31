@@ -131,6 +131,10 @@ const Home = ({
           } else {
             raduis += 200;
           }
+          //checl if raduis is too big which means no spot exist
+          if (raduis > 4655000) {
+            return;
+          }
         } else {
           tempSPots = data;
           setSpots(data);
