@@ -20,7 +20,7 @@ const app = express();
 const RedisStore = connectRedis.RedisStore;
 const redisClient = redis.createClient({ url: process.env.REDIS_URL });
 redisClient.on("error", (err) => {
-  console.error("Redis Client Error", err);
+  throw err;
 });
 async function startRedis() {
   await redisClient.connect();
