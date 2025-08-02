@@ -45,11 +45,9 @@ const SearchForSpot = ({
           type="text"
           name="spot"
           placeholder={
-            mode === "route"
-              ? "Search for Parking spots"
-              : mode === "Home"
+            mode === "Home"
               ? "Search for your favorite spot"
-              : "Vieww your spot's prediction"
+              : "Search for a spot to update"
           }
           value={searchKeyword}
           onChange={handleSearch}
