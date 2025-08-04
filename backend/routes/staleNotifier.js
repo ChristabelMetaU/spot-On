@@ -62,7 +62,7 @@ module.exports = function sendReminder(wss) {
     } catch (err) {
       console.error("Error in reminder cron job:", err);
     } finally {
-      const duration = Date.now() - start;
+      await prisma.$disconnect();
     }
   });
 };

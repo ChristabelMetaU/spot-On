@@ -65,7 +65,6 @@ const RouteDetails = ({
   const [viewedSpots, setViewedSpots] = useState([]);
   const [clusteredLots, setClusteredLots] = useState([]);
   const [openClusterIndex, setOpenClusterIndex] = useState(null);
-
   const fetchSpotsCloseToDestination = async () => {
     let tempSpots = [];
     let radius = 200;
@@ -90,9 +89,28 @@ const RouteDetails = ({
   };
 
   const loadPaths = async (nearByFreeSpots, value) => {
+    const N = 30;
+    const candidates = nearByFreeSpots
+      .map((spot) => ({
+        ...spot,
+        distToUser: getDistance(
+          userLocation.lat,
+          userLocation.lng,
+          spot.coordLat,
+          spot.coordLng
+        ),
+        distToDest: getDistance(
+          destinationLocation.lat,
+          destinationLocation.lng,
+          spot.coordLat,
+          spot.coordLng
+        ),
+      }))
+      .sort((a, b) => a.distToUser - b.distToUser)
+      .slice(0, N);
     const { userNode, spotNodes } = await buildGraph(
       userLocation,
-      nearByFreeSpots,
+      candidates,
       destinationLocation
     );
     const allPaths = dynamicPathFinder(userNode, spotNodes);
@@ -257,7 +275,6 @@ const RouteDetails = ({
       isDriving
     );
     setEndLocation(path.path[path.path.length - 1]);
-    setShowRouteList(false);
   };
   return (
     <>
@@ -426,7 +443,7 @@ const RouteDetails = ({
             ))}
           </div>
         )}
-
+        {showRouteList && loaded && <h2>Your best spots from best to worst</h2>}
         {showRouteList &&
           loaded &&
           clusteredLots.map((cluster, index) => (

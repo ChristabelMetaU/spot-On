@@ -184,7 +184,6 @@ body {
   margin-top: 1.5rem;
   min-height: calc(100vh - 200px);
   flex-direction: column;
-  max-width: 2000px;
 }
 .map-title {
   background-color: #1c2e46;
@@ -238,6 +237,10 @@ body {
   display: flex;
   flex-direction: column;
 }
+.quick-actions {
+  color: #1c2e46;
+  width: 100%;
+}
 .actions-body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -256,6 +259,13 @@ body {
   font-weight: 600;
 }
 
+.actions-div p {
+  margin: 0;
+  margin-bottom: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .report-btn {
   background: var(--nav-color);
   color: #fff;

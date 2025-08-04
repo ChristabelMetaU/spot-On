@@ -5,11 +5,9 @@ import "../styles/Fab.css";
 const Fab = () => {
   const navigate = useNavigate();
   return (
-    <TooltipWrapper text="Find best route to spot of your choice">
-      <button className="fab" onClick={() => navigate("/Home/RouteDetails")}>
-        <i className="fa-solid fa-car"></i>
-      </button>
-    </TooltipWrapper>
+    <button className="fab" onClick={() => navigate("/Home/RouteDetails")}>
+      <i className="fa-solid fa-car"></i>
+    </button>
   );
 };
 
