@@ -10,6 +10,8 @@ SpotOn is a real-time smart parking web app that helps users find, reserve, and 
 
 ## _Demo Video:_ [Watch on Loom](https://www.loom.com/share/bd8eb98b79404860a5f5e36f3399a6ed?sid=a0b16b89-0c41-459f-a31d-7a92c8eb199e)
 
+more on loom..
+
 ## Preview
 
 ## Links
